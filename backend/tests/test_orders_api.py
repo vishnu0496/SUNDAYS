@@ -1,6 +1,7 @@
 """
 Backend API Tests for Sundays Cookie Website
-Tests: POST /api/orders, GET /api/orders, GET /api/
+Tests: POST /api/orders, GET /api/orders, GET /api/, GET /api/config
+Includes: UPI payment fields, config endpoint
 """
 import pytest
 import requests
@@ -20,6 +21,27 @@ class TestHealthEndpoints:
         assert "message" in data
         assert data["message"] == "Sundays API"
         print(f"✓ API root returns: {data}")
+
+
+class TestConfigEndpoint:
+    """Test config endpoint for UPI settings"""
+    
+    def test_get_config(self):
+        """Test GET /api/config returns UPI configuration"""
+        response = requests.get(f"{BASE_URL}/api/config")
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Verify required fields
+        assert "upi_id" in data, "Config should contain upi_id"
+        assert "business_name" in data, "Config should contain business_name"
+        assert "whatsapp" in data, "Config should contain whatsapp"
+        
+        # Verify values
+        assert data["upi_id"] == "sundays@upi", f"Expected sundays@upi, got {data['upi_id']}"
+        assert data["business_name"] == "Sundays"
+        
+        print(f"✓ Config endpoint returns: {data}")
 
 
 class TestOrdersAPI:
@@ -54,7 +76,9 @@ class TestOrdersAPI:
             "assorted_boxes": 0,
             "assorted_selections": [],
             "total": 277,
-            "notes": f"Test order {unique_id}"
+            "notes": f"Test order {unique_id}",
+            "payment_reference": f"TXN_{unique_id}",
+            "payment_method": "upi"
         }
     
     @pytest.fixture
@@ -97,16 +121,22 @@ class TestOrdersAPI:
         assert "status" in data
         assert "created_at" in data
         
+        # Verify UPI payment fields
+        assert "payment_reference" in data, "Response should contain payment_reference"
+        assert "payment_method" in data, "Response should contain payment_method"
+        assert "payment_status" in data, "Response should contain payment_status"
+        
         # Verify data values
         assert data["customer_name"] == test_order_data["customer_name"]
         assert data["phone"] == test_order_data["phone"]
         assert data["address"] == test_order_data["address"]
         assert data["total"] == test_order_data["total"]
         assert data["status"] == "pending"
+        assert data["payment_method"] == "upi"
+        assert data["payment_status"] == "pending"
         assert len(data["items"]) == 2
         
-        print(f"✓ Order created with ID: {data['id']}")
-        return data
+        print(f"✓ Order created with ID: {data['id']}, Payment ref: {data['payment_reference']}")
     
     def test_create_assorted_order(self, assorted_order_data):
         """Test POST /api/orders with assorted box"""

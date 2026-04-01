@@ -14,7 +14,6 @@ from datetime import datetime, timezone
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
@@ -56,6 +55,8 @@ class OrderCreate(BaseModel):
     assorted_selections: List[AssortedItem] = []
     total: float
     notes: str = ""
+    payment_reference: str = ""
+    payment_method: str = "upi"
 
 class Order(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -68,6 +69,9 @@ class Order(BaseModel):
     assorted_selections: List[AssortedItem] = []
     total: float
     notes: str = ""
+    payment_reference: str = ""
+    payment_method: str = "upi"
+    payment_status: str = "pending"
     status: str = "pending"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -77,6 +81,14 @@ class Order(BaseModel):
 @api_router.get("/")
 async def root():
     return {"message": "Sundays API"}
+
+@api_router.get("/config")
+async def get_config():
+    return {
+        "upi_id": os.environ.get("UPI_ID", ""),
+        "business_name": "Sundays",
+        "whatsapp": "919177155540",
+    }
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
