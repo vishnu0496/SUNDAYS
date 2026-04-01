@@ -185,7 +185,7 @@ const Navbar = () => {
       </span>
 
       <motion.a
-        href={wa("a cookie")}
+        href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi! I'd like to place an order from Sundays 🍪")}`}
         target="_blank"
         rel="noopener noreferrer"
         data-testid="navbar-order-btn"
