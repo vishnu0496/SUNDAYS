@@ -1,0 +1,86 @@
+{
+  "theme": "dark",
+  "archetype": "5 (Jewel & Luxury)",
+  "design_philosophy": "Motion-first, high-end, moody, cinematic storytelling. The site must feel expensive, artisanal, and worth the wait.",
+  "colors": {
+    "primary": "#C9A84C",
+    "primary_hover": "#DCC275",
+    "background_base": "#0A140E",
+    "background_surface": "#1C3A2A",
+    "background_elevated": "#254836",
+    "text_primary": "#FDFBF7",
+    "text_secondary": "#A9B8AF",
+    "border_subtle": "rgba(201, 168, 76, 0.2)",
+    "overlay": "rgba(10, 20, 14, 0.6)"
+  },
+  "typography": {
+    "font_family_headings": "Playfair Display, serif",
+    "font_family_body": "Manrope, sans-serif",
+    "h1": "text-5xl sm:text-6xl lg:text-7xl font-light tracking-tighter leading-none text-[#FDFBF7]",
+    "h2": "text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-[#C9A84C]",
+    "h3": "text-2xl sm:text-3xl font-light text-[#FDFBF7]",
+    "body": "text-base sm:text-lg font-light leading-relaxed text-[#FDFBF7]/90",
+    "overline": "text-xs sm:text-sm uppercase tracking-[0.2em] font-medium text-[#C9A84C]"
+  },
+  "layout_and_spacing": {
+    "container_padding": "px-6 md:px-12 lg:px-24",
+    "section_spacing": "py-24 md:py-32 lg:py-48",
+    "grid_bento": "grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8",
+    "corners": "rounded-none",
+    "surfaces": "bg-[#1C3A2A]/40 backdrop-blur-sm border border-[#C9A84C]/20"
+  },
+  "motion_and_interactions": {
+    "scroll_library": "lenis",
+    "animation_library": "framer-motion",
+    "parallax_scrolling": "Use Framer Motion's useScroll and useTransform for smooth y-axis translations on background elements and floating cookie images.",
+    "hover_menu_items": "On hover, images must subtly zoom (scale 1.05) and brighten (filter: brightness 1.15). Transitions should be smooth (duration-500 ease-out).",
+    "buttons": "Gold buttons should have a soft glow on hover and scale slightly (scale 0.98 on tap).",
+    "staggered_entrances": "List items and grid cards should fade and slide up sequentially on scroll."
+  },
+  "sections": [
+    {
+      "name": "Navigation",
+      "style": "Fixed top, glassmorphism (bg-[#0A140E]/80 backdrop-blur-md), minimal links, 'Order Now' CTA in Gold."
+    },
+    {
+      "name": "Hero",
+      "style": "Full height (h-screen). Background video loop of gooey chocolate cookies in slow motion (absolute inset-0, object-cover). Dark overlay (bg-[#0A140E]/60). Center aligned text: 'Sundays' (H1) and 'The 24-Hour Cookie' (Overline)."
+    },
+    {
+      "name": "The Process",
+      "style": "Scrollable timeline. 4 steps: Browning → Mixing → 24hr Chilling → Baking. As user scrolls, text stays sticky while parallax images of the process slide in from the side or bottom."
+    },
+    {
+      "name": "The Shop",
+      "style": "Showcase of 3 large flavor cards (e.g., The OG, The Minis, Rich & Reckless). Dark green surface cards. Image takes up 60% of card, title and description below. 'Order on WhatsApp' button in solid Gold (#C9A84C) with dark text."
+    },
+    {
+      "name": "Footer",
+      "style": "Massive typography, brand statement, rich dark spacing (py-32 bg-[#0A140E])."
+    }
+  ],
+  "components_to_use": {
+    "html_native": ["section", "div", "header", "footer", "video"],
+    "lucide_icons": ["MessageCircle", "ArrowRight", "ChevronDown"]
+  },
+  "media": {
+    "hero_video": "https://assets.mixkit.co/videos/preview/mixkit-chocolate-chip-cookies-in-a-pile-39420-large.mp4",
+    "hero_video_fallback": "https://images.unsplash.com/photo-1620499634096-3dfa6ecdc5c7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxnb29leSUyMGNob2NvbGF0ZSUyMGNoaXAlMjBjb29raWUlMjBkYXJrfGVufDB8fHx8MTc3NTA0MzQxOHww&ixlib=rb-4.1.0&q=85",
+    "process_browning": "https://images.unsplash.com/photo-1758874960608-f0d7f38d9846?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxjb29raWUlMjBkb3VnaCUyMG1peGluZyUyMGJvd2x8ZW58MHx8fHwxNzc1MDQzNDI3fDA&ixlib=rb-4.1.0&q=85",
+    "process_mixing": "https://images.unsplash.com/photo-1772915516557-2d57f94b0bd0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxjb29raWUlMjBkb3VnaCUyMG1peGluZyUyMGJvd2x8ZW58MHx8fHwxNzc1MDQzNDI3fDA&ixlib=rb-4.1.0&q=85",
+    "process_chilling": "https://images.unsplash.com/photo-1687549181635-e795cefee8b5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w8NjA1NTN8MHwxfHNlYXJjaHwzfHxkYXJrJTIwY2hvY29sYXRlJTIwY29va2llJTIwbWFjcm98ZW58MHx8fHwxNzc1MDQzNDI3fDA&ixlib=rb-4.1.0&q=85",
+    "process_baking": "https://images.unsplash.com/photo-1737674879060-7be2f5198aab?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwyfHxnb29leSUyMGNob2NvbGF0ZSUyMGNoaXAlMjBjb29raWUlMjBkYXJrfGVufDB8fHx8MTc3NTA0MzQxOHww&ixlib=rb-4.1.0&q=85",
+    "cookie_card_1": "https://images.pexels.com/photos/13815330/pexels-photo-13815330.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "cookie_card_2": "https://images.unsplash.com/photo-1504472893907-7f577b7c9beb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwyfHxjaG9jb2xhdGUlMjBjaGlwJTIwY29va2llJTIwc3RhY2t8ZW58MHx8fHwxNzc1MDQzNDI1fDA&ixlib=rb-4.1.0&q=85",
+    "cookie_card_3": "https://images.pexels.com/photos/20509471/pexels-photo-20509471.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+  },
+  "instructions_to_main_agent": [
+    "Strictly use the provided color codes: #1C3A2A (Forest Night Green) for backgrounds and #C9A84C (Antique Gold) for accents.",
+    "Implement the Hero background video loop with a fallback image. Make sure the overlay bg-[#0A140E]/60 is used so text is legible.",
+    "For the Process timeline, use Framer Motion to create a sticky scrolling effect where images slide up with a parallax feel while text remains visible.",
+    "The 3 flavor cards in The Shop section must include a 'Order on WhatsApp' gold button.",
+    "All interactive elements (buttons, cards) must have the requested hover state: scale 1.05 and filter: brightness(1.15) for images.",
+    "Add 'data-testid' to all interactive elements, e.g., 'data-testid=\"order-whatsapp-button\"'.",
+    "Do NOT use 'Inter' font. Use Playfair Display for headings and Manrope for body text via Google Fonts."
+  ]
+}
