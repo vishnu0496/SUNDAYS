@@ -5,9 +5,10 @@ import "./App.css";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const WHATSAPP = "919177155540";
+// Use web.whatsapp.com directly to avoid api.whatsapp.com blocks
 const wa = (cookieName) =>
-  `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-    `Hi! I'd like to order "${cookieName}" from Sundays 🍪`
+  `https://web.whatsapp.com/send?phone=${WHATSAPP}&text=${encodeURIComponent(
+    `Hi! I'd like to order "${cookieName}" from Sundays`
   )}`;
 
 const C = {
@@ -185,7 +186,7 @@ const Navbar = () => {
       </span>
 
       <motion.a
-        href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi! I'd like to place an order from Sundays 🍪")}`}
+        href={`https://web.whatsapp.com/send?phone=${WHATSAPP}&text=${encodeURIComponent("Hi! I'd like to place an order from Sundays")}`}
         target="_blank"
         rel="noopener noreferrer"
         data-testid="navbar-order-btn"
@@ -727,8 +728,8 @@ const FooterSection = () => (
             Place an order
           </p>
           <motion.a
-            href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-              "Hi! I'd like to place an order from Sundays 🍪"
+            href={`https://web.whatsapp.com/send?phone=${WHATSAPP}&text=${encodeURIComponent(
+              "Hi! I'd like to place an order from Sundays"
             )}`}
             target="_blank"
             rel="noopener noreferrer"
