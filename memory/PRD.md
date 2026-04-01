@@ -1,6 +1,6 @@
 # Sundays — Premium Cookie Brand Website
 **Date Created:** 2025-01-01  
-**Last Updated:** 2025-01-01
+**Last Updated:** 2026-04-01
 
 ## Original Problem Statement
 Create a high-end, single-page "Motion-First" website for "Sundays," a premium cookie brand.
@@ -11,64 +11,82 @@ Create a high-end, single-page "Motion-First" website for "Sundays," a premium c
 
 ## User Inputs
 - WhatsApp: +919177155540
-- 7 Cookie SKUs across 5 categories
-- High-quality chocolate chip cookie making video for hero
+- Instagram: https://www.instagram.com/sundays.hyd/
+- 7 Cookie SKUs across 2 categories (Always Available + Exclusive)
+- Pricing provided per cookie/pack
+- Assorted box of 6 for ₹649
+- 10% off for first-time social media tag
+- All cookies contain eggs
+- Delivery only, confirmation via WhatsApp
 
 ## Architecture
-- **Frontend Only** — React SPA (no backend needed)
-- **Animations:** framer-motion (v12)
+- **Frontend:** React SPA with Framer Motion
+- **Backend:** FastAPI + MongoDB (orders)
 - **Fonts:** Playfair Display (serif, headings) + Manrope (sans, body)
 - **Colors:** #0A140E (bg), #1C3A2A (surface), #C9A84C (gold), #FDFBF7 (text)
 
-## What's Been Implemented (v1.0 — 2025-01-01)
+## What's Been Implemented
 
-### Sections
-1. **Navbar** — Fixed glassmorphism, SUNDAYS wordmark, gold "Order Now" WhatsApp CTA
-2. **Hero** — Full-screen video loop (Mixkit chocolate chip cookies), parallax + fade-out on scroll
-3. **Intro** — Philosophy copy, 4 animated stats (24h, 7, 0, ∞)
-4. **Process** — 4 alternating image/text timeline steps (Browning → Mixing → 24hr Chilling → Baking)
-5. **Shop** — 5 category groups, 7 cookie cards with hover zoom/brighten + gold WhatsApp order buttons
-6. **Footer** — Massive Sundays typographic branding + WhatsApp CTA
+### v1.0 — Initial MVP (2025-01-01)
+- Static site with hero video, process timeline, 7 cookie cards
+- WhatsApp click-to-chat ordering
+
+### v2.0 — Full Ordering System (2026-04-01)
+- **Shop restructured**: "Always Available" (Lazy Legend + Little Rebels) and "Exclusive Flavours" (5 cookies)
+- **Pricing on all cards**: ₹89, ₹99, ₹109, ₹219/pack
+- **Quantity selector** (1, 2, 4, 6) on all cookies except minis
+- **Weight info**: 65g before baking (regular), 12g each (minis)
+- **Egg allergen badge** on all cards
+- **Cart system**: Add to cart, update qty, remove items, cart panel slide-over
+- **Assorted Box builder**: Pick 6 from all regular flavors for ₹649
+- **Order form**: Name, phone (+91 validation), delivery address, notes
+- **Backend API**: POST /api/orders, GET /api/orders (MongoDB storage)
+- **Order success overlay** with WhatsApp confirmation message
+- **10% off promo section** for Instagram tagging @sundays.hyd
+- **Instagram link** in navbar and footer
+- **Delivery only** messaging throughout
+- **Toast notifications** (Sonner) for cart actions
 
 ### Cookie SKUs
-| Category | Name | Flavor |
-|---|---|---|
-| The OG | The Lazy Legend | Classic Choco Chip |
-| The Minis | Little Rebels | Mini Choco Bites |
-| Rotation 1 | The Dark Side | Oreo Cookies & Cream |
-| Rotation 1 | The After Hours | Double Dark & Sea Salt |
-| Rotation 2 | The Golden Affair | Lotus Biscoff |
-| Rotation 2 | The Midnight Meltdown | S'mores |
-| Rich & Reckless | Nutella Lava | Hazelnut Chocolate |
-
-### Motion Features
-- ✅ Parallax scrolling (hero video + process images via `useScroll/useTransform`)
-- ✅ Scroll-triggered fade + slide animations (`whileInView`)
-- ✅ Hover zoom (scale 1.07) + brighten (brightness 1.18) on cookie card images
-- ✅ Staggered entrance animations on stats and cards
-- ✅ Bouncing scroll indicator chevron
+| Section | Name | Flavor | Price | Weight |
+|---|---|---|---|---|
+| Always Available | The Lazy Legend | Classic Choco Chip | ₹89/cookie | 65g |
+| Always Available | Little Rebels | Mini Choco Bites | ₹219/pack | 12g each |
+| Exclusive | The Dark Side | Oreo Cookies & Cream | ₹99/cookie | 65g |
+| Exclusive | The After Hours | Double Dark & Sea Salt | ₹89/cookie | 65g |
+| Exclusive | The Golden Affair | Lotus Biscoff | ₹109/cookie | 65g |
+| Exclusive | The Midnight Meltdown | S'mores | ₹109/cookie | 65g |
+| Exclusive | Nutella Lava | Hazelnut Chocolate | ₹109/cookie | 65g |
 
 ## Prioritized Backlog
 
 ### P0 — Core (DONE)
 - [x] Hero video background
-- [x] All 7 cookie cards with WhatsApp links
+- [x] All 7 cookie cards with correct pricing
 - [x] Process timeline
 - [x] Animations (parallax, hover, scroll-triggered)
+- [x] Cart + Order system
+- [x] Assorted box of 6
+- [x] Backend order API
+- [x] Instagram integration
+- [x] 10% promo section
 
 ### P1 — Enhancements
-- [ ] Instagram link in footer (user to provide handle)
-- [ ] Pricing on cookie cards (user to provide prices)
+- [ ] Admin dashboard to view/manage orders
+- [ ] Order status tracking
 - [ ] Lightbox/modal for cookie detail view
-- [ ] Menu navigation links in navbar (Process, Shop)
-- [ ] Scroll-based active section highlighting
+- [ ] Scroll-based active section highlighting in navbar
 
 ### P2 — Future
-- [ ] Custom cookie order form
+- [ ] Payment integration (Razorpay)
 - [ ] Gallery/testimonials section
 - [ ] SEO meta tags
+- [ ] Loyalty/repeat customer tracking
 
 ## Files
-- `/app/frontend/src/App.js` — All components
-- `/app/frontend/src/App.css` — Typography + grain texture + scrollbar
-- `/app/frontend/src/index.css` — Tailwind base + CSS variables
+- `/app/frontend/src/App.js` — Main app with all sections
+- `/app/frontend/src/components/CartPanel.jsx` — Cart slide panel
+- `/app/frontend/src/components/OrderModal.jsx` — Order form modal
+- `/app/frontend/src/App.css` — Typography + grain texture
+- `/app/frontend/src/index.css` — Tailwind base
+- `/app/backend/server.py` — FastAPI with order endpoints
