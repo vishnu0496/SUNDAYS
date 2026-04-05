@@ -1232,7 +1232,7 @@ function CheckoutPage() {
         <h1 className="sundays-heading text-4xl text-[#FDFBF7] mb-10">Checkout</h1>
         <CheckoutStageHeader currentStep={checkoutStep} onStepClick={(stepNumber) => setCheckoutStep(stepNumber < 3 ? stepNumber : checkoutStep)} />
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form id="checkout-form" onSubmit={handleSubmit} className="space-y-8">
           {checkoutStep === 1 ? (
             <>
               <div className="p-6" style={{ background: 'rgba(253,251,247,0.02)', border: `1px solid ${C.borderLight}` }}>
@@ -1341,10 +1341,6 @@ function CheckoutPage() {
                   style={{ ...inputStyle(false), resize: 'none' }} />
               </div>
 
-              <button type="submit" disabled={submitting} className="w-full py-4 text-sm font-bold tracking-[0.12em] uppercase transition-all"
-                style={{ background: C.gold, color: C.bg, fontFamily: 'Manrope, sans-serif', opacity: submitting ? 0.6 : 1 }}>
-                {submitting ? 'Processing...' : 'Continue to Payment'}
-              </button>
             </>
           )}
         </form>
@@ -1357,7 +1353,7 @@ function CheckoutPage() {
               <div key={item.id} className="flex items-center gap-4">
                 <img src={item.image} alt={item.name} className="w-12 h-12 object-cover shrink-0" style={{ filter: 'brightness(0.85)' }} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ fontFamily: 'Manrope, sans-serif' }}>{item.name}</p>
+                  <p className="text-sm font-medium truncate" style={{ color: C.text, fontFamily: 'Manrope, sans-serif' }}>{item.name}</p>
                   <p className="text-xs" style={{ color: C.muted }}>{item.subtitle}</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1380,6 +1376,11 @@ function CheckoutPage() {
             </div>
           </div>
         </div>
+
+        <button type="submit" form="checkout-form" disabled={submitting} className="w-full mt-8 py-4 text-sm font-bold tracking-[0.12em] uppercase transition-all"
+          style={{ background: C.gold, color: C.bg, fontFamily: 'Manrope, sans-serif', opacity: submitting ? 0.6 : 1 }}>
+          {submitting ? 'Processing...' : 'Continue to Payment'}
+        </button>
       </div>
     </div>
   );
