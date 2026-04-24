@@ -39,7 +39,14 @@ export function Header() {
             className="text-xl md:text-2xl font-serif font-bold flex items-center uppercase"
           >
             <span className="text-white">SUN</span>
-            <span className="text-gold">DAYS</span>
+            <motion.span 
+              initial={{ marginLeft: "0.1em" }}
+              animate={{ marginLeft: "0.3em" }}
+              transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1] }}
+              className="text-gold"
+            >
+              DAYS
+            </motion.span>
           </motion.h1>
 
           <div className="hidden md:flex gap-10 items-center text-[12px] tracking-widest font-bold text-cream uppercase">
