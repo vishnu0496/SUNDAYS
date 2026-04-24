@@ -72,6 +72,83 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDraw
     window.open(`https://wa.me/919177155540?text=${message}`, "_blank");
   };
 
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+
+  const handleCompleteOrder = async () => {
+    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+      alert("Please fill in all delivery details.");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer: {
+            firstName: formData.name.split(' ')[0],
+            email: formData.email,
+            whatsapp: formData.phone,
+            addressHouse: formData.address,
+            addressLocality: "Hyderabad",
+            addressCity: "Hyderabad",
+            addressState: "Telangana",
+            addressPincode: "500001",
+          },
+          items: cart.map(item => ({
+            name: item.packName,
+            quantity: 1,
+            price: item.price,
+            selections: item.selections
+          })),
+          subtotal,
+          delivery,
+          total
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setOrderSuccess(true);
+        // After sending email, we can still open WhatsApp as a courtesy
+        handleWhatsAppOrder();
+      } else {
+        alert(result.error || "Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Order error:", error);
+      alert("Failed to connect to server. Check your connection.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  if (orderSuccess) {
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 bg-black/80 z-[100]" onClick={onClose} />
+            <motion.div 
+              initial={{ x: "100%" }} animate={{ x: 0 }}
+              className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-[#050D0A] z-[101] flex flex-col items-center justify-center p-12 text-center"
+            >
+              <div className="w-24 h-24 bg-gold/10 rounded-full flex items-center justify-center mb-8 border border-gold/20">
+                <svg className="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+              <h2 className="text-4xl font-serif text-white mb-4">Order Reserved</h2>
+              <p className="text-tan/60 text-lg mb-10 font-serif italic">Check your email for your receipt. We are preparing your box of joy!</p>
+              <button onClick={onClose} className="premium-button w-full py-6">Back to Sundays</button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    );
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -236,10 +313,18 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDraw
                 </button>
               ) : (
                 <button 
-                  onClick={handleWhatsAppOrder}
-                  className="premium-button w-full py-6 flex items-center justify-center gap-3"
+                  onClick={handleCompleteOrder}
+                  disabled={isProcessing}
+                  className="premium-button w-full py-6 flex items-center justify-center gap-3 disabled:opacity-50"
                 >
-                  Send Order via WhatsApp
+                  {isProcessing ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Confirm & Send Order'
+                  )}
                 </button>
               )}
             </div>

@@ -1,15 +1,7 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { OrderEntry } from "./storage";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "",
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: process.env.SMTP_PORT === "465",
-  auth: {
-    user: process.env.SMTP_USER || "",
-    pass: process.env.SMTP_PASS || "",
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = process.env.EMAIL_FROM || "Sundays <noreply@sundays.xyz>";
 const OWNER_EMAIL = process.env.OWNER_NOTIFICATION_EMAIL || "sundayshyd@gmail.com";
@@ -212,7 +204,7 @@ Follow the drop — instagram.com/sundays.hyd`;
 </body>
 </html>`;
 
-  return transporter.sendMail({
+  return resend.emails.send({
     from: FROM_EMAIL,
     to: data.customer.email,
     subject,
@@ -373,7 +365,7 @@ Received: ${receivedAt}`;
 </body>
 </html>`;
 
-  return transporter.sendMail({
+  return resend.emails.send({
     from: FROM_EMAIL,
     to: OWNER_EMAIL,
     subject,
