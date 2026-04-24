@@ -55,7 +55,7 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
   const updateQuantity = (packId: string, cookieName: string, delta: number) => {
     const pack = PACKS.find(p => p.id === packId)!;
     const currentTotal = getPackTotal(packId);
-    
+
     if (delta > 0 && currentTotal >= pack.maxCookies) return;
     if (delta < 0 && selections[packId][cookieName] <= 0) return;
 
@@ -81,8 +81,8 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
 
         <div className="grid lg:grid-cols-2 gap-gap-md max-w-7xl mx-auto">
           {PACKS.map((pack, idx) => (
-            <motion.div 
-              key={pack.id} 
+            <motion.div
+              key={pack.id}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -90,9 +90,9 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
               className="glass-card group overflow-hidden flex flex-col"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
-                <img 
-                  src={pack.image} 
-                  alt={pack.name} 
+                <img
+                  src={pack.image}
+                  alt={pack.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-transparent to-transparent opacity-80" />
@@ -112,26 +112,26 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
 
                 <div className="space-y-6 flex-grow">
                   <div className="flex justify-between items-end border-b border-gold/10 pb-5 mb-5">
-                    <p className="text-tan text-[9px] tracking-[0.4em] uppercase font-bold">
+                    <p className="text-tan text-[11px] tracking-[0.3em] uppercase font-bold">
                       CHOOSE {pack.maxCookies} COOKIES
                     </p>
-                    <p className="text-cream/30 text-[9px] tracking-widest uppercase">
+                    <p className="text-cream/30 text-[11px] tracking-widest uppercase">
                       Selected: <span className="text-tan font-bold">{getPackTotal(pack.id)} / {pack.maxCookies}</span>
                     </p>
                   </div>
-                  
+
                   {COOKIES.map((cookie) => (
                     <div key={cookie.name} className="flex items-center justify-between py-2 group/row">
                       <div className="max-w-[65%]">
-                        <p className="text-cream font-medium text-lg mb-1 group-hover/row:text-tan transition-colors duration-300 tracking-wide">
+                        <p className="text-cream font-medium text-xl mb-1 group-hover/row:text-tan transition-colors duration-300">
                           {cookie.name}
                         </p>
-                        <p className="font-serif-display text-cream-dim/30 text-xs italic">
+                        <p className="font-serif-display text-cream-dim/40 text-sm italic">
                           {cookie.description}
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
-                        <button 
+                        <button
                           onClick={() => updateQuantity(pack.id, cookie.name, -1)}
                           className="w-10 h-10 rounded-full border border-gold/10 flex items-center justify-center text-gold/40 hover:text-gold hover:border-gold hover:bg-gold/5 transition-all duration-300"
                         >
@@ -140,7 +140,7 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                         <span className="text-cream font-bold text-base w-4 text-center tabular-nums">
                           {selections[pack.id][cookie.name] || 0}
                         </span>
-                        <button 
+                        <button
                           onClick={() => updateQuantity(pack.id, cookie.name, 1)}
                           disabled={getPackTotal(pack.id) >= pack.maxCookies}
                           className="w-10 h-10 rounded-full border border-gold/10 flex items-center justify-center text-gold/40 hover:text-gold hover:border-gold hover:bg-gold/5 transition-all duration-300 disabled:opacity-5"
@@ -161,27 +161,26 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                     {[...Array(pack.id === "6-pack" ? 6 : 3)].map((_, i) => {
                       const filledSlots: string[] = [];
                       Object.entries(selections[pack.id]).forEach(([name, count]) => {
-                        for(let j=0; j<count; j++) filledSlots.push(name);
+                        for (let j = 0; j < count; j++) filledSlots.push(name);
                       });
-                      
+
                       const isFreeSlot = pack.id === "6-pack" && i === 5;
                       const cookieType = filledSlots[i];
-                      
+
                       return (
-                        <motion.div 
+                        <motion.div
                           key={i}
                           initial={false}
-                          animate={{ 
+                          animate={{
                             scale: cookieType || (isFreeSlot && filledSlots.length >= 5) ? 1.1 : 1,
-                            backgroundColor: cookieType === "Chocolate Chip" ? "#C7A44C" : 
-                                            cookieType === "Nutella Stuffed" ? "#4B3621" :
-                                            cookieType === "Lemon Crinkle" ? "#FDFD96" : 
-                                            (isFreeSlot && filledSlots.length >= 5) ? "#C7A44C" : "transparent",
-                            boxShadow: cookieType || (isFreeSlot && filledSlots.length >= 5) ? `0 0 15px ${
-                              cookieType === "Chocolate Chip" ? "rgba(199,164,76,0.3)" : 
-                              cookieType === "Nutella Stuffed" ? "rgba(75,54,33,0.3)" :
-                              "rgba(253,253,150,0.3)"
-                            }` : "none"
+                            backgroundColor: cookieType === "Chocolate Chip" ? "#C7A44C" :
+                              cookieType === "Nutella Stuffed" ? "#4B3621" :
+                                cookieType === "Lemon Crinkle" ? "#FDFD96" :
+                                  (isFreeSlot && filledSlots.length >= 5) ? "#C7A44C" : "transparent",
+                            boxShadow: cookieType || (isFreeSlot && filledSlots.length >= 5) ? `0 0 15px ${cookieType === "Chocolate Chip" ? "rgba(199,164,76,0.3)" :
+                                cookieType === "Nutella Stuffed" ? "rgba(75,54,33,0.3)" :
+                                  "rgba(253,253,150,0.3)"
+                              }` : "none"
                           }}
                           className={`w-8 h-8 rounded-full border ${cookieType || (isFreeSlot && filledSlots.length >= 5) ? "border-transparent" : "border-gold/20"} flex items-center justify-center text-[8px] font-bold`}
                         >
