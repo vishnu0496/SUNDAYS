@@ -32,10 +32,15 @@ export function Header() {
 
       <nav className="h-16 flex items-center border-b border-gold/5 bg-deep-forest sticky top-10 z-[100]">
         <div className="container mx-auto px-6 flex justify-between items-center">
-          <h1 className="text-xl md:text-2xl font-serif tracking-widest font-bold flex items-center">
+          <motion.h1 
+            initial={{ letterSpacing: "0.2em", opacity: 0 }}
+            animate={{ letterSpacing: "0.5em", opacity: 1 }}
+            transition={{ duration: 2, ease: "easeOut" }}
+            className="text-xl md:text-2xl font-serif font-bold flex items-center uppercase"
+          >
             <span className="text-white">SUN</span>
-            <span className="text-gold ml-1">DAYS</span>
-          </h1>
+            <span className="text-gold ml-2">DAYS</span>
+          </motion.h1>
 
           <div className="hidden md:flex gap-10 items-center text-[12px] tracking-widest font-bold text-cream uppercase">
             <a href="#menu" className="hover:text-gold transition-colors">Menu</a>
