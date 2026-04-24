@@ -32,15 +32,49 @@ export function Header() {
 
       <nav className="h-16 flex items-center border-b border-gold/5 bg-deep-forest sticky top-10 z-[100]">
         <div className="container mx-auto px-6 flex justify-between items-center">
-          <motion.h1 
-            initial={{ letterSpacing: "0.2em", opacity: 0 }}
-            animate={{ letterSpacing: "0.5em", opacity: 1 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-            className="text-xl md:text-2xl font-serif font-bold flex items-center uppercase"
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.1 } }
+            }}
+            className="flex items-center text-xl md:text-2xl font-serif font-bold tracking-[0.2em] uppercase"
           >
-            <span className="text-white">SUN</span>
-            <span className="text-gold ml-2">DAYS</span>
-          </motion.h1>
+            {/* SUN */}
+            <div className="flex text-white">
+              {["S", "U", "N"].map((letter, i) => (
+                <motion.span
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    visible: { opacity: 1, y: 0 }
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  {letter}
+                </motion.span>
+              ))}
+            </div>
+            
+            {/* Gap */}
+            <span className="mx-1.5" />
+
+            {/* DAYS */}
+            <div className="flex text-gold">
+              {["D", "A", "Y", "S"].map((letter, i) => (
+                <motion.span
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    visible: { opacity: 1, y: 0 }
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  {letter}
+                </motion.span>
+              ))}
+            </div>
+          </motion.div>
 
           <div className="hidden md:flex gap-10 items-center text-[12px] tracking-widest font-bold text-cream uppercase">
             <a href="#menu" className="hover:text-gold transition-colors">Menu</a>
