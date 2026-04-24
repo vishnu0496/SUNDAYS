@@ -38,15 +38,13 @@ function addressLines(c: OrderEntry["customer"]): string[] {
 }
 
 function dropLabel(orderNumber: string): string {
-  // "DRP01-007" → "Drop 01"
-  const match = orderNumber.match(/^DRP(\d+)/);
-  return match ? `Drop ${match[1]}` : "Drop";
+  return "Boutique Bakery";
 }
 
 // ── Customer Confirmation Email ───────────────────────────────────────────────
 
 export async function sendCustomerOrderConfirmation(data: OrderEntry) {
-  const subject = `Your Sundays order is reserved — ${data.orderNumber}`;
+  const subject = `Order Confirmed — ${data.orderNumber} | Sundays`;
 
   const addrLines = addressLines(data.customer);
   const addrHtml = addrLines.join("<br>");
@@ -74,7 +72,7 @@ export async function sendCustomerOrderConfirmation(data: OrderEntry) {
   const textBody = `
 Thank you, ${data.customer.firstName}.
 
-Your place in this week's drop has been reserved. Here is a copy of your order.
+We've received your order and we're getting ready to bake your handcrafted treats.
 
 ORDER: ${data.orderNumber}
 ${itemsText}
@@ -87,14 +85,14 @@ Delivering to:
 ${addrText}
 
 WHAT HAPPENS NEXT:
-01  We review this week's orders and confirm your slot.
-02  When checkout opens, we'll send payment details to this address. Nothing on your end until then.
-03  After payment, your batch is baked fresh and delivered to you in Hyderabad.
+01  We confirm your order details and delivery window.
+02  Your cookies are baked fresh specifically for your order.
+03  Your box is hand-delivered to your doorstep in Hyderabad.
 
 Until then,
 Team Sundays
 
-Follow the drop — instagram.com/sundays.hyd`;
+Follow the bake — instagram.com/sundays.hyd`;
 
   const htmlBody = `
 <!DOCTYPE html>
@@ -110,9 +108,9 @@ Follow the drop — instagram.com/sundays.hyd`;
         <!-- Header -->
         <tr>
           <td style="background-color:#163126; padding: 44px 40px 38px; text-align:center; border-bottom: 2px solid #C7A44C;">
-            <p style="margin:0 0 14px; font-family:Arial,Helvetica,sans-serif; font-size:9px; letter-spacing:5px; text-transform:uppercase; color:#C7A44C;">This Week&rsquo;s Drop &middot; ${dropLabel(data.orderNumber)}</p>
+            <p style="margin:0 0 14px; font-family:Arial,Helvetica,sans-serif; font-size:9px; letter-spacing:5px; text-transform:uppercase; color:#C7A44C;">The Art of the Cookie &middot; Hyderabad</p>
             <h1 style="margin:0 0 14px; font-family:'Times New Roman',Times,serif; font-size:38px; font-weight:normal; color:#F6F0E7; letter-spacing:4px;">SUNDAYS</h1>
-            <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:10px; letter-spacing:3px; color:#C7A44C; opacity:0.8;">${data.orderNumber}</p>
+            <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:10px; letter-spacing:3px; color:#C7A44C; opacity:0.8;">ORDER ${data.orderNumber}</p>
           </td>
         </tr>
 
@@ -122,13 +120,13 @@ Follow the drop — instagram.com/sundays.hyd`;
 
             <!-- Greeting -->
             <p style="margin:0 0 6px; font-family:'Times New Roman',Times,serif; font-size:22px; color:#163126;">Thank you, ${data.customer.firstName}.</p>
-            <p style="margin:0 0 36px; font-family:'Times New Roman',Times,serif; font-size:17px; color:#163126; line-height:1.75; opacity:0.85;">Your place in this week&rsquo;s drop has been reserved. Below is a copy of your order &mdash; we will be in touch when checkout goes live. Nothing else is required from you until then.</p>
+            <p style="margin:0 0 36px; font-family:'Times New Roman',Times,serif; font-size:17px; color:#163126; line-height:1.75; opacity:0.85;">We&rsquo;ve received your order. Our bakers are preparing to handcraft your selection using the finest ingredients. Below is a copy of your order details.</p>
 
             <!-- Order Summary Card -->
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FAF7F2; border:1px solid #DDD0B8; margin-bottom:32px;">
               <tr>
                 <td style="padding: 24px 24px 0;">
-                  <p style="margin:0 0 16px; font-family:Arial,Helvetica,sans-serif; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:#9A7B4F; padding-bottom:14px; border-bottom:1px solid #DDD0B8;">Order Summary</p>
+                  <p style="margin:0 0 16px; font-family:Arial,Helvetica,sans-serif; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:#9A7B4F; padding-bottom:14px; border-bottom:1px solid #DDD0B8;">Your Selection</p>
                   <table width="100%" cellpadding="0" cellspacing="0" border="0">
                     ${itemsHtml}
                   </table>
@@ -172,26 +170,26 @@ Follow the drop — instagram.com/sundays.hyd`;
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;">
                   <tr>
                     <td width="28" style="vertical-align:top; padding-top:3px; font-family:Arial,Helvetica,sans-serif; font-size:9px; color:#C7A44C; font-weight:bold; letter-spacing:1px;">01</td>
-                    <td style="font-family:'Times New Roman',Times,serif; font-size:16px; color:#163126; line-height:1.7;">We review this week&rsquo;s orders and confirm your slot in the drop.</td>
+                    <td style="font-family:'Times New Roman',Times,serif; font-size:16px; color:#163126; line-height:1.7;">We confirm your order details and your specific delivery window.</td>
                   </tr>
                 </table>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;">
                   <tr>
                     <td width="28" style="vertical-align:top; padding-top:3px; font-family:Arial,Helvetica,sans-serif; font-size:9px; color:#C7A44C; font-weight:bold; letter-spacing:1px;">02</td>
-                    <td style="font-family:'Times New Roman',Times,serif; font-size:16px; color:#163126; line-height:1.7;">When checkout opens, we&rsquo;ll send payment details to this email address. Nothing happens on your end until then.</td>
+                    <td style="font-family:'Times New Roman',Times,serif; font-size:16px; color:#163126; line-height:1.7;">Your cookies are baked fresh to order using our signature recipes.</td>
                   </tr>
                 </table>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td width="28" style="vertical-align:top; padding-top:3px; font-family:Arial,Helvetica,sans-serif; font-size:9px; color:#C7A44C; font-weight:bold; letter-spacing:1px;">03</td>
-                    <td style="font-family:'Times New Roman',Times,serif; font-size:16px; color:#163126; line-height:1.7;">After payment, your batch is baked fresh and delivered to you in Hyderabad.</td>
+                    <td style="font-family:'Times New Roman',Times,serif; font-size:16px; color:#163126; line-height:1.7;">Your box is hand-delivered to your doorstep in Hyderabad.</td>
                   </tr>
                 </table>
               </td></tr>
             </table>
 
             <!-- Closing -->
-            <p style="margin:0 0 44px; font-family:'Times New Roman',Times,serif; font-size:17px; color:#163126; line-height:1.8;">Until then,<br><em>Team Sundays</em></p>
+            <p style="margin:0 0 44px; font-family:'Times New Roman',Times,serif; font-size:17px; color:#163126; line-height:1.8;">With joy,<br><em>Team Sundays</em></p>
 
           </td>
         </tr>
@@ -199,8 +197,8 @@ Follow the drop — instagram.com/sundays.hyd`;
         <!-- Footer CTA -->
         <tr>
           <td style="background-color:#163126; padding:32px 40px; text-align:center; border-top:2px solid #C7A44C;">
-            <a href="https://instagram.com/sundays.hyd" style="display:inline-block; padding:13px 30px; background-color:#C7A44C; color:#163126; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; text-decoration:none; border-radius:1px;">Follow the Drop on Instagram</a>
-            <p style="margin:18px 0 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#F6F0E7; opacity:0.35; letter-spacing:2px; text-transform:uppercase;">Sundays &middot; Hyderabad &middot; Baked Weekly</p>
+            <a href="https://instagram.com/sundays.hyd" style="display:inline-block; padding:13px 30px; background-color:#C7A44C; color:#163126; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; text-decoration:none; border-radius:1px;">Follow our Story</a>
+            <p style="margin:18px 0 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#F6F0E7; opacity:0.35; letter-spacing:2px; text-transform:uppercase;">Sundays &middot; Hyderabad &middot; Handcrafted Weekly</p>
           </td>
         </tr>
 
@@ -232,12 +230,11 @@ export async function sendOwnerOrderNotification(data: OrderEntry, previousOrder
     ? `Returning (${previousOrderCount} previous)`
     : "New customer";
 
-  const drop = dropLabel(data.orderNumber);
   const receivedAt = formatIST(data.timestamp);
   const totalItems = data.items.reduce((n, i) => n + i.quantity, 0);
   const addrLines = addressLines(data.customer);
 
-  const subject = `[${data.orderNumber}] ₹${data.total} — ${data.customer.firstName} (${customerLabelText})`;
+  const subject = `New Order: ₹${data.total} — ${data.customer.firstName} (${customerLabelText})`;
 
   const itemsHtml = data.items
     .map(
@@ -251,7 +248,7 @@ export async function sendOwnerOrderNotification(data: OrderEntry, previousOrder
 
   const textBody = `
 NEW ORDER — ${data.orderNumber}
-${drop} · ${totalItems} item${totalItems > 1 ? "s" : ""} · ₹${data.total} · ${receivedAt}
+${totalItems} item${totalItems > 1 ? "s" : ""} · ₹${data.total} · ${receivedAt}
 Customer: ${customerLabelText}
 
 ITEMS:
@@ -287,7 +284,7 @@ Received: ${receivedAt}`;
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td>
-                  <p style="margin:0 0 2px; font-size:11px; color:#C7A44C; letter-spacing:2px; text-transform:uppercase;">${drop} &middot; Sundays</p>
+                  <p style="margin:0 0 2px; font-size:11px; color:#C7A44C; letter-spacing:2px; text-transform:uppercase;">Sundays &middot; New Order</p>
                   <p style="margin:0; font-size:18px; font-weight:600; color:#F6F0E7; letter-spacing:0.5px;">${data.orderNumber} &mdash; ${data.customer.firstName}</p>
                 </td>
                 <td align="right">
@@ -361,7 +358,7 @@ Received: ${receivedAt}`;
         <!-- Footer -->
         <tr>
           <td style="background-color:#FAFAF8; padding:14px 24px; border-top:1px solid #E8E0D0; text-align:center;">
-            <p style="margin:0; font-size:10px; color:#aaa; text-transform:uppercase; letter-spacing:2px;">Sundays &middot; Operations &middot; ${drop}</p>
+            <p style="margin:0; font-size:10px; color:#aaa; text-transform:uppercase; letter-spacing:2px;">Sundays &middot; Boutique Operations</p>
           </td>
         </tr>
 
