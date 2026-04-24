@@ -38,53 +38,47 @@ export function Header() {
             variants={{
               visible: { 
                 transition: { 
-                  staggerChildren: 0.12,
-                  delayChildren: 0.2
+                  staggerChildren: 0.05
                 } 
               }
             }}
-            className="flex items-center text-xl md:text-2xl font-serif font-bold uppercase"
+            className="flex items-center text-xl md:text-2xl font-serif font-bold tracking-widest uppercase overflow-hidden"
           >
-            <motion.div 
-              variants={{
-                hidden: { letterSpacing: "0.1em" },
-                visible: { letterSpacing: "0.25em" }
-              }}
-              transition={{ duration: 2, ease: "easeOut" }}
-              className="flex items-center"
-            >
-              {/* SUN */}
-              <div className="flex text-white">
-                {["S", "U", "N"].map((letter, i) => (
+            {/* SUN */}
+            <div className="flex text-white">
+              {["S", "U", "N"].map((letter, i) => (
+                <div key={`sun-${i}`} className="overflow-hidden">
                   <motion.span
-                    key={i}
                     variants={{
-                      hidden: { opacity: 0, filter: "blur(4px)", scale: 0.95 },
-                      visible: { opacity: 1, filter: "blur(0px)", scale: 1 }
+                      hidden: { y: "100%" },
+                      visible: { y: 0 }
                     }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                    className="inline-block"
                   >
                     {letter}
                   </motion.span>
-                ))}
-              </div>
+                </div>
+              ))}
+            </div>
 
-              {/* DAYS */}
-              <div className="flex text-gold">
-                {["D", "A", "Y", "S"].map((letter, i) => (
+            {/* DAYS */}
+            <div className="flex text-gold">
+              {["D", "A", "Y", "S"].map((letter, i) => (
+                <div key={`days-${i}`} className="overflow-hidden">
                   <motion.span
-                    key={i}
                     variants={{
-                      hidden: { opacity: 0, filter: "blur(4px)", scale: 0.95 },
-                      visible: { opacity: 1, filter: "blur(0px)", scale: 1 }
+                      hidden: { y: "100%" },
+                      visible: { y: 0 }
                     }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                    className="inline-block"
                   >
                     {letter}
                   </motion.span>
-                ))}
-              </div>
-            </motion.div>
+                </div>
+              ))}
+            </div>
           </motion.div>
 
           <div className="hidden md:flex gap-10 items-center text-[12px] tracking-widest font-bold text-cream uppercase">
