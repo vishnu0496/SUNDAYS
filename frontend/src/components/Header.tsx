@@ -33,16 +33,16 @@ export function Header() {
       <nav className="h-16 flex items-center border-b border-gold/5 bg-deep-forest sticky top-10 z-[100]">
         <div className="container mx-auto px-6 flex justify-between items-center">
           <motion.h1 
-            initial={{ letterSpacing: "0.1em", opacity: 0 }}
-            animate={{ letterSpacing: "0.3em", opacity: 1 }}
-            transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ letterSpacing: "0.05em", opacity: 0 }}
+            animate={{ letterSpacing: "0.15em", opacity: 1 }}
+            transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
             className="text-xl md:text-2xl font-serif font-bold flex items-center uppercase"
           >
             <span className="text-white">SUN</span>
             <motion.span 
-              initial={{ marginLeft: "0.1em" }}
-              animate={{ marginLeft: "0.3em" }}
-              transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ marginLeft: "0.05em" }}
+              animate={{ marginLeft: "0.15em" }}
+              transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
               className="text-gold"
             >
               DAYS
