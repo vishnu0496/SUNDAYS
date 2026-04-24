@@ -30,7 +30,7 @@ export function Header() {
         </div>
       </div>
 
-      <nav className="h-16 flex items-center border-b border-gold/5 bg-forest/90 backdrop-blur-md sticky top-10 z-[100] will-change-transform">
+      <nav className="h-16 flex items-center border-b border-gold/5 bg-deep-forest sticky top-10 z-[100]">
         <div className="container mx-auto px-6 flex justify-between items-center">
           <h1 className="text-xl md:text-2xl font-serif tracking-widest font-bold flex items-center">
             <span className="text-white">SUN</span>

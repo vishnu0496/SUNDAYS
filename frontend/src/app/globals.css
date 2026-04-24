@@ -53,24 +53,19 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-[#0A1A14]/90 backdrop-blur-md border border-gold/10 rounded-[32px] transition-[transform,opacity] duration-500;
-    will-change: transform, opacity;
-    transform: translateZ(0);
-    backface-visibility: hidden;
+    @apply bg-[#0A1A14] border border-gold/10 rounded-[32px] transition-opacity duration-300;
   }
   
   .premium-button {
     @apply bg-tan text-forest px-12 py-4 rounded-lg font-bold tracking-[0.2em] uppercase text-[11px] 
-           transition-[transform,filter,shadow] duration-500 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] 
+           transition-opacity duration-300 hover:brightness-110 active:scale-[0.98] 
            shadow-xl shadow-black/20;
-    will-change: transform;
-    transform: translateZ(0);
   }
 
   .input-premium {
     @apply w-full bg-white/[0.03] border border-gold/5 rounded-2xl px-8 py-5 text-cream 
            placeholder:text-cream/20 focus:outline-none focus:border-gold/30 
-           transition-all duration-300;
+           transition-colors duration-300;
   }
 
   .animate-ticker-seamless {
