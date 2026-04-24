@@ -152,8 +152,8 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDraw
                             </span>
 
                             <div className="flex justify-between items-center">
-                              <span className="text-tan text-[11px] tracking-[0.3em] font-bold uppercase">Box #{index + 1}</span>
-                              <button onClick={() => onUpdateQuantity(index, -1)} className="text-white/20 hover:text-red-400 transition-colors text-[10px] uppercase tracking-widest font-bold">Remove</button>
+                              <span className="text-tan text-[12px] tracking-[0.3em] font-bold uppercase">Box #{index + 1}</span>
+                              <button onClick={() => onUpdateQuantity(index, -1)} className="text-white/40 hover:text-red-400 transition-colors text-[11px] uppercase tracking-widest font-bold">Remove</button>
                             </div>
 
                             <div className="flex justify-between items-baseline">

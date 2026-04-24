@@ -37,7 +37,7 @@ export function Header() {
             <span className="text-gold ml-1">DAYS</span>
           </h1>
 
-          <div className="hidden md:flex gap-8 items-center text-[10px] tracking-widest font-bold text-cream uppercase">
+          <div className="hidden md:flex gap-10 items-center text-[12px] tracking-widest font-bold text-cream uppercase">
             <a href="#menu" className="hover:text-gold transition-colors">Menu</a>
             <a href="#craft" className="hover:text-gold transition-colors">The Craft</a>
             <a href="#story" className="hover:text-gold transition-colors">Our Story</a>

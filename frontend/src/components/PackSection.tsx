@@ -112,10 +112,10 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
 
                 <div className="space-y-6 flex-grow">
                   <div className="flex justify-between items-end border-b border-gold/10 pb-5 mb-5">
-                    <p className="text-tan text-[11px] tracking-[0.3em] uppercase font-bold">
+                    <p className="text-tan text-[12px] tracking-[0.3em] uppercase font-bold">
                       CHOOSE {pack.maxCookies} COOKIES
                     </p>
-                    <p className="text-cream/30 text-[11px] tracking-widest uppercase">
+                    <p className="text-cream/80 text-[12px] tracking-widest uppercase">
                       Selected: <span className="text-tan font-bold">{getPackTotal(pack.id)} / {pack.maxCookies}</span>
                     </p>
                   </div>
