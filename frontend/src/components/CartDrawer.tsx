@@ -14,9 +14,10 @@ interface CartDrawerProps {
   onClose: () => void;
   cart: OrderItem[];
   onUpdateQuantity: (index: number, delta: number) => void;
+  onClearCart?: () => void;
 }
 
-export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDrawerProps) {
+export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCart }: CartDrawerProps) {
   const [stage, setStage] = useState<'cart' | 'checkout'>('cart');
   const [formData, setFormData] = useState({
     name: "",
@@ -126,6 +127,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDraw
       
       if (result.success) {
         setOrderSuccess(true);
+        onClearCart?.();
         handleWhatsAppOrder();
       } else {
         alert(result.error || "Order failed. Please try again.");

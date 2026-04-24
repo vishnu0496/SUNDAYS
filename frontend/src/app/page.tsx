@@ -51,6 +51,10 @@ export default function Home() {
     }
   };
 
+  const handleClearCart = () => {
+    setCart([]);
+  };
+
 
   return (
     <main className="min-h-screen">
@@ -88,6 +92,7 @@ export default function Home() {
         onClose={() => setIsCartOpen(false)}
         cart={cart}
         onUpdateQuantity={handleUpdateQuantity}
+        onClearCart={handleClearCart}
       />
     </main>
   );
