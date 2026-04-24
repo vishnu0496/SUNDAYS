@@ -5,8 +5,10 @@ import { sendCustomerOrderConfirmation, sendOwnerOrderNotification } from "@/lib
 const REVIEW_MODE = process.env.NEXT_PUBLIC_REVIEW_MODE === "true";
 
 export async function POST(req: Request) {
+  console.log(">>> [API] Order request received");
   // ── REVIEW MODE: Return mock success. No emails, no file writes. ──────────
   if (REVIEW_MODE) {
+    console.log(">>> [API] Review mode active");
     await new Promise((resolve) => setTimeout(resolve, 1200));
     return NextResponse.json({
       success: true,
@@ -18,6 +20,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
+    console.log(">>> [API] Request body parsed:", !!body);
     const { customer, items, subtotal, delivery, total } = body as {
       customer: CustomerDetails;
       items: OrderItem[];

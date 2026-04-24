@@ -83,12 +83,18 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDraw
 
     setIsProcessing(true);
     try {
-      const response = await fetch('/api/order', {
+      const apiUrl = `${window.location.origin}/api/order`;
+      console.log(">>> [Cart] Sending order to:", apiUrl);
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
           customer: {
-            firstName: formData.name.split(' ')[0],
+            firstName: formData.name ? formData.name.split(' ')[0] : 'Customer',
             email: formData.email,
             whatsapp: formData.phone,
             addressHouse: formData.address,
@@ -109,18 +115,22 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDraw
         })
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+      }
+
       const result = await response.json();
       
       if (result.success) {
         setOrderSuccess(true);
-        // After sending email, we can still open WhatsApp as a courtesy
         handleWhatsAppOrder();
       } else {
-        alert(result.error || "Something went wrong. Please try again.");
+        alert(result.error || "Order failed. Please try again.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Order error:", error);
-      alert("Failed to connect to server. Check your connection.");
+      alert(`System Error: ${error.message || "Could not connect to server"}`);
     } finally {
       setIsProcessing(false);
     }
