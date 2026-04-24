@@ -53,15 +53,18 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-white/[0.02] backdrop-blur-xl border border-gold/10 rounded-[32px] transition-all duration-500;
+    @apply bg-[#0A1A14]/90 backdrop-blur-md border border-gold/10 rounded-[32px] transition-[transform,opacity] duration-500;
     will-change: transform, opacity;
+    transform: translateZ(0);
     backface-visibility: hidden;
   }
   
   .premium-button {
     @apply bg-tan text-forest px-12 py-4 rounded-lg font-bold tracking-[0.2em] uppercase text-[11px] 
-           transition-all duration-500 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] 
+           transition-[transform,filter,shadow] duration-500 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] 
            shadow-xl shadow-black/20;
+    will-change: transform;
+    transform: translateZ(0);
   }
 
   .input-premium {

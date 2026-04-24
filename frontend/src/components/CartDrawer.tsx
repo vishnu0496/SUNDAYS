@@ -89,7 +89,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDraw
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-forest border-l border-gold/10 z-[101] shadow-2xl flex flex-col will-change-transform"
+            className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-[#050D0A] border-l border-gold/10 z-[101] shadow-2xl flex flex-col will-change-transform"
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
             {/* Header */}
