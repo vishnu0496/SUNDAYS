@@ -34,7 +34,7 @@ export function Header() {
         <div className="container mx-auto px-6 flex justify-between items-center">
           <motion.h1 
             initial={{ letterSpacing: "0.1em", opacity: 0 }}
-            animate={{ letterSpacing: "0.4em", opacity: 1 }}
+            animate={{ letterSpacing: "0.3em", opacity: 1 }}
             transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1] }}
             className="text-xl md:text-2xl font-serif font-bold flex items-center uppercase"
           >
