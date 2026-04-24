@@ -1,0 +1,265 @@
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+
+interface OrderItem {
+  packName: string;
+  selections: Record<string, number>;
+  price: number;
+}
+
+interface CartDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  cart: OrderItem[];
+  onUpdateQuantity: (index: number, delta: number) => void;
+}
+
+export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity }: CartDrawerProps) {
+  const [stage, setStage] = useState<'cart' | 'checkout'>('cart');
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    note: ""
+  });
+
+  const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+  const deliveryGoal = 899;
+  const toteGoal = 1099;
+  
+  const deliveryFee = subtotal >= deliveryGoal || subtotal === 0 ? 0 : 49;
+  const total = subtotal + deliveryFee;
+  const hasFreeTote = total >= toteGoal;
+
+  const deliveryProgress = Math.min((subtotal / deliveryGoal) * 100, 100);
+  const toteProgress = Math.min((subtotal / toteGoal) * 100, 100);
+
+  const handleWhatsAppOrder = () => {
+    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+      alert("Please fill in your name, email, phone, and address.");
+      return;
+    }
+
+    let message = `*✨ NEW ORDER - SUNDAYS COOKIES ✨*%0A%0A`;
+    message += `*👤 CUSTOMER DETAILS*%0A`;
+    message += `Name: ${formData.name}%0A`;
+    message += `Email: ${formData.email}%0A`;
+    message += `Phone: ${formData.phone}%0A`;
+    message += `Address: ${formData.address}%0A`;
+    if (formData.note) message += `Note: _${formData.note}_%0A`;
+    
+    message += `%0A*📦 BOX BREAKDOWN*%0A`;
+
+    cart.forEach((item, index) => {
+      message += `%0A*BOX #${index + 1} (${item.packName})*%0A`;
+      Object.entries(item.selections).forEach(([cookie, count]) => {
+        if (count > 0) message += `• ${cookie}: ${count}%0A`;
+      });
+      if (item.packName === "5+1 Free Pack") message += `• _Chocolate Chip: 1 (FREE BONUS)_%0A`;
+    });
+
+    message += `%0A*──────────────────*%0A`;
+    message += `*Subtotal:* ₹${subtotal}%0A`;
+    message += `*Delivery:* ${deliveryFee === 0 ? "*FREE*" : `₹${deliveryFee}`}%0A`;
+    if (hasFreeTote) message += `*Gift:* *FREE TOTE BAG 🎁*%0A`;
+    message += `%0A*TOTAL AMOUNT: ₹${total}*%0A`;
+    message += `*──────────────────*%0A%0A`;
+    message += `_Please confirm availability for delivery!_`;
+
+    window.open(`https://wa.me/919177155540?text=${message}`, "_blank");
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+          />
+          
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-forest border-l border-gold/10 z-[101] shadow-2xl flex flex-col will-change-transform"
+            style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+          >
+            {/* Header */}
+            <div className="p-8 border-b border-gold/10 flex justify-between items-center">
+              <div>
+                <p className="text-[11px] tracking-[0.3em] font-bold text-gold-muted uppercase mb-1">
+                  {stage === 'cart' ? 'Your Selection' : 'Place Your Order'}
+                </p>
+                <h2 className="text-3xl font-serif text-white">
+                  {stage === 'cart' ? 'Order Summary' : 'Almost There'}
+                </h2>
+              </div>
+              <button onClick={onClose} className="text-gold-muted hover:text-white transition-colors">
+                <span className="text-[11px] tracking-widest uppercase font-bold">Close</span>
+              </button>
+            </div>
+
+            {/* Stages Container */}
+            <div className="flex-grow overflow-y-auto">
+              <AnimatePresence mode="wait">
+                {stage === 'cart' ? (
+                  <motion.div 
+                    key="cart"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="p-8 space-y-10"
+                  >
+                    {/* Rewards Tracker */}
+                    <div className="space-y-5 pb-8 border-b border-gold/5">
+                      <div className="flex justify-between text-[11px] tracking-widest uppercase font-bold">
+                        <span className={subtotal >= deliveryGoal ? "text-green-500" : "text-gold-muted"}>
+                          {subtotal >= deliveryGoal ? "Free Delivery Unlocked" : `₹${deliveryGoal - subtotal} more for Free Delivery`}
+                        </span>
+                      </div>
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className={`h-full transition-all duration-1000 ${subtotal >= deliveryGoal ? "bg-green-500" : "bg-gold"}`} style={{ width: `${deliveryProgress}%` }} />
+                      </div>
+                      
+                      <div className="flex justify-between text-[11px] tracking-widest uppercase font-bold">
+                        <span className={subtotal >= toteGoal ? "text-green-500" : "text-gold-muted"}>
+                          {subtotal >= toteGoal ? "Free Tote Bag Unlocked" : `₹${toteGoal - subtotal} more for Free Tote`}
+                        </span>
+                      </div>
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className={`h-full transition-all duration-1000 ${subtotal >= toteGoal ? "bg-green-500" : "bg-tan"}`} style={{ width: `${toteProgress}%` }} />
+                      </div>
+                    </div>
+
+                    {/* Cart Items */}
+                    <div className="space-y-6">
+                      {cart.length === 0 ? (
+                        <p className="text-white/20 font-serif italic text-center py-20 text-xl">Your selection is empty.</p>
+                      ) : (
+                        cart.map((item, index) => (
+                          <div key={index} className="bg-white/[0.03] border border-gold/5 rounded-2xl p-6 space-y-4 relative overflow-hidden group">
+                            {/* Subtle Box Number in background */}
+                            <span className="absolute -right-2 -top-4 text-7xl font-serif text-white/[0.02] italic select-none">
+                              {index + 1}
+                            </span>
+
+                            <div className="flex justify-between items-center">
+                              <span className="text-tan text-[10px] tracking-[0.3em] font-bold uppercase">Box #{index + 1}</span>
+                              <button onClick={() => onUpdateQuantity(index, -1)} className="text-white/20 hover:text-red-400 transition-colors text-[10px] uppercase tracking-widest font-bold">Remove</button>
+                            </div>
+
+                            <div className="flex justify-between items-baseline">
+                              <h3 className="text-xl font-serif text-white">{item.packName}</h3>
+                              <span className="text-white font-serif">₹{item.price}</span>
+                            </div>
+
+                            <div className="space-y-3 pt-4 border-t border-gold/5">
+                              {Object.entries(item.selections).filter(([_, count]) => count > 0).map(([name, count]) => (
+                                <div key={name} className="flex justify-between items-center text-sm">
+                                  <div className="flex items-center gap-3">
+                                    <div 
+                                      className="w-2 h-2 rounded-full" 
+                                      style={{ 
+                                        backgroundColor: name === "Chocolate Chip" ? "#C7A44C" : 
+                                                        name === "Nutella Stuffed" ? "#4B3621" : "#FDFD96" 
+                                      }} 
+                                    />
+                                    <span className="text-white/60 italic font-serif">{name}</span>
+                                  </div>
+                                  <span className="text-tan font-bold">x{count}</span>
+                                </div>
+                              ))}
+                              {item.packName === "5+1 Free Pack" && (
+                                <div className="flex justify-between items-center text-sm border-t border-gold/5 pt-2 mt-2">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 rounded-full bg-gold animate-pulse" />
+                                    <span className="text-gold italic font-serif">Chocolate Chip (Bonus)</span>
+                                  </div>
+                                  <span className="text-gold font-bold">x1</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    key="checkout"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="p-8 space-y-10"
+                  >
+                    <button onClick={() => setStage('cart')} className="text-gold-muted hover:text-white transition-colors text-[11px] tracking-widest uppercase font-bold flex items-center gap-2 mb-8">
+                      ← Back to Selection
+                    </button>
+                    
+                    <div className="space-y-10">
+                      <div>
+                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Your Name</label>
+                        <input type="text" placeholder="Full name" className="input-premium h-14 text-base" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Email Address</label>
+                        <input type="email" placeholder="hello@example.com" className="input-premium h-14 text-base" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">WhatsApp Number</label>
+                        <input type="tel" placeholder="+91 98765 43210" className="input-premium h-14 text-base" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Delivery Address</label>
+                        <textarea placeholder="Full address, Hyderabad" className="input-premium min-h-[140px] py-4 text-base" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Note (Optional)</label>
+                        <input type="text" placeholder="Any special requests?" className="input-premium h-14 text-base" value={formData.note} onChange={(e) => setFormData({...formData, note: e.target.value})} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Footer */}
+            <div className="p-8 border-t border-gold/10 bg-white/[0.02]">
+              <div className="flex justify-between items-center mb-8">
+                <span className="text-white/40 uppercase tracking-widest text-[11px] font-bold">
+                  {stage === 'cart' ? 'Total Selection' : 'Grand Total'}
+                </span>
+                <span className="text-tan text-3xl font-serif font-bold">₹{total}</span>
+              </div>
+              
+              {stage === 'cart' ? (
+                <button 
+                  onClick={() => setStage('checkout')}
+                  disabled={cart.length === 0}
+                  className="premium-button w-full py-6 disabled:opacity-20"
+                >
+                  Proceed to Checkout
+                </button>
+              ) : (
+                <button 
+                  onClick={handleWhatsAppOrder}
+                  className="premium-button w-full py-6 flex items-center justify-center gap-3"
+                >
+                  Send Order via WhatsApp
+                </button>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}

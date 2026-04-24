@@ -84,9 +84,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-cream text-forest font-sans">
+      <body className="min-h-full flex flex-col bg-forest text-cream font-sans">
         {children}
-        <ReviewModeBanner />
       </body>
     </html>
   );
