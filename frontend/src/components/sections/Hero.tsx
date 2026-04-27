@@ -7,21 +7,21 @@ export function Hero() {
   return (
     <section className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden bg-black">
       {/* Background Image with Ken Burns Effect */}
-      <motion.div 
+      <motion.div
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat origin-center"
         style={{ backgroundImage: 'url("/images/hero.png")' }}
         initial={{ scale: 1.0 }}
         animate={{ scale: 1.08 }}
         transition={{ duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
       />
-      
+
       {/* Readability Overlays - Premium Polish */}
       <div className="absolute inset-0 z-0 bg-black/40" />
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_80%,#000000_100%)]" />
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-5xl flex flex-col justify-center items-center text-center px-6 pt-16">
-        
+
         {/* Mask Reveal: Eyebrow */}
         <div className="overflow-hidden mb-10 md:mb-12">
           <motion.p
@@ -33,7 +33,7 @@ export function Hero() {
             THE 24-HOUR COOKIE
           </motion.p>
         </div>
-        
+
         {/* Mask Reveal: Title */}
         <div className="overflow-hidden pb-4 mb-12 md:mb-16">
           <motion.h1
@@ -70,7 +70,7 @@ export function Hero() {
             whileTap={{ scale: 0.98 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
-            <Button 
+            <Button
               className="bg-[#C7A44C] text-[#163126] font-bold px-12 md:px-14 py-5 text-xs md:text-sm tracking-[0.25em] shadow-2xl hover:bg-[#D8B45C] whitespace-nowrap border border-[#D8B45C]/20"
               onClick={() => document.getElementById('drop')?.scrollIntoView({ behavior: 'smooth' })}
             >
@@ -81,7 +81,7 @@ export function Hero() {
       </div>
 
       {/* Scroll Affordance */}
-      <motion.div 
+      <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-10 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -89,7 +89,7 @@ export function Hero() {
       >
         <span className="text-[#C7A44C] text-[9px] tracking-[0.3em] uppercase opacity-70">Scroll</span>
         <div className="h-16 w-px bg-white/10 overflow-hidden relative">
-          <motion.div 
+          <motion.div
             className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-transparent via-[#C7A44C] to-transparent"
             animate={{ y: ['-100%', '200%'] }}
             transition={{ duration: 2, ease: "linear", repeat: Infinity }}
