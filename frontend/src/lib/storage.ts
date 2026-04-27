@@ -6,6 +6,7 @@ export interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  selections?: Record<string, number>;
 }
 
 export interface CustomerDetails {
@@ -58,8 +59,6 @@ export async function getOrders(): Promise<OrderEntry[]> {
   }
 }
 
-const WEEKLY_LIMIT = 50;
-
 export async function processOrder(
   customer: CustomerDetails,
   items: OrderItem[],
@@ -68,13 +67,10 @@ export async function processOrder(
   total: number
 ): Promise<{ success: boolean; entry?: OrderEntry; error?: string }> {
   await acquireLock();
-  
+
   try {
     const orders = await getOrders();
-    
-    if (orders.length >= WEEKLY_LIMIT) {
-      return { success: false, error: "sold_out" };
-    }
+
 
     const orderNumber = `SUN-${String(orders.length + 1).padStart(4, '0')}`;
 

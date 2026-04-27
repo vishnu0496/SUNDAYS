@@ -5,9 +5,11 @@ import { motion } from "framer-motion";
 export function Hero() {
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
-      {/* Background Image - Strict Coverage */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+      <motion.div 
+        initial={{ scale: 1.1 }}
+        animate={{ scale: [1.1, 1.05, 1.1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60"
         style={{ backgroundImage: 'url("/images/hero.jpg")' }}
       />
       
@@ -19,7 +21,7 @@ export function Hero() {
         }}
       />
       
-      {/* Content Container - Exact Screenshot Spacing */}
+      {/* Content Container */}
       <div className="relative z-20 container mx-auto px-6 text-center max-w-5xl flex flex-col items-center pt-20">
         <motion.p
           initial={{ opacity: 0, y: 10 }}

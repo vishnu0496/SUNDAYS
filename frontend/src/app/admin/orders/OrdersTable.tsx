@@ -179,13 +179,23 @@ export function OrdersTable({ initialOrders, drops }: { initialOrders: MergedOrd
                         </div>
                       </td>
                       <td className="px-5 py-6">
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-2">
                           {order.items.map((item, idx) => (
-                            <span key={idx} className="text-xs font-bold text-[#163126] flex items-center">
-                              <span className="text-[#C7A44C] mr-1.5 opacity-60 font-mono text-[10px]">{item.quantity}×</span>
-                              {item.name}
-                              {item.name === 'Little Rebels' && <span className="ml-2 text-[8px] font-black text-[#7A8970] uppercase tracking-tighter opacity-70">(Pack)</span>}
-                            </span>
+                            <div key={idx} className="flex flex-col">
+                              <span className="text-xs font-bold text-[#163126] flex items-center">
+                                <span className="text-[#C7A44C] mr-1.5 opacity-60 font-mono text-[10px]">{item.quantity}×</span>
+                                {item.name}
+                                {item.name === 'Little Rebels' && <span className="ml-2 text-[8px] font-black text-[#7A8970] uppercase tracking-tighter opacity-70">(Pack)</span>}
+                              </span>
+                              {item.selections && (
+                                <span className="text-[10px] text-[#9A7B4F] font-bold ml-5 leading-tight italic opacity-80">
+                                  {Object.entries(item.selections)
+                                    .filter(([_, count]) => count > 0)
+                                    .map(([name, count]) => `${count} ${name}`)
+                                    .join(', ')}
+                                </span>
+                              )}
+                            </div>
                           ))}
                         </div>
                       </td>

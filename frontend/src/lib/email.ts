@@ -41,6 +41,24 @@ function dropLabel(orderNumber: string): string {
   return "Handcrafted";
 }
 
+function formatSelectionsHtml(selections?: Record<string, number>): string {
+  if (!selections) return "";
+  const lines = Object.entries(selections)
+    .filter(([_, count]) => count > 0)
+    .map(([name, count]) => `${count}× ${name}`);
+  if (lines.length === 0) return "";
+  return `<div style="font-size: 13px; color: #9A7B4F; margin-top: 4px; font-family: Arial, sans-serif; letter-spacing: 0.5px;">${lines.join(" &middot; ")}</div>`;
+}
+
+function formatSelectionsText(selections?: Record<string, number>): string {
+  if (!selections) return "";
+  const lines = Object.entries(selections)
+    .filter(([_, count]) => count > 0)
+    .map(([name, count]) => `${count}× ${name}`);
+  if (lines.length === 0) return "";
+  return `\n    (${lines.join(", ")})`;
+}
+
 // ── Customer Confirmation Email ───────────────────────────────────────────────
 
 export async function sendCustomerOrderConfirmation(data: OrderEntry) {
@@ -57,6 +75,7 @@ export async function sendCustomerOrderConfirmation(data: OrderEntry) {
       <td style="padding: 12px 0; border-bottom: 1px solid #E8DFC8; vertical-align: top;">
         <span style="display: block; font-family: 'Times New Roman', Times, serif; font-size: 16px; color: #163126; margin-bottom: 2px;">${item.name}</span>
         <span style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #9A7B4F; text-transform: uppercase; letter-spacing: 1px;">Qty ${item.quantity} &bull; ₹${item.price} each</span>
+        ${formatSelectionsHtml(item.selections)}
       </td>
       <td style="padding: 12px 0; border-bottom: 1px solid #E8DFC8; text-align: right; font-family: 'Times New Roman', Times, serif; font-size: 16px; color: #163126; vertical-align: top;">
         ₹${item.price * item.quantity}
@@ -66,7 +85,7 @@ export async function sendCustomerOrderConfirmation(data: OrderEntry) {
     .join("");
 
   const itemsText = data.items
-    .map((item) => `  ${item.quantity}× ${item.name}   ₹${item.price * item.quantity}`)
+    .map((item) => `  ${item.quantity}× ${item.name}   ₹${item.price * item.quantity}${formatSelectionsText(item.selections)}`)
     .join("\n");
 
   const textBody = `
@@ -240,8 +259,11 @@ export async function sendOwnerOrderNotification(data: OrderEntry, previousOrder
     .map(
       (item) => `
     <tr>
-      <td style="padding:8px 12px; border-bottom:1px solid #f0f0f0; font-size:14px; color:#163126;">${item.quantity}&times; ${item.name}</td>
-      <td style="padding:8px 12px; border-bottom:1px solid #f0f0f0; text-align:right; font-size:14px; color:#163126;">₹${item.price * item.quantity}</td>
+      <td style="padding:8px 12px; border-bottom:1px solid #f0f0f0; font-size:14px; color:#163126;">
+        <div>${item.quantity}&times; ${item.name}</div>
+        <div style="font-size:11px; color:#9A7B4F; margin-top:2px;">${Object.entries(item.selections || {}).filter(([_,c]) => c > 0).map(([n,c]) => `${c} ${n}`).join(', ')}</div>
+      </td>
+      <td style="padding:8px 12px; border-bottom:1px solid #f0f0f0; text-align:right; font-size:14px; color:#163126; vertical-align:top;">₹${item.price * item.quantity}</td>
     </tr>`
     )
     .join("");
@@ -252,7 +274,7 @@ ${totalItems} item${totalItems > 1 ? "s" : ""} · ₹${data.total} · ${received
 Customer: ${customerLabelText}
 
 ITEMS:
-${data.items.map((i) => `  ${i.quantity}× ${i.name}   ₹${i.price * i.quantity}`).join("\n")}
+${data.items.map((i) => `  ${i.quantity}× ${i.name}   ₹${i.price * i.quantity}${formatSelectionsText(i.selections)}`).join("\n")}
   Subtotal:  ₹${data.subtotal}
   Delivery:  ₹${data.delivery}
   TOTAL:     ₹${data.total}

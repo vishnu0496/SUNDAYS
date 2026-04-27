@@ -36,20 +36,28 @@ const getDropsPath = () => path.join(process.cwd(), 'drops.json');
 // OFFICIAL BRANDED SOURCE OF TRUTH (Comprehensive Normalization)
 const BRANDED_NAMES: Record<string, string> = {
   // Official
-  'The Lazy Legend': 'The Lazy Legend',
-  'The Golden Affair': 'The Golden Affair',
-  'Salted Noir': 'Salted Noir',
+  'The Legend': 'The Legend',
+  'The Naughty Nutella': 'The Naughty Nutella',
+  'The Citrus Cloud': 'The Citrus Cloud',
   'Little Rebels': 'Little Rebels',
   
   // Legacy / Samples (Mapping strictly based on brand identity)
-  'Classic Chocolate Chip': 'The Lazy Legend',
-  'Classic Choco Chip': 'The Lazy Legend',
-  'classic': 'The Lazy Legend',
+  'The Lazy Legend': 'The Legend',
+  'Chocolate Chip': 'The Legend',
+  'Classic Chocolate Chip': 'The Legend',
+  'Classic Choco Chip': 'The Legend',
+  'classic': 'The Legend',
   
-  'Lotus Biscoff': 'The Golden Affair',
-  'Brown Butter & Sea Salt': 'The Golden Affair',
-  'brown-butter': 'The Golden Affair',
+  'The Golden Affair': 'The Naughty Nutella',
+  'Nutella Stuffed': 'The Naughty Nutella',
+  'Lotus Biscoff': 'The Naughty Nutella',
+  'Brown Butter & Sea Salt': 'The Naughty Nutella',
+  'brown-butter': 'The Naughty Nutella',
   
+  'The Citrus Cloud': 'The Citrus Cloud',
+  'Lemon Crinkle': 'The Citrus Cloud',
+  
+  'Salted Noir': 'Salted Noir',
   'Dark Chocolate + Salt': 'Salted Noir',
   'Dark Cocoa Espresso': 'Salted Noir',
   'dark-cocoa': 'Salted Noir',
@@ -169,6 +177,63 @@ function calculateDropStats(orders: MergedOrder[], dropId: string) {
   };
 }
 
+export async function getBoutiqueAnalytics() {
+  const orders = await getMergedOrders();
+  
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const filterByTime = (start: Date) => orders.filter(o => new Date(o.timestamp) >= start);
+
+  const todayOrders = filterByTime(startOfToday);
+  const weekOrders = filterByTime(startOfWeek);
+  const monthOrders = filterByTime(startOfMonth);
+
+  const calculateStats = (ordersSubset: MergedOrder[]) => ({
+    revenue: ordersSubset.reduce((sum, o) => sum + o.total, 0),
+    count: ordersSubset.length,
+    acv: ordersSubset.length > 0 ? ordersSubset.reduce((sum, o) => sum + o.total, 0) / ordersSubset.length : 0
+  });
+
+  const todayStats = calculateStats(todayOrders);
+  const weekStats = calculateStats(weekOrders);
+  const monthStats = calculateStats(monthOrders);
+
+  const productPerformance: Record<string, number> = {};
+  orders.forEach(o => {
+    o.items.forEach(i => {
+      productPerformance[i.name] = (productPerformance[i.name] || 0) + i.quantity;
+    });
+  });
+  const bestSellers = Object.entries(productPerformance)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([name, quantity]) => ({ name, quantity }));
+
+  const actionItems = {
+    unpaidCount: orders.filter(o => ['Unpaid', 'Pending Review'].includes(o.meta.paymentStatus)).length,
+    readyForFulfillment: orders.filter(o => o.meta.paymentStatus === 'Paid' && o.meta.fulfillmentStatus === 'Reserved').length,
+    inProduction: orders.filter(o => ['Queued', 'Baking', 'Packed'].includes(o.meta.fulfillmentStatus)).length,
+    todayOrders: todayOrders.length
+  };
+
+  return {
+    hero: {
+      today: todayStats,
+      week: weekStats,
+      month: monthStats,
+      totalRevenue: orders.reduce((sum, o) => sum + o.total, 0),
+      totalOrders: orders.length
+    },
+    actionItems,
+    bestSellers,
+    recentOrders: orders.slice(0, 10),
+    repeatRate: (orders.filter(o => o.isRepeat).length / Math.max(1, orders.length)) * 100
+  };
+}
+
 export async function getAdminAnalytics() {
   const orders = await getMergedOrders();
   const drops = await getDrops();
@@ -176,7 +241,7 @@ export async function getAdminAnalytics() {
   const liveDrop = drops.find(d => d.status === 'live');
   const sortedDrops = [...drops].sort((a,b) => b.dropNumber.localeCompare(a.dropNumber));
   
-  const activeDrop = liveDrop || sortedDrops[0];
+  const activeDrop = liveDrop || sortedDrops[0] || { id: 'default', dropNumber: '1', slotLimit: 100, status: 'closed' };
   const previousDrop = sortedDrops.find(d => d.dropNumber < activeDrop.dropNumber);
 
   const activeStats = calculateDropStats(orders, activeDrop.id);

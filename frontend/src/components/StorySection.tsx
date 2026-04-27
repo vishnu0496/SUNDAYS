@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export function StorySection() {
   return (
-    <section id="story" className="py-section bg-forest relative">
+    <section id="story" className="py-section bg-deep-forest relative">
       <div className="container mx-auto px-6 max-w-4xl text-center">
         <p className="text-gold-muted tracking-[0.5em] uppercase text-[10px] font-bold mb-gap-sm">OUR STORY</p>
         <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif text-bone mb-gap-md leading-[1.05]">

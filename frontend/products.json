@@ -1,0 +1,32 @@
+[
+  {
+    "id": "the-legend",
+    "name": "The Legend",
+    "flavor": "Classic Choco-Chip",
+    "description": "Hand-chopped dark chocolate · Sea salt finish",
+    "price": 349,
+    "status": "active",
+    "isBestseller": true,
+    "category": "Classic"
+  },
+  {
+    "id": "naughty-nutella",
+    "name": "The Naughty Nutella",
+    "flavor": "Nutella Stuffed",
+    "description": "Molten hazelnut core · Creamy Belgian base",
+    "price": 349,
+    "status": "active",
+    "isBestseller": false,
+    "category": "Indulgent"
+  },
+  {
+    "id": "citrus-cloud",
+    "name": "The Citrus Cloud",
+    "flavor": "Lemon Crinkle",
+    "description": "Zesty organic lemons · Melt-in-your-mouth texture",
+    "price": 349,
+    "status": "active",
+    "isBestseller": false,
+    "category": "Zesty"
+  }
+]

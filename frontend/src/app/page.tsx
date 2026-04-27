@@ -12,6 +12,7 @@ import { WhatsAppButton, Footer } from "@/components/FooterComponents";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { CartDrawer } from "@/components/CartDrawer";
+import { RitualSection } from "@/components/sections/RitualSection";
 
 interface OrderItem {
   packName: string;
@@ -57,11 +58,12 @@ export default function Home() {
 
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen relative bg-[#030A08]">
       <Header />
       <Hero />
       <PackSection onAddToCart={handleAddToCart} />
       <CraftSection />
+      <RitualSection />
       <StorySection />
       <StepsSection />
       <TestimonialsSection />
@@ -74,7 +76,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.8 }}
             onClick={() => setIsCartOpen(true)}
-            className="fixed bottom-28 right-6 md:bottom-24 md:right-8 z-[90] bg-tan text-forest px-8 py-5 rounded-full font-bold tracking-[0.2em] uppercase text-[11px] shadow-2xl flex items-center gap-4 hover:scale-105 active:scale-95 transition-all"
+            className="fixed bottom-24 right-6 z-[90] bg-tan text-forest px-8 py-5 rounded-full font-bold tracking-[0.2em] uppercase text-[11px] shadow-2xl flex items-center gap-4 hover:scale-105 active:scale-95 transition-all"
           >
             View Cart
             <span className="bg-forest/10 w-5 h-5 flex items-center justify-center rounded-full text-[9px]">

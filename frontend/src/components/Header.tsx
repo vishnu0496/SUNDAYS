@@ -20,26 +20,18 @@ export function Header() {
       {/* Ticker Bar */}
       <div className="bg-[#030A08] text-gold h-10 flex items-center overflow-hidden border-b border-gold/5 select-none">
         <div className="flex w-max animate-ticker-seamless">
-          <div className="flex items-center whitespace-nowrap px-4 text-[11px] tracking-[0.2em] uppercase font-medium">
-            <span className="mx-12">CALORIES DON’T COUNT ON SUNDAYS</span>
-            <span className="text-gold/30">✦</span>
-            <span className="mx-12">FREE DELIVERY ABOVE ₹899</span>
-            <span className="text-gold/30">✦</span>
-            <span className="mx-12">HYDERABAD ONLY</span>
-            <span className="text-gold/30">✦</span>
-            <span className="mx-12">FREE TOTE BAG ABOVE ₹1099</span>
-            <span className="text-gold/30">✦</span>
-          </div>
-          <div className="flex items-center whitespace-nowrap px-4 text-[11px] tracking-[0.2em] uppercase font-medium">
-            <span className="mx-12">CALORIES DON’T COUNT ON SUNDAYS</span>
-            <span className="text-gold/30">✦</span>
-            <span className="mx-12">FREE DELIVERY ABOVE ₹899</span>
-            <span className="text-gold/30">✦</span>
-            <span className="mx-12">HYDERABAD ONLY</span>
-            <span className="text-gold/30">✦</span>
-            <span className="mx-12">FREE TOTE BAG ABOVE ₹1099</span>
-            <span className="text-gold/30">✦</span>
-          </div>
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex items-center whitespace-nowrap gap-12 pr-12 text-[11px] tracking-[0.2em] uppercase font-medium">
+              <span>100% EGGLESS & VEGETARIAN</span>
+              <span className="text-gold/30 text-[14px]">✦</span>
+              <span>FREE DELIVERY ABOVE ₹899</span>
+              <span className="text-gold/30 text-[14px]">✦</span>
+              <span>HYDERABAD ONLY</span>
+              <span className="text-gold/30 text-[14px]">✦</span>
+              <span>CALORIES DON’T COUNT ON SUNDAYS</span>
+              <span className="text-gold/30 text-[14px]">✦</span>
+            </div>
+          ))}
         </div>
       </div>
 

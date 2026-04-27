@@ -16,7 +16,12 @@ const ITEMS = [
   {
     num: "03",
     title: "Premium Chocolate",
-    desc: "Real chocolate, chopped into uneven chunks — so every bite has a different ratio of dough to molten chocolate."
+    desc: "Real 70% dark chocolate, hand-chopped into uneven chunks — so every bite has a different ratio of dough to molten chocolate."
+  },
+  {
+    num: "04",
+    title: "100% Eggless",
+    desc: "We've mastered the art of the eggless cookie — using specialized techniques to achieve a lighter, cleaner texture that regular cookies can't touch."
   }
 ];
 

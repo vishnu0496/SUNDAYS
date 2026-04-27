@@ -20,7 +20,7 @@ const STEPS = [
 
 export function StepsSection() {
   return (
-    <section className="py-section bg-deep-forest relative overflow-hidden">
+    <section className="py-section bg-forest relative overflow-hidden">
       <div className="container mx-auto px-6">
         <div className="text-center mb-gap-lg">
           <p className="text-gold-muted tracking-[0.4em] uppercase text-[10px] font-bold mb-gap-sm">HOW IT WORKS</p>
