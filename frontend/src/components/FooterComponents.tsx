@@ -28,7 +28,7 @@ export function Footer() {
         <div className="flex justify-center gap-12 mb-16 text-[10px] tracking-[0.2em] uppercase font-bold text-cream/40">
           <a href="https://instagram.com/sundays.hyd" target="_blank" className="hover:text-gold transition-colors">Instagram</a>
           <a href="https://wa.me/919177155540" target="_blank" className="hover:text-gold transition-colors">WhatsApp</a>
-          <a href="mailto:hello@sundays.com" className="hover:text-gold transition-colors">Email</a>
+          <a href="mailto:sundayshyd@gmail.com" className="hover:text-gold transition-colors">Email</a>
         </div>
         
         <p className="text-cream/20 text-[10px] tracking-[0.2em] uppercase font-bold">
