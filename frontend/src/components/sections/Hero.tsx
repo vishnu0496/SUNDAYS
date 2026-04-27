@@ -5,97 +5,87 @@ import { Button } from "../ui/Button";
 
 export function Hero() {
   return (
-    <section className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden bg-black">
-      {/* Background Image with Ken Burns Effect */}
-      <motion.div
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat origin-center"
-        style={{ backgroundImage: 'url("/images/hero.png")' }}
-        initial={{ scale: 1.0 }}
-        animate={{ scale: 1.08 }}
-        transition={{ duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
-      />
-
-      {/* Readability Overlays - Premium Polish */}
-      <div className="absolute inset-0 z-0 bg-black/40" />
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_80%,#000000_100%)]" />
-
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-5xl flex flex-col justify-center items-center text-center px-6 pt-16">
-
-        {/* Mask Reveal: Eyebrow */}
-        <div className="overflow-hidden mb-10 md:mb-12">
-          <motion.p
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.33, 1, 0.68, 1] }}
-            className="text-gold tracking-[0.2em] uppercase text-xs md:text-sm font-bold font-sans"
+    <section className="relative w-full min-h-[90svh] lg:min-h-[100svh] flex items-center bg-[#163126] overflow-hidden pt-20 lg:pt-0">
+      <div className="container mx-auto px-6 lg:px-12 w-full h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center h-full">
+          
+          {/* Left Column: Content */}
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: [0.33, 1, 0.68, 1] }}
+            className="flex flex-col justify-center items-start text-left z-10 order-2 lg:order-1"
           >
-            THE 24-HOUR COOKIE
-          </motion.p>
-        </div>
-
-        {/* Mask Reveal: Title */}
-        <div className="overflow-hidden pb-4 mb-12 md:mb-16">
-          <motion.h1
-            initial={{ y: "120%" }}
-            animate={{ y: 0 }}
-            transition={{ duration: 1.2, delay: 0.3, ease: [0.33, 1, 0.68, 1] }}
-            className="font-serif text-7xl md:text-8xl lg:text-[11rem] text-cream font-normal tracking-tight"
-          >
-            Sundays
-          </motion.h1>
-        </div>
-
-        {/* Mask Reveal: Subtitle */}
-        <div className="overflow-hidden mb-16 md:mb-20">
-          <motion.p
-            initial={{ y: "120%" }}
-            animate={{ y: 0 }}
-            transition={{ duration: 1, delay: 0.5, ease: [0.33, 1, 0.68, 1] }}
-            className="text-cream/95 font-serif italic text-2xl md:text-3xl lg:text-4xl max-w-xl tracking-wide"
-          >
-            Calories don't count on Sundays.
-          </motion.p>
-        </div>
-
-        {/* Action Button */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.8, ease: [0.33, 1, 0.68, 1] }}
-          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
-        >
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          >
-            <Button
-              className="bg-[#C7A44C] text-[#163126] font-bold px-12 md:px-14 py-5 text-xs md:text-sm tracking-[0.25em] shadow-2xl hover:bg-[#D8B45C] whitespace-nowrap border border-[#D8B45C]/20"
-              onClick={() => document.getElementById('drop')?.scrollIntoView({ behavior: 'smooth' })}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-[#C7A44C] tracking-[0.4em] uppercase text-xs font-bold font-sans mb-8"
             >
-              VIEW THIS WEEK'S DROP
-            </Button>
+              PRE-LAUNCH WAITLIST
+            </motion.p>
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.3 }}
+              className="font-serif text-5xl md:text-7xl lg:text-8xl text-[#F6F0E7] mb-8 font-normal tracking-tight leading-[1.1]"
+            >
+              Calories don't count <br className="hidden md:block" /> on Sundays.
+            </motion.h1>
+    
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.5 }}
+              className="text-[#F6F0E7]/70 font-sans text-lg md:text-xl max-w-lg mb-12 leading-relaxed"
+            >
+              Obsessively crafted, small-batch cookies. We spent a year perfecting the ultimate indulgence. You just have to wait a little longer.
+            </motion.p>
+    
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.7 }}
+            >
+              <Button 
+                variant="secondary"
+                className="bg-[#C7A44C] text-[#163126] font-bold px-12 py-6 text-sm tracking-[0.2em] shadow-2xl hover:bg-[#D8B45C] transition-all rounded-full"
+                onClick={() => document.getElementById('drop')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                JOIN THE FIRST DROP
+              </Button>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      </div>
-
-      {/* Scroll Affordance */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-10 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-      >
-        <span className="text-[#C7A44C] text-[9px] tracking-[0.3em] uppercase opacity-70">Scroll</span>
-        <div className="h-16 w-px bg-white/10 overflow-hidden relative">
-          <motion.div
-            className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-transparent via-[#C7A44C] to-transparent"
-            animate={{ y: ['-100%', '200%'] }}
-            transition={{ duration: 2, ease: "linear", repeat: Infinity }}
-          />
+    
+          {/* Right Column: Visual */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, x: 30 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 1.2, delay: 0.4, ease: [0.33, 1, 0.68, 1] }}
+            className="relative aspect-square lg:aspect-[4/5] w-full order-1 lg:order-2"
+          >
+            <div className="w-full h-full rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.4)] border border-white/5">
+              <img 
+                src="/hero-cookie.png" 
+                alt="Premium Sunday Cookie" 
+                className="w-full h-full object-cover scale-105 hover:scale-110 transition-transform duration-[3s] ease-out"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#163126]/40 via-transparent to-transparent pointer-events-none" />
+            </div>
+            
+            {/* Subtle floating accent - Branded element */}
+            <motion.div 
+              animate={{ y: [0, -15, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -bottom-6 -left-6 md:-bottom-10 md:-left-10 w-24 h-24 md:w-32 md:h-32 rounded-full bg-[#C7A44C] flex items-center justify-center shadow-2xl border-4 border-[#163126] z-20"
+            >
+              <span className="text-[#163126] font-serif italic text-xl md:text-2xl">S.</span>
+            </motion.div>
+          </motion.div>
+          
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
