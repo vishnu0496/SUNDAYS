@@ -17,6 +17,59 @@ interface CartDrawerProps {
   onClearCart?: () => void;
 }
 
+type RazorpayPaymentResponse = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+};
+
+type RazorpayFailedPayment = {
+  error: {
+    description?: string;
+    reason?: string;
+  };
+};
+
+type RazorpayCheckoutOptions = {
+  key: string;
+  name: string;
+  currency: string;
+  amount: number;
+  order_id: string;
+  description: string;
+  handler: (response: RazorpayPaymentResponse) => void | Promise<void>;
+  modal: {
+    ondismiss: () => void;
+  };
+  prefill: {
+    name: string;
+    email: string;
+    contact: string;
+  };
+  theme: {
+    color: string;
+  };
+};
+
+type RazorpayCheckoutInstance = {
+  open: () => void;
+  on: (event: "payment.failed", handler: (response: RazorpayFailedPayment) => void) => void;
+};
+
+type CreateOrderResponse = {
+  order_id?: string;
+  id?: string;
+  amount?: number;
+  currency?: string;
+  error?: string;
+};
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: RazorpayCheckoutOptions) => RazorpayCheckoutInstance;
+  }
+}
+
 export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCart }: CartDrawerProps) {
   const [stage, setStage] = useState<'cart' | 'checkout'>('cart');
   const [formData, setFormData] = useState({
@@ -33,60 +86,43 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
   
   const deliveryFee = subtotal >= deliveryGoal || subtotal === 0 ? 0 : 49;
   const total = subtotal + deliveryFee;
-  const hasFreeTote = total >= toteGoal;
 
   const deliveryProgress = Math.min((subtotal / deliveryGoal) * 100, 100);
   const toteProgress = Math.min((subtotal / toteGoal) * 100, 100);
 
-  const handleWhatsAppOrder = () => {
-    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
-      alert("Please fill in your name, email, phone, and address.");
-      return;
-    }
-
-    let message = `*✨ NEW ORDER - SUNDAYS COOKIES ✨*%0A%0A`;
-    message += `*👤 CUSTOMER DETAILS*%0A`;
-    message += `Name: ${formData.name}%0A`;
-    message += `Email: ${formData.email}%0A`;
-    message += `Phone: ${formData.phone}%0A`;
-    message += `Address: ${formData.address}%0A`;
-    if (formData.note) message += `Note: _${formData.note}_%0A`;
-    
-    message += `%0A*📦 BOX BREAKDOWN*%0A`;
-
-    cart.forEach((item, index) => {
-      message += `%0A*BOX #${index + 1} (${item.packName})*%0A`;
-      Object.entries(item.selections).forEach(([cookie, count]) => {
-        if (count > 0) message += `• ${cookie}: ${count}%0A`;
-      });
-      if (item.packName === "5+1 Free Pack") message += `• _Chocolate Chip: 1 (FREE BONUS)_%0A`;
-    });
-
-    message += `%0A*──────────────────*%0A`;
-    message += `*Subtotal:* ₹${subtotal}%0A`;
-    message += `*Delivery:* ${deliveryFee === 0 ? "*FREE*" : `₹${deliveryFee}`}%0A`;
-    if (hasFreeTote) message += `*Gift:* *FREE TOTE BAG 🎁*%0A`;
-    message += `%0A*TOTAL AMOUNT: ₹${total}*%0A`;
-    message += `*──────────────────*%0A%0A`;
-    message += `_Please confirm availability for delivery!_`;
-
-    window.open(`https://wa.me/919177155540?text=${message}`, "_blank");
-  };
-
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
 
   const initializeRazorpay = () => {
-    return new Promise((resolve) => {
+    if (window.Razorpay) {
+      return Promise.resolve(true);
+    }
+
+    return new Promise<boolean>((resolve) => {
+      const existingScript = document.querySelector<HTMLScriptElement>(
+        'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+      );
+
+      if (existingScript) {
+        existingScript.addEventListener("load", () => resolve(true), { once: true });
+        existingScript.addEventListener("error", () => resolve(false), { once: true });
+        return;
+      }
+
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
       script.onload = () => resolve(true);
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
   };
 
-  const submitOrderToBackend = async (deliveryCharge: number) => {
+  const submitOrderToBackend = async (
+    deliveryCharge: number,
+    payment: RazorpayPaymentResponse
+  ) => {
     const apiUrl = `${window.location.origin}/api/order`;
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -106,6 +142,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
           addressPincode: "500001",
         },
         items: cart.map(item => ({
+          id: item.packName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
           name: item.packName,
           quantity: 1,
           price: item.price,
@@ -113,7 +150,8 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
         })),
         subtotal,
         delivery: deliveryCharge,
-        total: subtotal + deliveryCharge
+        total: subtotal + deliveryCharge,
+        payment
       })
     });
 
@@ -122,46 +160,62 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
       throw new Error(`Server responded with ${response.status}: ${errorText}`);
     }
 
-    const result = await response.json();
+    const result: { success?: boolean; error?: string } = await response.json();
     return result;
   };
 
   const handleCompleteOrder = async () => {
+    setPaymentError("");
+
     if (!formData.name || !formData.email || !formData.phone || !formData.address) {
-      alert("Please fill in all delivery details.");
+      setPaymentError("Please fill in all delivery details before payment.");
       return;
     }
 
-    const deliveryCharge = subtotal >= 899 ? 0 : 50;
-    const finalTotal = subtotal + deliveryCharge;
+    const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    if (!razorpayKeyId) {
+      setPaymentError("Razorpay public key is missing. Add NEXT_PUBLIC_RAZORPAY_KEY_ID and redeploy.");
+      return;
+    }
+
+    const deliveryCharge = deliveryFee;
+    const finalTotal = total;
     
     setIsProcessing(true);
     try {
       const res = await initializeRazorpay();
-      if (!res) {
-        alert("Razorpay SDK Failed to load");
-        setIsProcessing(false);
-        return;
+      if (!res || !window.Razorpay) {
+        throw new Error("Razorpay checkout failed to load. Please refresh and try again.");
       }
 
-      const data = await fetch("/api/razorpay/create-order", {
+      const createOrderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: finalTotal * 100 }), // amount in paise
-      }).then((t) => t.json());
+        body: JSON.stringify({
+          amount: Math.round(finalTotal * 100),
+          currency: "INR",
+          receipt: `sundays_${Date.now()}`,
+        }),
+      });
 
-      if (data.error) {
-        throw new Error(data.error);
+      const data = (await createOrderRes.json()) as CreateOrderResponse;
+      if (!createOrderRes.ok || data.error) {
+        throw new Error(data.error || "Could not create Razorpay order.");
       }
 
-      var options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+      const orderId = data.order_id || data.id;
+      if (!orderId || !data.amount || !data.currency) {
+        throw new Error("Razorpay order response was incomplete.");
+      }
+
+      const options: RazorpayCheckoutOptions = {
+        key: razorpayKeyId,
         name: "Sundays",
         currency: data.currency,
         amount: data.amount,
-        order_id: data.id,
+        order_id: orderId,
         description: "Sundays Order",
-        handler: async function (response: any) {
+        handler: async function (response) {
           try {
             const verifyRes = await fetch("/api/razorpay/verify-payment", {
               method: "POST",
@@ -174,21 +228,25 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
             });
 
             const verifyData = await verifyRes.json();
-            if (verifyData.success) {
-              const result = await submitOrderToBackend(deliveryCharge);
-              if (result.success) {
-                setOrderSuccess(true);
-                onClearCart?.();
-                handleWhatsAppOrder();
-              } else {
-                alert(result.error || "Order saving failed after payment.");
-              }
+            if (!verifyRes.ok || !verifyData.success) {
+              throw new Error(verifyData.error || "Payment verification failed.");
+            }
+
+            const result = await submitOrderToBackend(deliveryCharge, response);
+            if (result.success) {
+              setOrderSuccess(true);
+              setStage("cart");
+              onClearCart?.();
             } else {
-              alert("Payment verification failed. If money was deducted, it will be refunded.");
+              throw new Error(result.error || "Order saving failed after payment.");
             }
           } catch (error) {
             console.error("Verification error:", error);
-            alert("Error verifying payment");
+            setPaymentError(
+              error instanceof Error
+                ? error.message
+                : "Error verifying payment. Please contact us if money was deducted."
+            );
           } finally {
              setIsProcessing(false);
           }
@@ -208,15 +266,17 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
         },
       };
 
-      const paymentObject = new (window as any).Razorpay(options);
-      paymentObject.on("payment.failed", function (response: any) {
-        alert("Payment failed. " + response.error.description);
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.on("payment.failed", function (response) {
+        setPaymentError(
+          response.error.description || response.error.reason || "Payment failed. Please try again."
+        );
         setIsProcessing(false);
       });
       paymentObject.open();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Order error:", error);
-      alert(`System Error: ${error.message || "Could not connect to server"}`);
+      setPaymentError(error instanceof Error ? error.message : "Could not connect to payment server.");
       setIsProcessing(false);
     }
   };
@@ -326,7 +386,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                             </div>
 
                             <div className="space-y-3 pt-3 border-l-2 border-gold/10 pl-6">
-                              {Object.entries(item.selections).filter(([_, count]) => count > 0).map(([name, count]) => (
+                              {Object.entries(item.selections).filter(([, count]) => count > 0).map(([name, count]) => (
                                 <div key={name} className="flex justify-between text-sm">
                                   <div className="flex items-center gap-3">
                                     <div 
@@ -365,19 +425,19 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                     <div className="space-y-10">
                       <div>
                         <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Your Name</label>
-                        <input type="text" placeholder="Full name" className="input-premium h-14 text-base" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                        <input required type="text" placeholder="Full name" className="input-premium h-14 text-base" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                       </div>
                       <div>
                         <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Email Address</label>
-                        <input type="email" placeholder="hello@example.com" className="input-premium h-14 text-base" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                        <input required type="email" placeholder="hello@example.com" className="input-premium h-14 text-base" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
                       </div>
                       <div>
                         <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">WhatsApp Number</label>
-                        <input type="tel" placeholder="+91 98765 43210" className="input-premium h-14 text-base" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                        <input required type="tel" placeholder="+91 98765 43210" className="input-premium h-14 text-base" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
                       </div>
                       <div>
                         <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Delivery Address</label>
-                        <textarea placeholder="Full address, Hyderabad" className="input-premium min-h-[140px] py-4 text-base" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
+                        <textarea required placeholder="Full address, Hyderabad" className="input-premium min-h-[140px] py-4 text-base" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
                       </div>
                       <div>
                         <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Note (Optional)</label>
@@ -391,20 +451,40 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
 
             {/* Footer */}
             <div className="p-8 border-t border-gold/10 bg-white/[0.02]">
+              {cart.length > 0 && (
+                <div className="mb-6 space-y-3 border-b border-gold/10 pb-6 text-sm">
+                  <div className="flex justify-between text-white/50">
+                    <span>Subtotal</span>
+                    <span>₹{subtotal}</span>
+                  </div>
+                  <div className="flex justify-between text-white/50">
+                    <span>Delivery</span>
+                    <span>{deliveryFee === 0 ? "Free" : `₹${deliveryFee}`}</span>
+                  </div>
+                </div>
+              )}
               <div className="flex justify-between items-center mb-8">
                 <span className="text-white/40 uppercase tracking-widest text-[11px] font-bold">
                   {stage === 'cart' ? 'Total Selection' : 'Grand Total'}
                 </span>
                 <span className="text-tan text-3xl font-serif font-bold">₹{total}</span>
               </div>
+              {paymentError && (
+                <p className="mb-5 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-center text-sm text-red-300">
+                  {paymentError}
+                </p>
+              )}
               
               {stage === 'cart' ? (
                 <button 
-                  onClick={() => setStage('checkout')}
+                  onClick={() => {
+                    setPaymentError("");
+                    setStage('checkout');
+                  }}
                   disabled={cart.length === 0}
                   className="premium-button w-full py-6 disabled:opacity-20"
                 >
-                  Proceed to Checkout
+                  Continue to Payment
                 </button>
               ) : (
                 <button 
@@ -415,10 +495,10 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                   {isProcessing ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Processing...
+                      Opening Razorpay...
                     </>
                   ) : (
-                    'Confirm & Send Order'
+                    `Pay ₹${total} with Razorpay`
                   )}
                 </button>
               )}

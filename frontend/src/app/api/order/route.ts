@@ -1,8 +1,18 @@
 import { NextResponse } from "next/server";
 import { processOrder, getOrders, getPreviousOrderCount, CustomerDetails, OrderItem } from "@/lib/storage";
 import { sendCustomerOrderConfirmation, sendOwnerOrderNotification } from "@/lib/email";
+import { RazorpayConfigError, verifyRazorpaySignature } from "@/lib/razorpay";
+import { updateOrderMeta } from "@/lib/admin-data";
 
 const REVIEW_MODE = process.env.NEXT_PUBLIC_REVIEW_MODE === "true";
+
+export const runtime = "nodejs";
+
+type RazorpayPaymentPayload = {
+  razorpay_order_id?: string;
+  razorpay_payment_id?: string;
+  razorpay_signature?: string;
+};
 
 export async function POST(req: Request) {
   console.log(">>> [API] Order request received");
@@ -21,12 +31,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log(">>> [API] Request body parsed:", !!body);
-    const { customer, items, subtotal, delivery, total } = body as {
+    const { customer, items, subtotal, delivery, total, payment } = body as {
       customer: CustomerDetails;
       items: OrderItem[];
       subtotal: number;
       delivery: number;
       total: number;
+      payment?: RazorpayPaymentPayload;
     };
 
     if (
@@ -46,6 +57,32 @@ export async function POST(req: Request) {
       );
     }
 
+    let paymentVerified = false;
+
+    if (payment) {
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = payment;
+
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return NextResponse.json(
+          { success: false, error: "Missing Razorpay payment verification fields" },
+          { status: 400 }
+        );
+      }
+
+      paymentVerified = verifyRazorpaySignature({
+        orderId: razorpay_order_id,
+        paymentId: razorpay_payment_id,
+        signature: razorpay_signature,
+      });
+
+      if (!paymentVerified) {
+        return NextResponse.json(
+          { success: false, error: "Payment verification failed" },
+          { status: 400 }
+        );
+      }
+    }
+
     const result = await processOrder(customer, items, subtotal, delivery, total);
 
     if (!result.success || !result.entry) {
@@ -53,6 +90,14 @@ export async function POST(req: Request) {
         { success: false, status: result.error, error: "Weekly drop limit reached. Sold out." },
         { status: 400 }
       );
+    }
+
+    if (paymentVerified && payment?.razorpay_payment_id && payment.razorpay_order_id) {
+      await updateOrderMeta(result.entry.orderNumber, {
+        paymentStatus: "Paid",
+        fulfillmentStatus: "Reserved",
+        notes: `Razorpay payment verified. Payment ID: ${payment.razorpay_payment_id}; Order ID: ${payment.razorpay_order_id}`,
+      });
     }
 
     // Check for previous orders from this customer (for owner email insight)
@@ -72,6 +117,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, order: result.entry });
   } catch (error) {
     console.error("Order processing error:", error);
+    if (error instanceof RazorpayConfigError) {
+      return NextResponse.json(
+        { success: false, error: "Razorpay is not configured. Add the key secret environment variable." },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
@@ -94,7 +146,7 @@ export async function GET() {
       count: orders.length,
       isSoldOut,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, error: "Failed to fetch status" },
       { status: 500 }
