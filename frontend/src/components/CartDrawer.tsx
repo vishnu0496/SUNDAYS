@@ -76,6 +76,56 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
+  const initializeRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const submitOrderToBackend = async (deliveryCharge: number) => {
+    const apiUrl = `${window.location.origin}/api/order`;
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        customer: {
+          firstName: formData.name ? formData.name.split(' ')[0] : 'Customer',
+          email: formData.email,
+          whatsapp: formData.phone,
+          addressHouse: formData.address,
+          addressLocality: "Hyderabad",
+          addressCity: "Hyderabad",
+          addressState: "Telangana",
+          addressPincode: "500001",
+        },
+        items: cart.map(item => ({
+          name: item.packName,
+          quantity: 1,
+          price: item.price,
+          selections: item.selections
+        })),
+        subtotal,
+        delivery: deliveryCharge,
+        total: subtotal + deliveryCharge
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server responded with ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    return result;
+  };
+
   const handleCompleteOrder = async () => {
     if (!formData.name || !formData.email || !formData.phone || !formData.address) {
       alert("Please fill in all delivery details.");
@@ -83,59 +133,90 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
     }
 
     const deliveryCharge = subtotal >= 899 ? 0 : 50;
+    const finalTotal = subtotal + deliveryCharge;
     
     setIsProcessing(true);
     try {
-      const apiUrl = `${window.location.origin}/api/order`;
-      console.log(">>> [Cart] Sending order to:", apiUrl);
+      const res = await initializeRazorpay();
+      if (!res) {
+        alert("Razorpay SDK Failed to load");
+        setIsProcessing(false);
+        return;
+      }
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+      const data = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: finalTotal * 100 }), // amount in paise
+      }).then((t) => t.json());
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      var options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+        name: "Sundays",
+        currency: data.currency,
+        amount: data.amount,
+        order_id: data.id,
+        description: "Sundays Order",
+        handler: async function (response: any) {
+          try {
+            const verifyRes = await fetch("/api/razorpay/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              const result = await submitOrderToBackend(deliveryCharge);
+              if (result.success) {
+                setOrderSuccess(true);
+                onClearCart?.();
+                handleWhatsAppOrder();
+              } else {
+                alert(result.error || "Order saving failed after payment.");
+              }
+            } else {
+              alert("Payment verification failed. If money was deducted, it will be refunded.");
+            }
+          } catch (error) {
+            console.error("Verification error:", error);
+            alert("Error verifying payment");
+          } finally {
+             setIsProcessing(false);
+          }
         },
-        body: JSON.stringify({
-          customer: {
-            firstName: formData.name ? formData.name.split(' ')[0] : 'Customer',
-            email: formData.email,
-            whatsapp: formData.phone,
-            addressHouse: formData.address,
-            addressLocality: "Hyderabad",
-            addressCity: "Hyderabad",
-            addressState: "Telangana",
-            addressPincode: "500001",
-          },
-          items: cart.map(item => ({
-            name: item.packName,
-            quantity: 1,
-            price: item.price,
-            selections: item.selections
-          })),
-          subtotal,
-          delivery: deliveryCharge,
-          total: subtotal + deliveryCharge
-        })
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: "#C7A44C", // Using the gold color from the app
+        },
+      };
+
+      const paymentObject = new (window as any).Razorpay(options);
+      paymentObject.on("payment.failed", function (response: any) {
+        alert("Payment failed. " + response.error.description);
+        setIsProcessing(false);
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server responded with ${response.status}: ${errorText}`);
-      }
-
-      const result = await response.json();
-      
-      if (result.success) {
-        setOrderSuccess(true);
-        onClearCart?.();
-        handleWhatsAppOrder();
-      } else {
-        alert(result.error || "Order failed. Please try again.");
-      }
+      paymentObject.open();
     } catch (error: any) {
       console.error("Order error:", error);
       alert(`System Error: ${error.message || "Could not connect to server"}`);
-    } finally {
       setIsProcessing(false);
     }
   };
