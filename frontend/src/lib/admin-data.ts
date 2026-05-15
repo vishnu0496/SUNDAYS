@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { getOrders, OrderEntry, CustomerDetails, OrderItem } from './storage';
+import { getStore } from '@netlify/blobs';
+import { getOrders, OrderEntry } from './storage';
 
 // Shopify-grade Status Architecture
 export type PaymentStatus = 'Unpaid' | 'Pending Review' | 'Paid' | 'Failed' | 'Refunded';
@@ -32,6 +33,17 @@ export interface DropEntry {
 
 const getMetaPath = () => path.join(process.cwd(), 'order-meta.json');
 const getDropsPath = () => path.join(process.cwd(), 'drops.json');
+const isNetlifyRuntime = Boolean(process.env.NETLIFY);
+const META_BLOB_KEY = 'order-meta';
+
+function getAdminStore() {
+  return getStore('sundays-admin');
+}
+
+type RawOrderMeta = Partial<OrderMeta> & {
+  orderStatus?: FulfillmentStatus;
+  paymentStatus?: PaymentStatus | 'Pending';
+};
 
 // OFFICIAL BRANDED SOURCE OF TRUTH (Comprehensive Normalization)
 const BRANDED_NAMES: Record<string, string> = {
@@ -82,13 +94,14 @@ export async function getDrops(): Promise<DropEntry[]> {
 
 export async function getOrderMeta(): Promise<Record<string, OrderMeta>> {
   try {
-    const data = await fs.readFile(getMetaPath(), 'utf-8');
-    const rawData = JSON.parse(data);
+    const rawData: Record<string, RawOrderMeta> = isNetlifyRuntime
+      ? ((await getAdminStore().get(META_BLOB_KEY, { type: 'json' })) ?? {})
+      : JSON.parse(await fs.readFile(getMetaPath(), 'utf-8'));
     
     // Schema Migration & Normalization on the fly
     const normalizedMeta: Record<string, OrderMeta> = {};
     for (const [id, meta] of Object.entries(rawData)) {
-      const m = meta as any;
+      const m = meta;
       
       // Handle legacy 'orderStatus' -> 'fulfillmentStatus'
       const fStatus = m.fulfillmentStatus || m.orderStatus || 'Reserved';
@@ -114,6 +127,12 @@ export async function updateOrderMeta(orderNumber: string, updates: Partial<Orde
   const meta = await getOrderMeta();
   const current = meta[orderNumber] || { paymentStatus: 'Unpaid', fulfillmentStatus: 'Reserved', notes: '' };
   meta[orderNumber] = { ...current, ...updates };
+
+  if (isNetlifyRuntime) {
+    await getAdminStore().setJSON(META_BLOB_KEY, meta);
+    return;
+  }
+
   await fs.writeFile(getMetaPath(), JSON.stringify(meta, null, 2));
 }
 

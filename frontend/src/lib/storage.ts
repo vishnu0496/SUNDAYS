@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { getStore } from "@netlify/blobs";
 
 export interface OrderItem {
   id: string;
@@ -32,6 +33,8 @@ export interface OrderEntry {
 }
 
 let isWriting = false;
+const isNetlifyRuntime = Boolean(process.env.NETLIFY);
+const ORDERS_BLOB_KEY = "orders";
 
 async function acquireLock() {
   while (isWriting) {
@@ -46,13 +49,21 @@ function releaseLock() {
 
 const getFilePath = () => path.join(process.cwd(), "orders.json");
 
+function getOrdersStore() {
+  return getStore("sundays-orders");
+}
+
 export async function getOrders(): Promise<OrderEntry[]> {
+  if (isNetlifyRuntime) {
+    return (await getOrdersStore().get(ORDERS_BLOB_KEY, { type: "json" })) ?? [];
+  }
+
   const filePath = getFilePath();
   try {
     const data = await fs.readFile(filePath, "utf-8");
     return JSON.parse(data);
-  } catch (error: any) {
-    if (error.code === "ENOENT") {
+  } catch (error: unknown) {
+    if (typeof error === "object" && error && "code" in error && error.code === "ENOENT") {
       return [];
     }
     throw error;
@@ -94,6 +105,11 @@ export async function processOrder(
 }
 
 async function saveOrders(orders: OrderEntry[]) {
+  if (isNetlifyRuntime) {
+    await getOrdersStore().setJSON(ORDERS_BLOB_KEY, orders);
+    return;
+  }
+
   const filePath = getFilePath();
   const rawData = JSON.stringify(orders, null, 2);
   await fs.writeFile(filePath, rawData, "utf-8");
