@@ -38,9 +38,6 @@ const META_BLOB_KEY = 'order-meta';
 function isNetlifyRuntime() {
   return Boolean(
     process.env.NETLIFY_BLOBS_CONTEXT ||
-      process.env.NETLIFY ||
-      process.env.CONTEXT ||
-      process.env.URL ||
       process.cwd().startsWith('/var/task')
   );
 }
