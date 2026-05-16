@@ -107,11 +107,15 @@ export async function POST(req: Request) {
     );
 
     // Trigger emails asynchronously — non-fatal if they fail
-    Promise.all([
+    const emailResults = await Promise.allSettled([
       sendCustomerOrderConfirmation(result.entry),
       sendOwnerOrderNotification(result.entry, previousOrderCount),
-    ]).catch((err) => {
-      console.error("Non-fatal email dispatch error:", err);
+    ]);
+
+    emailResults.forEach((emailResult) => {
+      if (emailResult.status === "rejected") {
+        console.error("Non-fatal email dispatch error:", emailResult.reason);
+      }
     });
 
     return NextResponse.json({ success: true, order: result.entry });

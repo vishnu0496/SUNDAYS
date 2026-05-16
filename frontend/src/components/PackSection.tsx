@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { VegSeal } from "./ui/VegSeal";
 import { BatchIndicator } from "./ui/BatchIndicator";
 
-type CookieType = "The Legend" | "The Naughty Nutella" | "The Citrus Cloud";
+type CookieType = "The Legend" | "The Naughty Nutella";
 
 interface Pack {
   id: string;
@@ -18,9 +18,8 @@ interface Pack {
 }
 
 const COOKIES: { name: CookieType; flavor: string; description: string }[] = [
-  { name: "The Legend", flavor: "Classic Choco-Chip", description: "Hand-chopped dark chocolate · Sea salt finish" },
-  { name: "The Naughty Nutella", flavor: "Nutella Stuffed", description: "Molten hazelnut core · Creamy Belgian base" },
-  { name: "The Citrus Cloud", flavor: "Lemon Crinkle", description: "Zesty organic lemons · Melt-in-your-mouth texture" },
+  { name: "The Legend", flavor: "Classic Choco-Chip", description: "Hand-chopped dark chocolate, sea salt finish" },
+  { name: "The Naughty Nutella", flavor: "Nutella Stuffed", description: "Molten hazelnut core, creamy Belgian base" },
 ];
 
 const PACKS: Pack[] = [
@@ -35,38 +34,47 @@ const PACKS: Pack[] = [
   },
   {
     id: "6-pack",
-    name: "5+1 Free Pack",
-    subtitle: "Choose 5, get 1 The Legend free",
+    name: "6-Cookie Pack",
+    subtitle: "Mix any 6 cookies you love",
     price: 649,
-    maxCookies: 5, // User chooses 5, 1 is auto-added
+    maxCookies: 6,
     image: "/images/pack2.jpg",
     badge: "BEST VALUE",
   },
 ];
 
+const EMPTY_SELECTIONS: Record<string, Record<CookieType, number>> = {
+  "3-pack": { "The Legend": 0, "The Naughty Nutella": 0 },
+  "6-pack": { "The Legend": 0, "The Naughty Nutella": 0 },
+};
+
 export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selections: Record<string, number>) => void }) {
-  const [selections, setSelections] = useState<Record<string, Record<string, number>>>({
-    "3-pack": { "The Legend": 0, "The Naughty Nutella": 0, "The Citrus Cloud": 0 },
-    "6-pack": { "The Legend": 0, "The Naughty Nutella": 0, "The Citrus Cloud": 0 },
-  });
+  const [selections, setSelections] = useState<Record<string, Record<CookieType, number>>>(EMPTY_SELECTIONS);
 
   const getPackTotal = (packId: string) => {
     return Object.values(selections[packId]).reduce((a, b) => a + b, 0);
   };
 
-  const updateQuantity = (packId: string, cookieName: string, delta: number) => {
-    const pack = PACKS.find(p => p.id === packId)!;
+  const updateQuantity = (packId: string, cookieName: CookieType, delta: number) => {
+    const pack = PACKS.find((p) => p.id === packId)!;
     const currentTotal = getPackTotal(packId);
 
     if (delta > 0 && currentTotal >= pack.maxCookies) return;
     if (delta < 0 && selections[packId][cookieName] <= 0) return;
 
-    setSelections(prev => ({
+    setSelections((prev) => ({
       ...prev,
       [packId]: {
         ...prev[packId],
         [cookieName]: prev[packId][cookieName] + delta,
-      }
+      },
+    }));
+  };
+
+  const resetPack = (packId: string) => {
+    setSelections((prev) => ({
+      ...prev,
+      [packId]: { "The Legend": 0, "The Naughty Nutella": 0 },
     }));
   };
 
@@ -77,7 +85,7 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
           <p className="text-gold-muted tracking-[0.4em] uppercase text-[10px] font-bold mb-gap-sm">CHOOSE YOUR PACK</p>
           <h2 className="text-5xl md:text-7xl font-serif text-cream">Pick. Mix. Devour.</h2>
           <p className="text-cream/60 mt-gap-sm font-serif italic text-lg max-w-xl mx-auto leading-relaxed">
-            Mix any flavours. Each cookie is baked fresh on your chosen day.
+            Choose Chocolate Chip, Nutella, or a mix of both. Each cookie is baked fresh on your chosen day.
           </p>
           <div className="flex justify-center mt-8">
             <BatchIndicator />
@@ -101,8 +109,7 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-transparent to-transparent opacity-80" />
-                
-                {/* Premium Veg Seal */}
+
                 <VegSeal className="absolute top-6 left-6 z-10" />
 
                 {pack.badge && (
@@ -115,7 +122,7 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
               <div className="p-8 md:p-12 flex flex-col flex-grow">
                 <div className="flex justify-between items-baseline mb-2">
                   <h3 className="text-3xl md:text-4xl font-serif text-cream">{pack.name}</h3>
-                  <span className="text-tan text-3xl md:text-4xl font-serif">₹{pack.price}</span>
+                  <span className="text-tan text-3xl md:text-4xl font-serif">&#8377;{pack.price}</span>
                 </div>
                 <p className="font-serif-display text-cream/50 text-base mb-gap-md">{pack.subtitle}</p>
 
@@ -168,19 +175,17 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                   ))}
                 </div>
 
-                {/* Visual Box Builder */}
                 <div className="mt-8 pt-8 border-t border-gold/10">
                   <p className="text-[11px] tracking-[0.3em] uppercase font-bold text-gold-muted mb-5 text-center">
                     YOUR BOX PROGRESS
                   </p>
                   <div className="flex justify-center gap-3">
-                    {[...Array(pack.id === "6-pack" ? 6 : 3)].map((_, i) => {
+                    {[...Array(pack.maxCookies)].map((_, i) => {
                       const filledSlots: string[] = [];
                       Object.entries(selections[pack.id]).forEach(([name, count]) => {
                         for (let j = 0; j < count; j++) filledSlots.push(name);
                       });
 
-                      const isFreeSlot = pack.id === "6-pack" && i === 5;
                       const cookieType = filledSlots[i];
 
                       return (
@@ -188,20 +193,23 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                           key={i}
                           initial={false}
                           animate={{
-                            scale: cookieType || (isFreeSlot && filledSlots.length >= 5) ? 1.1 : 1,
-                          backgroundColor: cookieType === "The Legend" ? "#C7A44C" :
-                              cookieType === "The Naughty Nutella" ? "#4B3621" :
-                                cookieType === "The Citrus Cloud" ? "#FDFD96" :
-                                  (isFreeSlot && filledSlots.length >= 5) ? "#C7A44C" : "transparent",
-                            boxShadow: cookieType || (isFreeSlot && filledSlots.length >= 5) ? `0 0 15px ${cookieType === "The Legend" ? "rgba(199,164,76,0.3)" :
-                                cookieType === "The Naughty Nutella" ? "rgba(75,54,33,0.3)" :
-                                  "rgba(253,253,150,0.3)"
-                              }` : "none"
+                            scale: cookieType ? 1.1 : 1,
+                            backgroundColor:
+                              cookieType === "The Legend"
+                                ? "#C7A44C"
+                                : cookieType === "The Naughty Nutella"
+                                  ? "#4B3621"
+                                  : "transparent",
+                            boxShadow: cookieType
+                              ? `0 0 15px ${
+                                  cookieType === "The Legend" ? "rgba(199,164,76,0.3)" : "rgba(75,54,33,0.3)"
+                                }`
+                              : "none",
                           }}
-                          className={`w-8 h-8 rounded-full border ${cookieType || (isFreeSlot && filledSlots.length >= 5) ? "border-transparent" : "border-gold/20"} flex items-center justify-center text-[8px] font-bold`}
-                        >
-                          {isFreeSlot && filledSlots.length >= 5 && <span className="text-forest">FREE</span>}
-                        </motion.div>
+                          className={`w-8 h-8 rounded-full border ${
+                            cookieType ? "border-transparent" : "border-gold/20"
+                          }`}
+                        />
                       );
                     })}
                   </div>
@@ -221,10 +229,7 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                       }, 2000);
                     }
                     onAddToCart(pack, selections[pack.id]);
-                    setSelections(prev => ({
-                      ...prev,
-                      [pack.id]: { "The Legend": 0, "The Naughty Nutella": 0, "The Citrus Cloud": 0 }
-                    }));
+                    resetPack(pack.id);
                   }}
                   id={`add-${pack.id}`}
                   disabled={getPackTotal(pack.id) < pack.maxCookies}

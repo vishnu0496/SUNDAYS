@@ -4,7 +4,7 @@ const STEPS = [
   {
     num: "01",
     title: "Pick Your Pack",
-    desc: "Choose between our 3-cookie starter or 5+1 value pack."
+    desc: "Choose between our 3-cookie starter or 6-cookie value pack."
   },
   {
     num: "02",

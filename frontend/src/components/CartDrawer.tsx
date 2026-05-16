@@ -392,8 +392,8 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                                     <div 
                                       className="w-2 h-2 rounded-full" 
                                       style={{ 
-                                        backgroundColor: name === "Chocolate Chip" ? "#C7A44C" : 
-                                                        name === "Nutella Stuffed" ? "#4B3621" : "#FDFD96" 
+                                        backgroundColor: name === "The Legend" ? "#C7A44C" :
+                                                        name === "The Naughty Nutella" ? "#4B3621" : "#FDFD96"
                                       }} 
                                     />
                                     <span className="text-white/60 italic font-serif text-lg">{name}</span>
@@ -401,15 +401,6 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                                   <span className="text-tan font-bold">x{count}</span>
                                 </div>
                               ))}
-                              {item.packName === "5+1 Free Pack" && (
-                                <div className="flex justify-between items-center text-sm border-t border-gold/5 pt-2 mt-2">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-                                    <span className="text-gold italic font-serif">Chocolate Chip (Bonus)</span>
-                                  </div>
-                                  <span className="text-gold font-bold">x1</span>
-                                </div>
-                              )}
                             </div>
                           </div>
                         ))
