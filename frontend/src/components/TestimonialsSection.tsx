@@ -29,20 +29,30 @@ function Stars({
   onChange?: (rating: number) => void;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       {[1, 2, 3, 4, 5].map((star) => {
         const active = star <= rating;
+        if (!onChange) {
+          return (
+            <span key={star} className={`text-2xl leading-none ${active ? "text-tan" : "text-cream/20"}`}>
+              ★
+            </span>
+          );
+        }
+
         return (
           <button
             key={star}
             type="button"
-            onClick={() => onChange?.(star)}
-            className={`text-3xl leading-none transition-all ${
-              active ? "text-tan" : "text-cream/20 hover:text-tan/70"
-            } ${onChange ? "cursor-pointer" : "cursor-default"}`}
-            aria-label={`${star} star${star > 1 ? "s" : ""}`}
+            onClick={() => onChange(star)}
+            className={`h-12 w-12 rounded-full border text-xl leading-none transition-all ${
+              active
+                ? "border-tan bg-tan text-forest shadow-[0_0_18px_rgba(199,164,76,0.18)]"
+                : "border-gold/15 bg-white/[0.03] text-cream/35 hover:border-tan/50 hover:text-tan"
+            }`}
+            aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
           >
-            *
+            ★
           </button>
         );
       })}
@@ -182,9 +192,14 @@ export function TestimonialsSection() {
               </div>
 
               <div>
-                <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">
-                  Stars
-                </label>
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold">
+                    Tap to Rate
+                  </label>
+                  <span className="text-tan text-[11px] tracking-[0.2em] uppercase font-bold">
+                    {rating}/5
+                  </span>
+                </div>
                 <Stars rating={rating} onChange={setRating} />
               </div>
             </div>
@@ -203,12 +218,17 @@ export function TestimonialsSection() {
             </div>
 
             <div className="grid md:grid-cols-[1fr_auto] gap-6 items-center">
-              <label className="block cursor-pointer rounded-[8px] border border-gold/10 bg-white/[0.03] px-6 py-5 hover:border-gold/30 transition-colors">
-                <span className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-2">
-                  Add Photo
+              <label className="flex cursor-pointer items-center justify-between gap-5 rounded-[8px] border border-gold/15 bg-white/[0.03] px-6 py-5 hover:border-gold/40 hover:bg-gold/[0.03] transition-colors">
+                <span>
+                  <span className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-2">
+                    Add Photo
+                  </span>
+                  <span className="block text-cream/45 font-serif italic">
+                    {imageDataUrl ? "Photo selected" : "Show us your cookie picture"}
+                  </span>
                 </span>
-                <span className="block text-cream/40 font-serif italic">
-                  {imageDataUrl ? "Photo selected" : "Upload your cookie picture"}
+                <span className="shrink-0 rounded-full bg-tan px-5 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-forest">
+                  ↑ Choose Photo
                 </span>
                 <input type="file" accept="image/*" className="sr-only" onChange={handleImageChange} />
               </label>
