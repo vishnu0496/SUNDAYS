@@ -33,8 +33,17 @@ export interface OrderEntry {
 }
 
 let isWriting = false;
-const isNetlifyRuntime = Boolean(process.env.NETLIFY);
 const ORDERS_BLOB_KEY = "orders";
+
+function isNetlifyRuntime() {
+  return Boolean(
+    process.env.NETLIFY_BLOBS_CONTEXT ||
+      process.env.NETLIFY ||
+      process.env.CONTEXT ||
+      process.env.URL ||
+      process.cwd().startsWith("/var/task")
+  );
+}
 
 async function acquireLock() {
   while (isWriting) {
@@ -54,7 +63,7 @@ function getOrdersStore() {
 }
 
 export async function getOrders(): Promise<OrderEntry[]> {
-  if (isNetlifyRuntime) {
+  if (isNetlifyRuntime()) {
     return (await getOrdersStore().get(ORDERS_BLOB_KEY, { type: "json" })) ?? [];
   }
 
@@ -105,7 +114,7 @@ export async function processOrder(
 }
 
 async function saveOrders(orders: OrderEntry[]) {
-  if (isNetlifyRuntime) {
+  if (isNetlifyRuntime()) {
     await getOrdersStore().setJSON(ORDERS_BLOB_KEY, orders);
     return;
   }

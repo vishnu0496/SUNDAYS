@@ -33,8 +33,17 @@ export interface DropEntry {
 
 const getMetaPath = () => path.join(process.cwd(), 'order-meta.json');
 const getDropsPath = () => path.join(process.cwd(), 'drops.json');
-const isNetlifyRuntime = Boolean(process.env.NETLIFY);
 const META_BLOB_KEY = 'order-meta';
+
+function isNetlifyRuntime() {
+  return Boolean(
+    process.env.NETLIFY_BLOBS_CONTEXT ||
+      process.env.NETLIFY ||
+      process.env.CONTEXT ||
+      process.env.URL ||
+      process.cwd().startsWith('/var/task')
+  );
+}
 
 function getAdminStore() {
   return getStore('sundays-admin');
@@ -94,7 +103,7 @@ export async function getDrops(): Promise<DropEntry[]> {
 
 export async function getOrderMeta(): Promise<Record<string, OrderMeta>> {
   try {
-    const rawData: Record<string, RawOrderMeta> = isNetlifyRuntime
+    const rawData: Record<string, RawOrderMeta> = isNetlifyRuntime()
       ? ((await getAdminStore().get(META_BLOB_KEY, { type: 'json' })) ?? {})
       : JSON.parse(await fs.readFile(getMetaPath(), 'utf-8'));
     
@@ -128,7 +137,7 @@ export async function updateOrderMeta(orderNumber: string, updates: Partial<Orde
   const current = meta[orderNumber] || { paymentStatus: 'Unpaid', fulfillmentStatus: 'Reserved', notes: '' };
   meta[orderNumber] = { ...current, ...updates };
 
-  if (isNetlifyRuntime) {
+  if (isNetlifyRuntime()) {
     await getAdminStore().setJSON(META_BLOB_KEY, meta);
     return;
   }
