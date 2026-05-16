@@ -19,7 +19,7 @@ console.log('SMTP_HOST:', env.SMTP_HOST);
 console.log('SMTP_PORT:', env.SMTP_PORT);
 console.log('SMTP_USER:', env.SMTP_USER);
 console.log('SMTP_PASS lengths:', env.SMTP_PASS ? env.SMTP_PASS.length : 0);
-console.log('SMTP_PASS: [' + env.SMTP_PASS + ']');
+console.log('SMTP_PASS:', env.SMTP_PASS ? '<set>' : '<missing>');
 
 // Gmail app passwords sometimes fail if they contain spaces.
 // Let's test both with and without spaces.
