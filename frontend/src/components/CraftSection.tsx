@@ -1,5 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
+
 const ITEMS = [
   {
     num: "01",
@@ -31,7 +33,7 @@ export function CraftSection() {
           <div className="w-full lg:w-1/2">
             <div className="relative rounded-[48px] overflow-hidden border border-gold/10 aspect-[4/5] md:aspect-square">
               <img 
-                src="/images/real-cookie-clean.png" 
+                src="/images/craft.jpg" 
                 alt="The Craft" 
                 className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-1000"
               />

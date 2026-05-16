@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import { ReviewModeBanner } from "@/components/ui/ReviewModeBanner";
 import "./globals.css";
 
 const inter = Inter({
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     siteName: "Sundays",
     images: [
       {
-        url: "/images/real-cookie-styled.png",
+        url: "/images/hero.png",
         width: 1200,
         height: 630,
         alt: "Sundays Cookies - The 24-Hour Cookie",
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Sundays | The Cookie, Mastered",
     description: "Small-batch cookies, released in weekly drops. Baked every Sunday in Hyderabad.",
-    images: ["/images/real-cookie-styled.png"],
+    images: ["/images/hero.png"],
   },
 };
 
@@ -59,7 +60,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Sundays Hyderabad",
-    "image": "https://sundays-cookies.vercel.app/images/real-cookie-styled.png",
+    "image": "https://sundays-cookies.vercel.app/images/hero.png",
     "@id": "https://sundays-cookies.vercel.app",
     "url": "https://sundays-cookies.vercel.app",
     "telephone": "",
