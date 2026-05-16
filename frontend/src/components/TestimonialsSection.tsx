@@ -20,6 +20,7 @@ type ReviewResponse = {
 };
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+const UNRATED = 0;
 
 function Stars({
   rating,
@@ -31,7 +32,7 @@ function Stars({
   return (
     <div className="flex flex-wrap items-center gap-2">
       {[1, 2, 3, 4, 5].map((star) => {
-        const active = star <= rating;
+        const active = rating > 0 && star <= rating;
         if (!onChange) {
           return (
             <span key={star} className={`text-2xl leading-none ${active ? "text-tan" : "text-cream/20"}`}>
@@ -63,7 +64,7 @@ function Stars({
 export function TestimonialsSection() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [name, setName] = useState("");
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(UNRATED);
   const [message, setMessage] = useState("");
   const [imageDataUrl, setImageDataUrl] = useState("");
   const [status, setStatus] = useState("");
@@ -109,8 +110,8 @@ export function TestimonialsSection() {
     event.preventDefault();
     setStatus("");
 
-    if (!name.trim() || !message.trim()) {
-      setStatus("Please add your name and review.");
+    if (!name.trim() || !message.trim() || rating === UNRATED) {
+      setStatus("Please add your name, rating, and review.");
       return;
     }
 
@@ -129,7 +130,7 @@ export function TestimonialsSection() {
 
       setReviews((current) => [data.review!, ...current].slice(0, 6));
       setName("");
-      setRating(5);
+      setRating(UNRATED);
       setMessage("");
       setImageDataUrl("");
       setStatus("Review added. Thank you for sharing your Sunday.");
@@ -197,7 +198,7 @@ export function TestimonialsSection() {
                     Tap to Rate
                   </label>
                   <span className="text-tan text-[11px] tracking-[0.2em] uppercase font-bold">
-                    {rating}/5
+                    {rating === UNRATED ? "Choose" : `${rating}/5`}
                   </span>
                 </div>
                 <Stars rating={rating} onChange={setRating} />

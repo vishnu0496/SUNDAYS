@@ -6,8 +6,9 @@ export function Header() {
 
   React.useEffect(() => {
     // Listen for cart updates
-    const handleUpdate = (e: any) => {
-      setCartCount(e.detail?.count || 0);
+    const handleUpdate = (event: Event) => {
+      const detail = (event as CustomEvent<{ count?: number }>).detail;
+      setCartCount(detail?.count || 0);
     };
     window.addEventListener('cart-updated', handleUpdate);
     
@@ -25,8 +26,6 @@ export function Header() {
               <span>100% EGGLESS & VEGETARIAN</span>
               <span className="text-gold/30 text-[14px]">✦</span>
               <span>FREE DELIVERY ABOVE ₹899</span>
-              <span className="text-gold/30 text-[14px]">✦</span>
-              <span>HYDERABAD ONLY</span>
               <span className="text-gold/30 text-[14px]">✦</span>
               <span>CALORIES DON’T COUNT ON SUNDAYS</span>
               <span className="text-gold/30 text-[14px]">✦</span>
