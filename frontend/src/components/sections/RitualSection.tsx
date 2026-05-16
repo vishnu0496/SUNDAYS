@@ -15,7 +15,7 @@ export function RitualSection() {
               className="relative rounded-[48px] overflow-hidden border border-gold/10 aspect-[4/5]"
             >
               <img 
-                src="/images/ritual.jpg" 
+                src="/images/real-cookie-styled.png" 
                 alt="The Sunday Ritual" 
                 className="w-full h-full object-cover"
               />
@@ -29,7 +29,7 @@ export function RitualSection() {
               The Sunday Afternoon <br/> <span className="italic text-tan">Slowdown</span>
             </h2>
             <p className="text-cream/60 text-lg md:text-xl font-serif leading-relaxed max-w-xl mb-gap-md italic">
-              "We don't just bake cookies. We curate a moment. A soft chair, a hot espresso, and the molten center of The Legend. This is the Sunday you deserve."
+              &quot;We don&apos;t just bake cookies. We curate a moment. A soft chair, a hot espresso, and the molten center of The Legend. This is the Sunday you deserve.&quot;
             </p>
             
             <div className="flex flex-col gap-6">

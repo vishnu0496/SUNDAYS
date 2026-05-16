@@ -10,7 +10,7 @@ export function Hero() {
         animate={{ scale: [1.1, 1.05, 1.1] }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60"
-        style={{ backgroundImage: 'url("/images/hero.jpg")' }}
+        style={{ backgroundImage: 'url("/images/real-cookie-styled.png")' }}
       />
       
       {/* Strict Cinematic Overlay */}

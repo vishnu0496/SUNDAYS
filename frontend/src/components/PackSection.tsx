@@ -29,7 +29,7 @@ const PACKS: Pack[] = [
     subtitle: "Mix any 3 cookies you love",
     price: 349,
     maxCookies: 3,
-    image: "/images/pack1.jpg",
+    image: "/images/real-cookie-styled.png",
     badge: "BEST STARTER",
   },
   {
@@ -38,7 +38,7 @@ const PACKS: Pack[] = [
     subtitle: "Mix any 6 cookies you love",
     price: 649,
     maxCookies: 6,
-    image: "/images/pack2.jpg",
+    image: "/images/real-cookie-clean.png",
     badge: "BEST VALUE",
   },
 ];
