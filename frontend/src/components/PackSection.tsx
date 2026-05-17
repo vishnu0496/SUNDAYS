@@ -36,7 +36,7 @@ const PACKS: Pack[] = [
     id: "6-pack",
     name: "6-Cookie Pack",
     subtitle: "Mix any 6 cookies you love",
-    price: 649,
+    price: 599,
     maxCookies: 6,
     image: "/images/real-cookie-clean.png",
     badge: "BEST VALUE",
