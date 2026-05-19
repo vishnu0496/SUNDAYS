@@ -25,9 +25,11 @@ export function Header() {
             <div key={i} className="flex items-center whitespace-nowrap gap-12 pr-12 text-[11px] tracking-[0.2em] uppercase font-medium">
               <span>100% EGGLESS & VEGETARIAN</span>
               <span className="text-gold/30 text-[14px]">✦</span>
-              <span>FREE DELIVERY ABOVE ₹899</span>
+              <span>DELIVERY FROM ₹49</span>
               <span className="text-gold/30 text-[14px]">✦</span>
-              <span>CALORIES DON’T COUNT ON SUNDAYS</span>
+              <span>FREE DELIVERY ABOVE ₹799</span>
+              <span className="text-gold/30 text-[14px]">✦</span>
+              <span>HYDERABAD ONLY</span>
               <span className="text-gold/30 text-[14px]">✦</span>
             </div>
           ))}

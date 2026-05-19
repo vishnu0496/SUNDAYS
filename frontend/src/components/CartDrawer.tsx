@@ -2,6 +2,12 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import {
+  FREE_DELIVERY_THRESHOLD,
+  UNSUPPORTED_PINCODE_MESSAGE,
+  getDeliveryFeeByPincode,
+  normalizePincode,
+} from "@/lib/delivery";
 
 interface OrderItem {
   packName: string;
@@ -61,6 +67,9 @@ type CreateOrderResponse = {
   id?: string;
   amount?: number;
   currency?: string;
+  subtotal?: number;
+  delivery?: number;
+  total?: number;
   error?: string;
 };
 
@@ -76,16 +85,30 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
     name: "",
     email: "",
     phone: "",
+    pincode: "",
     address: "",
     note: ""
   });
 
   const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-  const deliveryGoal = 899;
+  const deliveryGoal = FREE_DELIVERY_THRESHOLD;
   const toteGoal = 1099;
-  
-  const deliveryFee = subtotal >= deliveryGoal || subtotal === 0 ? 0 : 49;
+  const normalizedPincode = normalizePincode(formData.pincode);
+  const calculatedDeliveryFee = subtotal > 0 ? getDeliveryFeeByPincode(normalizedPincode, subtotal) : 0;
+  const hasCompletePincode = normalizedPincode.length === 6;
+  const isUnsupportedPincode = hasCompletePincode && calculatedDeliveryFee === null;
+  const deliveryFee = calculatedDeliveryFee ?? 0;
   const total = subtotal + deliveryFee;
+  const deliveryLabel =
+    subtotal === 0
+      ? "Free"
+      : !hasCompletePincode
+        ? "Enter pincode"
+        : isUnsupportedPincode
+          ? "Unavailable"
+          : deliveryFee === 0
+            ? "FREE"
+            : `₹${deliveryFee}`;
 
   const deliveryProgress = Math.min((subtotal / deliveryGoal) * 100, 100);
   const toteProgress = Math.min((subtotal / toteGoal) * 100, 100);
@@ -93,6 +116,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+  const isCheckoutBlocked = isProcessing || !hasCompletePincode || calculatedDeliveryFee === null;
 
   const initializeRazorpay = () => {
     if (window.Razorpay) {
@@ -119,10 +143,15 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
     });
   };
 
-  const submitOrderToBackend = async (
-    deliveryCharge: number,
-    payment: RazorpayPaymentResponse
-  ) => {
+  const getApiItems = () => cart.map(item => ({
+    id: item.packName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+    name: item.packName,
+    quantity: 1,
+    price: item.price,
+    selections: item.selections
+  }));
+
+  const submitOrderToBackend = async (payment: RazorpayPaymentResponse) => {
     const apiUrl = `${window.location.origin}/api/order`;
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -139,18 +168,9 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
           addressLocality: "Hyderabad",
           addressCity: "Hyderabad",
           addressState: "Telangana",
-          addressPincode: "500001",
+          addressPincode: normalizedPincode,
         },
-        items: cart.map(item => ({
-          id: item.packName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
-          name: item.packName,
-          quantity: 1,
-          price: item.price,
-          selections: item.selections
-        })),
-        subtotal,
-        delivery: deliveryCharge,
-        total: subtotal + deliveryCharge,
+        items: getApiItems(),
         payment
       })
     });
@@ -167,8 +187,13 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
   const handleCompleteOrder = async () => {
     setPaymentError("");
 
-    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.address || !hasCompletePincode) {
       setPaymentError("Please fill in all delivery details before payment.");
+      return;
+    }
+
+    if (isUnsupportedPincode || calculatedDeliveryFee === null) {
+      setPaymentError(UNSUPPORTED_PINCODE_MESSAGE);
       return;
     }
 
@@ -178,9 +203,6 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
       return;
     }
 
-    const deliveryCharge = deliveryFee;
-    const finalTotal = total;
-    
     setIsProcessing(true);
     try {
       const res = await initializeRazorpay();
@@ -192,7 +214,8 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: Math.round(finalTotal * 100),
+          items: getApiItems(),
+          pincode: normalizedPincode,
           currency: "INR",
           receipt: `sundays_${Date.now()}`,
         }),
@@ -232,7 +255,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
               throw new Error(verifyData.error || "Payment verification failed.");
             }
 
-            const result = await submitOrderToBackend(deliveryCharge, response);
+            const result = await submitOrderToBackend(response);
             if (result.success) {
               setOrderSuccess(true);
               setStage("cart");
@@ -412,7 +435,10 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                     <button onClick={() => setStage('cart')} className="text-gold-muted hover:text-white transition-colors text-[11px] tracking-widest uppercase font-bold flex items-center gap-2 mb-8">
                       ← Back to Selection
                     </button>
-                    
+                    <p className="-mt-5 rounded-xl border border-gold/10 bg-white/[0.03] px-4 py-3 text-sm font-serif italic text-white/45">
+                      Delivery charges are calculated by pincode at checkout.
+                    </p>
+
                     <div className="space-y-10">
                       <div>
                         <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Your Name</label>
@@ -425,6 +451,29 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                       <div>
                         <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">WhatsApp Number</label>
                         <input required type="tel" placeholder="+91 98765 43210" className="input-premium h-14 text-base" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Delivery Pincode</label>
+                        <input
+                          required
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          placeholder="500085"
+                          className="input-premium h-14 text-base"
+                          value={formData.pincode}
+                          onChange={(e) => {
+                            setFormData({ ...formData, pincode: normalizePincode(e.target.value) });
+                            setPaymentError("");
+                          }}
+                        />
+                        <p className={`mt-3 text-sm font-serif italic ${isUnsupportedPincode ? "text-red-300" : "text-white/45"}`}>
+                          {isUnsupportedPincode
+                            ? UNSUPPORTED_PINCODE_MESSAGE
+                            : hasCompletePincode
+                              ? `Delivery: ${deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}`
+                              : "Enter your Hyderabad pincode to calculate delivery."}
+                        </p>
                       </div>
                       <div>
                         <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Delivery Address</label>
@@ -450,7 +499,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                   </div>
                   <div className="flex justify-between text-white/50">
                     <span>Delivery</span>
-                    <span>{deliveryFee === 0 ? "Free" : `₹${deliveryFee}`}</span>
+                    <span>{deliveryLabel}</span>
                   </div>
                 </div>
               )}
@@ -480,7 +529,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
               ) : (
                 <button 
                   onClick={handleCompleteOrder}
-                  disabled={isProcessing}
+                  disabled={isCheckoutBlocked}
                   className="premium-button w-full py-6 flex items-center justify-center gap-3 disabled:opacity-50"
                 >
                   {isProcessing ? (
@@ -489,6 +538,8 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                       Opening Razorpay...
                     </>
                   ) : (
+                    isUnsupportedPincode ? "Delivery unavailable" :
+                    !hasCompletePincode ? "Enter pincode to continue" :
                     `Pay ₹${total} with Razorpay`
                   )}
                 </button>

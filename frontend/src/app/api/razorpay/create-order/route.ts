@@ -1,12 +1,22 @@
 import { NextResponse } from 'next/server';
 import { getRazorpayClient, RazorpayConfigError } from '@/lib/razorpay';
+import { UNSUPPORTED_PINCODE_MESSAGE } from '@/lib/delivery';
+import { calculateServerOrderPricing } from '@/lib/order-pricing';
+import type { OrderItem } from '@/lib/storage';
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    const { amount, currency = "INR", receipt } = await req.json();
-    const amountInPaise = Number(amount);
+    const { items, pincode, currency = "INR", receipt } = await req.json() as {
+      items?: OrderItem[];
+      pincode?: string;
+      currency?: string;
+      receipt?: string;
+    };
+
+    const pricing = calculateServerOrderPricing(items || [], pincode);
+    const amountInPaise = pricing.total * 100;
 
     if (!Number.isInteger(amountInPaise) || amountInPaise < 100) {
       return NextResponse.json(
@@ -29,9 +39,27 @@ export async function POST(req: Request) {
       amount: order.amount,
       currency: order.currency,
       receipt: order.receipt,
+      subtotal: pricing.subtotal,
+      delivery: pricing.delivery,
+      total: pricing.total,
+      pincode: pricing.pincode,
     });
   } catch (error: unknown) {
     console.error("Razorpay order creation error:", error);
+    if (error instanceof Error && error.message === "UNSUPPORTED_PINCODE") {
+      return NextResponse.json(
+        { error: UNSUPPORTED_PINCODE_MESSAGE },
+        { status: 400 }
+      );
+    }
+
+    if (error instanceof Error && (error.message === "Cart is empty." || error.message.startsWith("Unknown product:"))) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+
     if (error instanceof RazorpayConfigError) {
       return NextResponse.json(
         { error: "Razorpay is not configured. Add key id and key secret environment variables." },

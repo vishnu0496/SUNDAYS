@@ -3,6 +3,8 @@ import { processOrder, getOrders, getPreviousOrderCount, CustomerDetails, OrderI
 import { sendCustomerOrderConfirmation, sendOwnerOrderNotification } from "@/lib/email";
 import { RazorpayConfigError, verifyRazorpaySignature } from "@/lib/razorpay";
 import { updateOrderMeta } from "@/lib/admin-data";
+import { UNSUPPORTED_PINCODE_MESSAGE } from "@/lib/delivery";
+import { calculateServerOrderPricing } from "@/lib/order-pricing";
 
 const REVIEW_MODE = process.env.NEXT_PUBLIC_REVIEW_MODE === "true";
 
@@ -31,12 +33,9 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log(">>> [API] Request body parsed:", !!body);
-    const { customer, items, subtotal, delivery, total, payment } = body as {
+    const { customer, items, payment } = body as {
       customer: CustomerDetails;
       items: OrderItem[];
-      subtotal: number;
-      delivery: number;
-      total: number;
       payment?: RazorpayPaymentPayload;
     };
 
@@ -56,6 +55,12 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    const pricing = calculateServerOrderPricing(items, customer.addressPincode);
+    const pricedCustomer = {
+      ...customer,
+      addressPincode: pricing.pincode,
+    };
 
     let paymentVerified = false;
 
@@ -83,7 +88,13 @@ export async function POST(req: Request) {
       }
     }
 
-    const result = await processOrder(customer, items, subtotal, delivery, total);
+    const result = await processOrder(
+      pricedCustomer,
+      pricing.items,
+      pricing.subtotal,
+      pricing.delivery,
+      pricing.total
+    );
 
     if (!result.success || !result.entry) {
       return NextResponse.json(
@@ -121,6 +132,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, order: result.entry });
   } catch (error) {
     console.error("Order processing error:", error);
+    if (error instanceof Error && error.message === "UNSUPPORTED_PINCODE") {
+      return NextResponse.json(
+        { success: false, error: UNSUPPORTED_PINCODE_MESSAGE },
+        { status: 400 }
+      );
+    }
+
+    if (error instanceof Error && (error.message === "Cart is empty." || error.message.startsWith("Unknown product:"))) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 400 }
+      );
+    }
+
     if (error instanceof RazorpayConfigError) {
       return NextResponse.json(
         { success: false, error: "Razorpay is not configured. Add the key secret environment variable." },
