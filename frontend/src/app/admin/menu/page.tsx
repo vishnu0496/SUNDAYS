@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { PRODUCT_NAMES, PRODUCT_PRICES } from '@/lib/products';
 
 interface Product {
   id: string;
@@ -16,24 +17,64 @@ interface Product {
 
 const PRODUCTS: Product[] = [
   {
-    id: 'the-legend',
-    name: 'The Legend',
-    flavor: 'Classic Choco-Chip',
-    description: 'Hand-chopped dark chocolate, sea salt finish',
-    price: 349,
+    id: 'trio',
+    name: PRODUCT_NAMES.trio,
+    flavor: '3 big cookies',
+    description: 'Mix any 3 regular cookies. Nutella is charged +₹10 per cookie.',
+    price: PRODUCT_PRICES.trio,
     status: 'active',
     isBestseller: true,
-    category: 'Classic',
+    category: 'Core Pack',
   },
   {
-    id: 'naughty-nutella',
-    name: 'The Naughty Nutella',
-    flavor: 'Nutella Stuffed',
-    description: 'Molten hazelnut core, creamy Belgian base',
-    price: 349,
+    id: 'half-dozen',
+    name: PRODUCT_NAMES.halfDozen,
+    flavor: '6 big cookies',
+    description: 'Mix any 6 regular cookies. Best-value box with the new premium anchor.',
+    price: PRODUCT_PRICES.halfDozen,
+    status: 'active',
+    isBestseller: true,
+    category: 'Core Pack',
+  },
+  {
+    id: 'starter',
+    name: PRODUCT_NAMES.starter,
+    flavor: '3 big + 12 mini',
+    description: 'First-order combo with regular cookies plus chocolate chip mini bites.',
+    price: PRODUCT_PRICES.starter,
     status: 'active',
     isBestseller: false,
-    category: 'Indulgent',
+    category: 'Combo',
+  },
+  {
+    id: 'gift-box',
+    name: PRODUCT_NAMES.giftBox,
+    flavor: '6 big + 12 mini',
+    description: 'Gifting-friendly combo built around the new pack pricing strategy.',
+    price: PRODUCT_PRICES.giftBox,
+    status: 'active',
+    isBestseller: false,
+    category: 'Combo',
+  },
+  {
+    id: 'full-sunday',
+    name: PRODUCT_NAMES.fullSunday,
+    flavor: '6 big + 24 mini',
+    description: 'Hero combo with free delivery threshold baked into the offer positioning.',
+    price: PRODUCT_PRICES.fullSunday,
+    status: 'active',
+    isBestseller: true,
+    category: 'Combo',
+  },
+  {
+    id: 'mini-24',
+    name: PRODUCT_NAMES.mini24,
+    flavor: '24 mini bites',
+    description: 'Chocolate chip mini bites for sharing. Standalone only for nearby orders.',
+    price: PRODUCT_PRICES.mini24,
+    status: 'active',
+    isBestseller: false,
+    category: 'Mini Bites',
   },
 ];
 
@@ -55,7 +96,7 @@ export default function LaboratoryPage() {
         </button>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {PRODUCTS.map((product) => (
           <motion.div
             key={product.id}

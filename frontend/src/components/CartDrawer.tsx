@@ -5,7 +5,7 @@ import { useState } from "react";
 import {
   FREE_DELIVERY_THRESHOLD,
   UNSUPPORTED_PINCODE_MESSAGE,
-  getDeliveryFeeByPincode,
+  getDeliveryQuoteByPincode,
   normalizePincode,
 } from "@/lib/delivery";
 
@@ -94,9 +94,17 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
   const deliveryGoal = FREE_DELIVERY_THRESHOLD;
   const toteGoal = 1099;
   const normalizedPincode = normalizePincode(formData.pincode);
-  const calculatedDeliveryFee = subtotal > 0 ? getDeliveryFeeByPincode(normalizedPincode, subtotal) : 0;
+  const deliveryQuote = subtotal > 0 ? getDeliveryQuoteByPincode(normalizedPincode, subtotal) : null;
+  const calculatedDeliveryFee = subtotal > 0 ? deliveryQuote?.fee ?? null : 0;
   const hasCompletePincode = normalizedPincode.length === 6;
   const isUnsupportedPincode = hasCompletePincode && calculatedDeliveryFee === null;
+  const missingMinimum = hasCompletePincode && deliveryQuote ? deliveryQuote.missingMinimum : 0;
+  const isBelowMinimum = missingMinimum > 0;
+  const isMiniBitesOnlyOrder =
+    cart.length > 0 &&
+    cart.every((item) => item.packName === "12 Mini Bites" || item.packName === "24 Mini Bites" || item.packName === "12 Bite-Size Box" || item.packName === "24 Bite-Size Box");
+  const isMiniOnlyBlocked = hasCompletePincode && Boolean(deliveryQuote) && deliveryQuote?.zoneId !== "zone1" && isMiniBitesOnlyOrder;
+  const miniOnlyBlockedMessage = "Mini Bites are standalone only in Zone 1. Add a regular pack or choose The Sunday Starter combo.";
   const deliveryFee = calculatedDeliveryFee ?? 0;
   const total = subtotal + deliveryFee;
   const deliveryLabel =
@@ -106,9 +114,11 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
         ? "Enter pincode"
         : isUnsupportedPincode
           ? "Unavailable"
-          : deliveryFee === 0
-            ? "FREE"
-            : `₹${deliveryFee}`;
+          : isBelowMinimum
+            ? `Add ₹${missingMinimum}`
+            : deliveryFee === 0
+              ? "FREE"
+              : `₹${deliveryFee}`;
 
   const deliveryProgress = Math.min((subtotal / deliveryGoal) * 100, 100);
   const toteProgress = Math.min((subtotal / toteGoal) * 100, 100);
@@ -116,7 +126,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState("");
-  const isCheckoutBlocked = isProcessing || !hasCompletePincode || calculatedDeliveryFee === null;
+  const isCheckoutBlocked = isProcessing || !hasCompletePincode || calculatedDeliveryFee === null || isBelowMinimum || isMiniOnlyBlocked;
 
   const initializeRazorpay = () => {
     if (window.Razorpay) {
@@ -194,6 +204,16 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
 
     if (isUnsupportedPincode || calculatedDeliveryFee === null) {
       setPaymentError(UNSUPPORTED_PINCODE_MESSAGE);
+      return;
+    }
+
+    if (isMiniOnlyBlocked) {
+      setPaymentError(miniOnlyBlockedMessage);
+      return;
+    }
+
+    if (isBelowMinimum) {
+      setPaymentError(`Add ₹${missingMinimum} more to meet the minimum order for your area.`);
       return;
     }
 
@@ -471,7 +491,11 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                           {isUnsupportedPincode
                             ? UNSUPPORTED_PINCODE_MESSAGE
                             : hasCompletePincode
-                              ? `Delivery: ${deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}`
+                              ? isMiniOnlyBlocked
+                                ? miniOnlyBlockedMessage
+                                : isBelowMinimum
+                                ? `${deliveryQuote?.zoneLabel}: add ₹${missingMinimum} more for this area`
+                                : `${deliveryQuote?.zoneLabel}: delivery ${deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}`
                               : "Enter your Hyderabad pincode to calculate delivery."}
                         </p>
                       </div>
@@ -540,6 +564,8 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                   ) : (
                     isUnsupportedPincode ? "Delivery unavailable" :
                     !hasCompletePincode ? "Enter pincode to continue" :
+                    isMiniOnlyBlocked ? "Add regular pack or combo" :
+                    isBelowMinimum ? `Add ₹${missingMinimum} more` :
                     `Pay ₹${total} with Razorpay`
                   )}
                 </button>

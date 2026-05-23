@@ -53,6 +53,21 @@ export async function POST(req: Request) {
       );
     }
 
+    if (error instanceof Error && error.message.startsWith("MINIMUM_ORDER_NOT_MET:")) {
+      const missingAmount = error.message.split(":")[1];
+      return NextResponse.json(
+        { error: `Add \u20b9${missingAmount} more to meet the minimum order for your area.` },
+        { status: 400 }
+      );
+    }
+
+    if (error instanceof Error && error.message === "MINI_STANDALONE_NOT_AVAILABLE") {
+      return NextResponse.json(
+        { error: "Mini Bites are available as a standalone order only in Zone 1. Add a regular cookie pack or choose The Sunday Starter combo." },
+        { status: 400 }
+      );
+    }
+
     if (error instanceof Error && (error.message === "Cart is empty." || error.message.startsWith("Unknown product:"))) {
       return NextResponse.json(
         { error: error.message },

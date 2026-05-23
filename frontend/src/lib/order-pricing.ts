@@ -1,12 +1,15 @@
-import { getDeliveryFeeByPincode, normalizePincode } from "@/lib/delivery";
+import { getDeliveryQuoteByPincode, normalizePincode } from "@/lib/delivery";
+import { NUTELLA_SURCHARGE_PER_COOKIE, PRODUCT_PRICE_BY_NAME } from "@/lib/products";
 import type { OrderItem } from "@/lib/storage";
 
-const PRODUCT_PRICES: Record<string, number> = {
-  "3-Cookie Pack": 349,
-  "6-Cookie Pack": 599,
-  "12 Bite-Size Box": 219,
-  "24 Bite-Size Box": 399,
-};
+function getNutellaSurcharge(selections: Record<string, number> | undefined) {
+  const nutellaCount = Math.max(0, Number(selections?.["The Naughty Nutella"]) || 0);
+  return nutellaCount * NUTELLA_SURCHARGE_PER_COOKIE;
+}
+
+function isMiniBitesOnlyOrder(items: OrderItem[]) {
+  return items.every((item) => item.name === "12 Mini Bites" || item.name === "24 Mini Bites" || item.name === "12 Bite-Size Box" || item.name === "24 Bite-Size Box");
+}
 
 export function calculateServerOrderPricing(items: OrderItem[], pincodeInput: string | number | null | undefined) {
   if (!Array.isArray(items) || items.length === 0) {
@@ -14,12 +17,14 @@ export function calculateServerOrderPricing(items: OrderItem[], pincodeInput: st
   }
 
   const normalizedItems = items.map((item) => {
-    const price = PRODUCT_PRICES[item.name];
+    const basePrice = PRODUCT_PRICE_BY_NAME[item.name];
     const quantity = Math.max(1, Number(item.quantity) || 1);
 
-    if (!price) {
+    if (!basePrice) {
       throw new Error(`Unknown product: ${item.name}`);
     }
+
+    const price = basePrice + getNutellaSurcharge(item.selections);
 
     return {
       ...item,
@@ -30,17 +35,25 @@ export function calculateServerOrderPricing(items: OrderItem[], pincodeInput: st
 
   const subtotal = normalizedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const pincode = normalizePincode(pincodeInput);
-  const delivery = getDeliveryFeeByPincode(pincode, subtotal);
+  const deliveryQuote = getDeliveryQuoteByPincode(pincode, subtotal);
 
-  if (delivery === null) {
+  if (!deliveryQuote) {
     throw new Error("UNSUPPORTED_PINCODE");
+  }
+
+  if (deliveryQuote.zoneId !== "zone1" && isMiniBitesOnlyOrder(normalizedItems)) {
+    throw new Error("MINI_STANDALONE_NOT_AVAILABLE");
+  }
+
+  if (deliveryQuote.missingMinimum > 0) {
+    throw new Error(`MINIMUM_ORDER_NOT_MET:${deliveryQuote.missingMinimum}`);
   }
 
   return {
     items: normalizedItems,
     subtotal,
-    delivery,
-    total: subtotal + delivery,
+    delivery: deliveryQuote.fee,
+    total: subtotal + deliveryQuote.fee,
     pincode,
   };
 }

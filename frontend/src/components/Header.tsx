@@ -5,32 +5,29 @@ export function Header() {
   const [cartCount, setCartCount] = React.useState(0);
 
   React.useEffect(() => {
-    // Listen for cart updates
     const handleUpdate = (event: Event) => {
       const detail = (event as CustomEvent<{ count?: number }>).detail;
       setCartCount(detail?.count || 0);
     };
-    window.addEventListener('cart-updated', handleUpdate);
-    
-    // Check initial state if possible or just wait for first update
-    return () => window.removeEventListener('cart-updated', handleUpdate);
+
+    window.addEventListener("cart-updated", handleUpdate);
+    return () => window.removeEventListener("cart-updated", handleUpdate);
   }, []);
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
-      {/* Ticker Bar */}
       <div className="bg-[#030A08] text-gold h-10 flex items-center overflow-hidden border-b border-gold/5 select-none">
         <div className="flex w-max animate-ticker-seamless">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center whitespace-nowrap gap-12 pr-12 text-[11px] tracking-[0.2em] uppercase font-medium">
               <span>100% EGGLESS & VEGETARIAN</span>
-              <span className="text-gold/30 text-[14px]">✦</span>
-              <span>DELIVERY FROM ₹49</span>
-              <span className="text-gold/30 text-[14px]">✦</span>
-              <span>FREE DELIVERY ABOVE ₹799</span>
-              <span className="text-gold/30 text-[14px]">✦</span>
-              <span>HYDERABAD ONLY</span>
-              <span className="text-gold/30 text-[14px]">✦</span>
+              <span className="text-gold/30 text-[14px]">*</span>
+              <span>HYDERABAD DELIVERY FROM &#8377;49</span>
+              <span className="text-gold/30 text-[14px]">*</span>
+              <span>FREE DELIVERY ABOVE &#8377;899</span>
+              <span className="text-gold/30 text-[14px]">*</span>
+              <span>SUNDAYS - COOKIES, MASTERED.</span>
+              <span className="text-gold/30 text-[14px]">*</span>
             </div>
           ))}
         </div>
@@ -38,14 +35,14 @@ export function Header() {
 
       <nav className="h-16 flex items-center border-b border-gold/5 bg-deep-forest sticky top-10 z-[100]">
         <div className="container mx-auto px-6 flex justify-between items-center">
-          <motion.h1 
+          <motion.h1
             initial={{ letterSpacing: "0.05em", opacity: 0 }}
             animate={{ letterSpacing: "0.15em", opacity: 1 }}
             transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
             className="text-xl md:text-2xl font-serif font-bold flex items-center uppercase"
           >
             <span className="text-white">SUN</span>
-            <motion.span 
+            <motion.span
               initial={{ marginLeft: "0.05em" }}
               animate={{ marginLeft: "0.15em" }}
               transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
@@ -59,15 +56,15 @@ export function Header() {
             <a href="#menu" className="hover:text-gold transition-colors">Menu</a>
             <a href="#craft" className="hover:text-gold transition-colors">The Craft</a>
             <a href="#story" className="hover:text-gold transition-colors">Our Story</a>
-            <button 
+            <button
               onClick={() => {
-                window.dispatchEvent(new CustomEvent('open-cart'));
+                window.dispatchEvent(new CustomEvent("open-cart"));
               }}
               className="relative hover:text-gold transition-colors flex items-center gap-2"
             >
               Cart
               {cartCount > 0 && (
-                <span className="w-1.5 h-1.5 bg-tan rounded-full shadow-[0_0_8px_rgba(194,163,93,0.8)]"></span>
+                <span className="w-1.5 h-1.5 bg-tan rounded-full shadow-[0_0_8px_rgba(194,163,93,0.8)]" />
               )}
             </button>
           </div>

@@ -42,6 +42,40 @@ function isNetlifyRuntime() {
   );
 }
 
+function isVercelKV() {
+  return Boolean(
+    (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) ||
+    (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+  );
+}
+
+async function runKVCommand(command: any[]) {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(command),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      console.error(`KV command failed: ${res.statusText}`);
+      return null;
+    }
+    const data = await res.json();
+    return data.result;
+  } catch (err) {
+    console.error("KV command error:", err);
+    return null;
+  }
+}
+
 function getAdminStore() {
   return getStore('sundays-admin');
 }
@@ -100,9 +134,18 @@ export async function getDrops(): Promise<DropEntry[]> {
 
 export async function getOrderMeta(): Promise<Record<string, OrderMeta>> {
   try {
-    const rawData: Record<string, RawOrderMeta> = isNetlifyRuntime()
-      ? ((await getAdminStore().get(META_BLOB_KEY, { type: 'json' })) ?? {})
-      : JSON.parse(await fs.readFile(getMetaPath(), 'utf-8'));
+    let rawData: Record<string, RawOrderMeta> = {};
+    
+    if (isNetlifyRuntime()) {
+      rawData = (await getAdminStore().get(META_BLOB_KEY, { type: 'json' })) ?? {};
+    } else if (isVercelKV()) {
+      const result = await runKVCommand(["GET", META_BLOB_KEY]);
+      if (result && typeof result === "string") {
+        rawData = JSON.parse(result);
+      }
+    } else {
+      rawData = JSON.parse(await fs.readFile(getMetaPath(), 'utf-8'));
+    }
     
     // Schema Migration & Normalization on the fly
     const normalizedMeta: Record<string, OrderMeta> = {};
@@ -136,6 +179,11 @@ export async function updateOrderMeta(orderNumber: string, updates: Partial<Orde
 
   if (isNetlifyRuntime()) {
     await getAdminStore().setJSON(META_BLOB_KEY, meta);
+    return;
+  }
+
+  if (isVercelKV()) {
+    await runKVCommand(["SET", META_BLOB_KEY, JSON.stringify(meta)]);
     return;
   }
 

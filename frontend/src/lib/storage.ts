@@ -42,6 +42,40 @@ function isNetlifyRuntime() {
   );
 }
 
+function isVercelKV() {
+  return Boolean(
+    (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) ||
+    (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+  );
+}
+
+async function runKVCommand(command: any[]) {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(command),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      console.error(`KV command failed: ${res.statusText}`);
+      return null;
+    }
+    const data = await res.json();
+    return data.result;
+  } catch (err) {
+    console.error("KV command error:", err);
+    return null;
+  }
+}
+
 async function acquireLock() {
   while (isWriting) {
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -62,6 +96,18 @@ function getOrdersStore() {
 export async function getOrders(): Promise<OrderEntry[]> {
   if (isNetlifyRuntime()) {
     return (await getOrdersStore().get(ORDERS_BLOB_KEY, { type: "json" })) ?? [];
+  }
+
+  if (isVercelKV()) {
+    const result = await runKVCommand(["GET", ORDERS_BLOB_KEY]);
+    if (result && typeof result === "string") {
+      try {
+        return JSON.parse(result);
+      } catch {
+        return [];
+      }
+    }
+    return [];
   }
 
   const filePath = getFilePath();
@@ -88,7 +134,6 @@ export async function processOrder(
   try {
     const orders = await getOrders();
 
-
     const orderNumber = `SUN-${String(orders.length + 1).padStart(4, '0')}`;
 
     const newEntry: OrderEntry = {
@@ -113,6 +158,11 @@ export async function processOrder(
 async function saveOrders(orders: OrderEntry[]) {
   if (isNetlifyRuntime()) {
     await getOrdersStore().setJSON(ORDERS_BLOB_KEY, orders);
+    return;
+  }
+
+  if (isVercelKV()) {
+    await runKVCommand(["SET", ORDERS_BLOB_KEY, JSON.stringify(orders)]);
     return;
   }
 
