@@ -119,7 +119,7 @@ const COMBOS: Combo[] = [
     price: PRODUCT_PRICES.fullSunday,
     compareAt: PRODUCT_PRICES.halfDozen + PRODUCT_PRICES.mini24,
     savings: "Save \u20b999",
-    tag: "Best Deal - Free delivery included",
+    tag: "Best Deal - biggest Sunday box",
     badge: "BEST DEAL",
     regularCookies: 6,
     miniBites: 24,
@@ -631,7 +631,7 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                 ["Zone 1", "₹49", "No min."],
                 ["Zone 2", "₹99", "₹399 min."],
                 ["Zone 3", "₹149", "₹599 min."],
-                ["Free", "₹899+", "Any zone"],
+                ["Free", "₹1099+", "Any zone"],
               ].map(([zone, fee, min]) => (
                 <div key={zone} className="rounded-[8px] border border-gold/10 bg-forest/40 px-4 py-3">
                   <p className="text-cream font-bold">{zone}</p>

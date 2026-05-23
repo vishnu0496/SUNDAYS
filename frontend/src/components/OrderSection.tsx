@@ -17,9 +17,8 @@ export function OrderSection({ cart }: { cart: OrderItem[] }) {
   });
 
   const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-  const deliveryFee = subtotal >= 899 || subtotal === 0 ? 0 : 49;
+  const deliveryFee = subtotal >= 1099 || subtotal === 0 ? 0 : 49;
   const total = subtotal + deliveryFee;
-  const hasFreeTote = total >= 1099;
 
   const handleWhatsAppOrder = () => {
     if (!formData.name || !formData.phone || !formData.address) {
@@ -43,7 +42,6 @@ export function OrderSection({ cart }: { cart: OrderItem[] }) {
 
     message += `%0A*Subtotal:* ₹${subtotal}%0A`;
     message += `*Delivery:* ${deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}%0A`;
-    if (hasFreeTote) message += `*Gift:* FREE TOTE BAG 🎁%0A`;
     message += `*Total:* ₹${total}%0A`;
 
     window.open(`https://wa.me/919999999999?text=${message}`, "_blank");
@@ -87,12 +85,7 @@ export function OrderSection({ cart }: { cart: OrderItem[] }) {
                 </span>
               </div>
               
-              {hasFreeTote && (
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-tan uppercase tracking-widest">Gift: Tote Bag</span>
-                  <span className="text-green-500 font-bold">FREE</span>
-                </div>
-              )}
+
 
               <div className="flex justify-between items-center pt-4 border-t border-gold/5">
                 <span className="text-white/40 uppercase tracking-[0.2em] font-bold">Total</span>

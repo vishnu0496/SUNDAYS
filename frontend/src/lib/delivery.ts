@@ -1,4 +1,4 @@
-export const FREE_DELIVERY_THRESHOLD = 899;
+export const FREE_DELIVERY_THRESHOLD = 1099;
 
 export const DELIVERY_ZONES = {
   zone1: {

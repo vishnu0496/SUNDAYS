@@ -92,7 +92,6 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
 
   const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
   const deliveryGoal = FREE_DELIVERY_THRESHOLD;
-  const toteGoal = 1099;
   const normalizedPincode = normalizePincode(formData.pincode);
   const deliveryQuote = subtotal > 0 ? getDeliveryQuoteByPincode(normalizedPincode, subtotal) : null;
   const calculatedDeliveryFee = subtotal > 0 ? deliveryQuote?.fee ?? null : 0;
@@ -121,7 +120,6 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
               : `₹${deliveryFee}`;
 
   const deliveryProgress = Math.min((subtotal / deliveryGoal) * 100, 100);
-  const toteProgress = Math.min((subtotal / toteGoal) * 100, 100);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -347,6 +345,7 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
     );
   }
 
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -369,14 +368,14 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
             {/* Header */}
             <div className="p-8 border-b border-gold/10 flex justify-between items-center">
               <div>
-                <p className="text-[11px] tracking-[0.3em] font-bold text-gold-muted uppercase mb-1">
+                <p className="text-[11px] tracking-[0.3em] font-bold text-[#C7A44C]/75 uppercase mb-1">
                   {stage === 'cart' ? 'Your Selection' : 'Place Your Order'}
                 </p>
                 <h2 className="text-3xl font-serif text-white">
                   {stage === 'cart' ? 'Order Summary' : 'Almost There'}
                 </h2>
               </div>
-              <button onClick={onClose} className="text-gold-muted hover:text-white transition-colors">
+              <button onClick={onClose} className="text-[#C7A44C]/75 hover:text-white transition-colors">
                 <span className="text-[11px] tracking-widest uppercase font-bold">Close</span>
               </button>
             </div>
@@ -395,15 +394,6 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                       </div>
                       <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                         <div className={`h-full ${subtotal >= deliveryGoal ? "bg-green-500" : "bg-gold"}`} style={{ width: `${deliveryProgress}%` }} />
-                      </div>
-                      
-                      <div className="flex justify-between text-[11px] tracking-widest uppercase font-bold">
-                        <span className={subtotal >= toteGoal ? "text-green-500" : "text-gold-muted"}>
-                          {subtotal >= toteGoal ? "Free Tote Bag Unlocked" : `₹${toteGoal - subtotal} more for Free Tote`}
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <div className={`h-full ${subtotal >= toteGoal ? "bg-green-500" : "bg-tan"}`} style={{ width: `${toteProgress}%` }} />
                       </div>
                     </div>
 

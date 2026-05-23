@@ -60,7 +60,7 @@ const PRODUCTS: Product[] = [
     id: 'full-sunday',
     name: PRODUCT_NAMES.fullSunday,
     flavor: '6 big + 24 mini',
-    description: 'Hero combo with free delivery threshold baked into the offer positioning.',
+    description: 'Hero combo for customers who want the biggest Sundays box.',
     price: PRODUCT_PRICES.fullSunday,
     status: 'active',
     isBestseller: true,
