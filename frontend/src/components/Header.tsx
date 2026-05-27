@@ -58,6 +58,14 @@ export function Header() {
             <a href="#story" className="hover:text-gold transition-colors">Our Story</a>
             <button
               onClick={() => {
+                window.dispatchEvent(new CustomEvent("open-ritual-modal"));
+              }}
+              className="hover:text-gold transition-colors text-[12px] tracking-widest font-bold uppercase"
+            >
+              Ritual Guide
+            </button>
+            <button
+              onClick={() => {
                 window.dispatchEvent(new CustomEvent("open-cart"));
               }}
               className="relative hover:text-gold transition-colors flex items-center gap-2"

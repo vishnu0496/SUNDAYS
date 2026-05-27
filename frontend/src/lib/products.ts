@@ -1,5 +1,3 @@
-export const NUTELLA_SURCHARGE_PER_COOKIE = 10;
-
 export const PRODUCT_NAMES = {
   trio: "Trio",
   halfDozen: "Half Dozen",

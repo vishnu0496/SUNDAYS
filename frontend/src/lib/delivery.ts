@@ -40,11 +40,11 @@ export function isHyderabadPincode(pincode: string) {
 export function getDeliveryZoneByPincode(pincodeInput: string | number | null | undefined): DeliveryZoneId | null {
   const pincode = normalizePincode(pincodeInput);
 
-  if (DELIVERY_ZONES.zone1.pincodes.includes(pincode)) {
+  if ((DELIVERY_ZONES.zone1.pincodes as readonly string[]).includes(pincode)) {
     return "zone1";
   }
 
-  if (DELIVERY_ZONES.zone2.pincodes.includes(pincode)) {
+  if ((DELIVERY_ZONES.zone2.pincodes as readonly string[]).includes(pincode)) {
     return "zone2";
   }
 

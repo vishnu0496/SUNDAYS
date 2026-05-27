@@ -174,7 +174,7 @@ function OrderRow({
           <div className="space-y-3">
             <p className="text-[10px] font-mono text-[#C7A44C] font-black tracking-widest opacity-60 uppercase">Registry #{order.orderNumber}</p>
             <div className="flex items-center gap-4">
-              <h3 className="text-3xl font-serif text-[#F6F0E7] tracking-tight group-hover:translate-x-2 transition-transform duration-700">{order.customer.firstName} {order.customer.lastName}</h3>
+              <h3 className="text-3xl font-serif text-[#F6F0E7] tracking-tight group-hover:translate-x-2 transition-transform duration-700">{order.customer.firstName}</h3>
               {isVIP && (
                 <span className="px-4 py-1 bg-[#C7A44C]/10 border border-[#C7A44C]/30 text-[#C7A44C] text-[8px] uppercase tracking-[0.4em] font-black rounded-full shadow-[0_0_15px_rgba(199,164,76,0.2)]">
                   Ritualist
@@ -236,7 +236,7 @@ function OrderRow({
             </button>
             
             <a 
-              href={`https://wa.me/91${order.customer.phone}`}
+              href={`https://wa.me/91${order.customer.whatsapp}`}
               target="_blank"
               className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xl hover:bg-emerald-500 hover:text-white transition-all shadow-lg"
               title="WhatsApp Concierge"

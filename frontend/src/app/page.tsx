@@ -13,6 +13,7 @@ import { WhatsAppButton, Footer } from "@/components/FooterComponents";
 import { motion, AnimatePresence } from "framer-motion";
 import { CartDrawer } from "@/components/CartDrawer";
 import { RitualSection } from "@/components/sections/RitualSection";
+import { RitualModal } from "@/components/RitualModal";
 
 interface OrderItem {
   packName: string;
@@ -24,16 +25,24 @@ export default function Home() {
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  const [isRitualOpen, setIsRitualOpen] = useState(false);
+
   useEffect(() => {
     const handleOpenCart = () => setIsCartOpen(true);
+    const handleOpenRitual = () => setIsRitualOpen(true);
+    
     window.addEventListener('open-cart', handleOpenCart);
+    window.addEventListener('open-ritual-modal', handleOpenRitual);
     
     // Dispatch initial and updated cart count
     window.dispatchEvent(new CustomEvent('cart-updated', { 
       detail: { count: cart.length } 
     }));
 
-    return () => window.removeEventListener('open-cart', handleOpenCart);
+    return () => {
+      window.removeEventListener('open-cart', handleOpenCart);
+      window.removeEventListener('open-ritual-modal', handleOpenRitual);
+    };
   }, [cart]);
 
   const handleAddToCart = (pack: any, selections: Record<string, number>) => {
@@ -95,6 +104,10 @@ export default function Home() {
         cart={cart}
         onUpdateQuantity={handleUpdateQuantity}
         onClearCart={handleClearCart}
+      />
+      <RitualModal 
+        isOpen={isRitualOpen} 
+        onClose={() => setIsRitualOpen(false)}
       />
     </main>
   );

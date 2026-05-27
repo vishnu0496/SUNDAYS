@@ -31,9 +31,9 @@ export default function LabelGenerator({ order, handwrittenNote, onClose }: Labe
           <div className="space-y-4">
             <p className="text-[9px] uppercase tracking-widest font-black text-gray-500">Deliver To:</p>
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold uppercase">{order.customer.firstName} {order.customer.lastName}</h2>
-              <p className="text-sm font-medium leading-relaxed">{order.customer.address}</p>
-              <p className="text-sm font-bold mt-2">TEL: +91 {order.customer.phone}</p>
+              <h2 className="text-2xl font-bold uppercase">{order.customer.firstName}</h2>
+              <p className="text-sm font-medium leading-relaxed">{order.customer.addressHouse}</p>
+              <p className="text-sm font-bold mt-2">TEL: +91 {order.customer.whatsapp}</p>
             </div>
           </div>
 
@@ -59,6 +59,14 @@ export default function LabelGenerator({ order, handwrittenNote, onClose }: Labe
               </p>
             </div>
           )}
+
+          {/* Reheat Guide */}
+          <div className="pt-4 border-t border-dashed border-gray-200 text-center">
+            <p className="text-[8px] uppercase tracking-widest font-black text-gray-500 mb-1">Reheat Ritual</p>
+            <p className="text-[9px] font-bold text-gray-800 uppercase">
+              Oven/Air Fryer: 160°C for 2-3 mins | Microwave: 10-15s
+            </p>
+          </div>
 
           {/* Footer / QR */}
           <div className="pt-6 flex justify-between items-end border-t-2 border-black">

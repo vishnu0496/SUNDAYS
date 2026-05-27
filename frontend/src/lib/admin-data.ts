@@ -88,25 +88,25 @@ type RawOrderMeta = Partial<OrderMeta> & {
 // OFFICIAL BRANDED SOURCE OF TRUTH (Comprehensive Normalization)
 const BRANDED_NAMES: Record<string, string> = {
   // Official
-  'The Legend': 'The Legend',
-  'The Naughty Nutella': 'The Naughty Nutella',
+  'Double Chocolate': 'Double Chocolate',
+  'Oreo Strong': 'Oreo Strong',
+  'The Legend': 'Double Chocolate',
+  'The Naughty Nutella': 'Oreo Strong',
   'The Citrus Cloud': 'The Citrus Cloud',
   'Little Rebels': 'Little Rebels',
   
   // Legacy / Samples (Mapping strictly based on brand identity)
-  'The Lazy Legend': 'The Legend',
-  'Chocolate Chip': 'The Legend',
-  'Classic Chocolate Chip': 'The Legend',
-  'Classic Choco Chip': 'The Legend',
-  'classic': 'The Legend',
+  'The Lazy Legend': 'Double Chocolate',
+  'Chocolate Chip': 'Double Chocolate',
+  'Classic Chocolate Chip': 'Double Chocolate',
+  'Classic Choco Chip': 'Double Chocolate',
+  'classic': 'Double Chocolate',
   
-  'The Golden Affair': 'The Naughty Nutella',
-  'Nutella Stuffed': 'The Naughty Nutella',
-  'Lotus Biscoff': 'The Naughty Nutella',
-  'Brown Butter & Sea Salt': 'The Naughty Nutella',
-  'brown-butter': 'The Naughty Nutella',
-  
-  'The Citrus Cloud': 'The Citrus Cloud',
+  'The Golden Affair': 'Oreo Strong',
+  'Nutella Stuffed': 'Oreo Strong',
+  'Lotus Biscoff': 'Oreo Strong',
+  'Brown Butter & Sea Salt': 'Oreo Strong',
+  'brown-butter': 'Oreo Strong',
   'Lemon Crinkle': 'The Citrus Cloud',
   
   'Salted Noir': 'Salted Noir',
@@ -156,7 +156,7 @@ export async function getOrderMeta(): Promise<Record<string, OrderMeta>> {
       const fStatus = m.fulfillmentStatus || m.orderStatus || 'Reserved';
       
       // Handle legacy 'Pending' -> 'Pending Review'
-      let pStatus = m.paymentStatus || 'Unpaid';
+      let pStatus: string = m.paymentStatus || 'Unpaid';
       if (pStatus === 'Pending') pStatus = 'Pending Review';
       
       normalizedMeta[id] = {

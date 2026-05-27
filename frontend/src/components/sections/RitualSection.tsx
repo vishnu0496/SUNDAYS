@@ -29,7 +29,7 @@ export function RitualSection() {
               The Sunday Afternoon <br/> <span className="italic text-tan">Slowdown</span>
             </h2>
             <p className="text-cream/60 text-lg md:text-xl font-serif leading-relaxed max-w-xl mb-gap-md italic">
-              "We don't just bake cookies. We curate a moment. A soft chair, a hot espresso, and the molten center of The Legend. This is the Sunday you deserve."
+              "We don't just bake cookies. We curate a moment. A soft chair, a hot espresso, and a box of Double Chocolate and Oreo Strong. This is the Sunday you deserve."
             </p>
             
             <div className="flex flex-col gap-6">

@@ -425,8 +425,8 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                                     <div 
                                       className="w-2 h-2 rounded-full" 
                                       style={{ 
-                                        backgroundColor: name === "The Legend" ? "#C7A44C" :
-                                                        name === "The Naughty Nutella" ? "#4B3621" : "#FDFD96"
+                                        backgroundColor: name === "Double Chocolate" ? "#5B2D1F" :
+                                                        name === "Oreo Strong" ? "#E8D9B8" : "#FDFD96"
                                       }} 
                                     />
                                     <span className="text-white/60 italic font-serif text-lg">{name}</span>
@@ -505,6 +505,11 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
 
             {/* Footer */}
             <div className="p-8 border-t border-gold/10 bg-white/[0.02]">
+              {cart.length > 0 && (
+                <div className="mb-5 rounded-2xl border border-gold/10 bg-white/[0.01] p-4 text-[11px] text-cream/50 leading-relaxed font-serif italic">
+                  💡 <strong>Sunday Reheat Ritual:</strong> Warm cookies in an air fryer or oven at 160°C for 2 mins (or microwave for 10s) to restore the signature gooey, molten chocolate center.
+                </div>
+              )}
               {cart.length > 0 && (
                 <div className="mb-6 space-y-3 border-b border-gold/10 pb-6 text-sm">
                   <div className="flex justify-between text-white/50">

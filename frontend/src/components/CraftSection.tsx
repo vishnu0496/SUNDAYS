@@ -16,7 +16,7 @@ const ITEMS = [
   {
     num: "03",
     title: "Premium Chocolate",
-    desc: "Real 70% dark chocolate, hand-chopped into uneven chunks — so every bite has a different ratio of dough to molten chocolate."
+    desc: "Real 55% dark couverture chocolate, hand-chopped into uneven chunks — so every bite has a different ratio of dough to molten chocolate."
   },
   {
     num: "04",

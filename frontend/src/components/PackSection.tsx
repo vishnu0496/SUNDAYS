@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { PRODUCT_NAMES, PRODUCT_PRICES, NUTELLA_SURCHARGE_PER_COOKIE } from "@/lib/products";
+import { PRODUCT_NAMES, PRODUCT_PRICES } from "@/lib/products";
 import { VegSeal } from "./ui/VegSeal";
 import { BatchIndicator } from "./ui/BatchIndicator";
 
-type CookieType = "The Legend" | "The Naughty Nutella";
+type CookieType = "Double Chocolate" | "Oreo Strong";
 
 interface Pack {
   id: string;
@@ -49,8 +49,8 @@ interface Combo {
 const MINI_COOKIE_NAME = "Bite-Size Chocolate Chip";
 
 const COOKIES: { name: CookieType; flavor: string; description: string }[] = [
-  { name: "The Legend", flavor: "Classic Choco-Chip", description: "Hand-chopped dark chocolate, sea salt finish" },
-  { name: "The Naughty Nutella", flavor: "Nutella Stuffed", description: "Molten hazelnut core, creamy Belgian base" },
+  { name: "Double Chocolate", flavor: "Dark Chocolate", description: "Double chocolate chunks, brown sugar dough, sea salt finish" },
+  { name: "Oreo Strong", flavor: "Oreo + White Chocolate", description: "Crushed Oreo, creamy white chocolate, soft bakery center" },
 ];
 
 const PACKS: Pack[] = [
@@ -60,9 +60,9 @@ const PACKS: Pack[] = [
     subtitle: "Mix any 3 cookies you love",
     price: PRODUCT_PRICES.trio,
     maxCookies: 3,
-    image: "/images/real-cookie-styled.png",
+    image: "/images/double-chocolate.png",
     badge: "BEST STARTER",
-    priceNote: `Nutella +${NUTELLA_SURCHARGE_PER_COOKIE} each`,
+    priceNote: "Mix Double Chocolate and Oreo Strong",
   },
   {
     id: "half-dozen",
@@ -70,11 +70,11 @@ const PACKS: Pack[] = [
     subtitle: "Mix any 6 cookies you love",
     price: PRODUCT_PRICES.halfDozen,
     maxCookies: 6,
-    image: "/images/real-cookie-clean.png",
+    image: "/images/oreo-strong.png",
     badge: "BEST VALUE",
     compareAt: PRODUCT_PRICES.trio * 2,
     savings: "Save \u20b9199 vs 2 Trios",
-    priceNote: `Nutella +${NUTELLA_SURCHARGE_PER_COOKIE} each`,
+    priceNote: "Mix Double Chocolate and Oreo Strong",
   },
 ];
 
@@ -140,8 +140,8 @@ const COMBOS: Combo[] = [
 ];
 
 const EMPTY_COOKIE_SELECTION: Record<CookieType, number> = {
-  "The Legend": 0,
-  "The Naughty Nutella": 0,
+  "Double Chocolate": 0,
+  "Oreo Strong": 0,
 };
 
 const EMPTY_SELECTIONS: Record<string, Record<CookieType, number>> = PACKS.reduce(
@@ -156,10 +156,6 @@ const EMPTY_COMBO_SELECTIONS: Record<string, Record<CookieType, number>> = COMBO
 
 function getSelectionTotal(selection: Record<CookieType, number>) {
   return Object.values(selection).reduce((a, b) => a + b, 0);
-}
-
-function getNutellaSurcharge(selection: Record<CookieType, number>) {
-  return (selection["The Naughty Nutella"] || 0) * NUTELLA_SURCHARGE_PER_COOKIE;
 }
 
 function getActiveSelections(selection: Record<CookieType, number>, miniBites = 0) {
@@ -230,10 +226,9 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
 
   const addRegularPack = (pack: Pack) => {
     const selected = selections[pack.id];
-    const surcharge = getNutellaSurcharge(selected);
 
     onAddToCart(
-      { ...pack, price: pack.price + surcharge },
+      pack,
       getActiveSelections(selected)
     );
     resetPack(pack.id);
@@ -241,14 +236,13 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
 
   const addCombo = (combo: Combo) => {
     const selected = comboSelections[combo.id];
-    const surcharge = getNutellaSurcharge(selected);
 
     onAddToCart(
       {
         id: combo.id,
         name: combo.name,
         subtitle: combo.contents,
-        price: combo.price + surcharge,
+        price: combo.price,
         maxCookies: combo.regularCookies + combo.miniBites,
         image: "/images/mini-chocolate-chip-bites.png",
         badge: combo.badge,
@@ -298,7 +292,6 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
             {COMBOS.map((combo, idx) => {
               const selected = comboSelections[combo.id];
               const selectedCount = getSelectionTotal(selected);
-              const surcharge = getNutellaSurcharge(selected);
               const isComplete = selectedCount === combo.regularCookies;
 
               return (
@@ -328,11 +321,11 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                   <div className="flex items-end justify-between gap-3 py-5 my-5 border-y border-gold/10">
                     <div>
                       <p className="text-cream/35 text-[10px] tracking-widest uppercase">Worth</p>
-                      <p className="text-cream/45 text-lg font-serif line-through">&#8377;{combo.compareAt + surcharge}</p>
+                      <p className="text-cream/45 text-lg font-serif line-through">&#8377;{combo.compareAt}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-cream/35 text-[10px] tracking-widest uppercase">Now</p>
-                      <p className="text-tan text-[2.15rem] lg:text-[2.35rem] font-serif">&#8377;{combo.price + surcharge}</p>
+                      <p className="text-tan text-[2.15rem] lg:text-[2.35rem] font-serif">&#8377;{combo.price}</p>
                     </div>
                   </div>
 
@@ -368,7 +361,7 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                       </div>
                     ))}
                     <p className="text-cream/35 text-xs font-serif italic pt-1">
-                      Includes {combo.miniBites} chocolate chip mini bites. Nutella +&#8377;{NUTELLA_SURCHARGE_PER_COOKIE} each.
+                      Includes {combo.miniBites} chocolate chip mini bites.
                     </p>
                   </div>
 
@@ -389,7 +382,6 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
           {PACKS.map((pack, idx) => {
             const selected = selections[pack.id];
             const selectedCount = getSelectionTotal(selected);
-            const surcharge = getNutellaSurcharge(selected);
 
             return (
               <motion.div
@@ -427,9 +419,9 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                     </div>
                     <div className="text-right shrink-0">
                       {pack.compareAt && (
-                        <p className="text-cream/35 text-base font-serif line-through">&#8377;{pack.compareAt + surcharge}</p>
+                        <p className="text-cream/35 text-base font-serif line-through">&#8377;{pack.compareAt}</p>
                       )}
-                      <span className="text-tan text-[2rem] lg:text-[2.1rem] font-serif">&#8377;{pack.price + surcharge}</span>
+                      <span className="text-tan text-[2rem] lg:text-[2.1rem] font-serif">&#8377;{pack.price}</span>
                     </div>
                   </div>
                   <p className="font-serif-display text-cream/50 text-[15px] mb-5">{pack.subtitle}</p>
@@ -508,10 +500,10 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                             animate={{
                               scale: cookieType ? 1.08 : 1,
                               backgroundColor:
-                                cookieType === "The Legend"
-                                  ? "#C7A44C"
-                                  : cookieType === "The Naughty Nutella"
-                                    ? "#4B3621"
+                                cookieType === "Double Chocolate"
+                                  ? "#5B2D1F"
+                                  : cookieType === "Oreo Strong"
+                                    ? "#E8D9B8"
                                     : "transparent",
                             }}
                             className={`w-7 h-7 rounded-full border ${
@@ -632,13 +624,25 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                 ["Zone 2", "₹99", "₹399 min."],
                 ["Zone 3", "₹149", "₹599 min."],
                 ["Free", "₹1099+", "Any zone"],
-              ].map(([zone, fee, min]) => (
+              ].map(([zone, fee, min]) => {
+                const displayFee =
+                  zone === "Zone 1" ? "\u20b949" :
+                  zone === "Zone 2" ? "\u20b999" :
+                  zone === "Zone 3" ? "\u20b9149" :
+                  "\u20b9899+";
+                const displayMinimum =
+                  zone === "Zone 2" ? "\u20b9399 min." :
+                  zone === "Zone 3" ? "\u20b9599 min." :
+                  min;
+
+                return (
                 <div key={zone} className="rounded-[8px] border border-gold/10 bg-forest/40 px-4 py-3">
                   <p className="text-cream font-bold">{zone}</p>
-                  <p className="text-tan font-serif text-xl">{fee}</p>
-                  <p className="text-cream/40 text-xs uppercase tracking-widest">{min}</p>
+                  <p className="text-tan font-serif text-xl">{displayFee}</p>
+                  <p className="text-cream/40 text-xs uppercase tracking-widest">{displayMinimum}</p>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

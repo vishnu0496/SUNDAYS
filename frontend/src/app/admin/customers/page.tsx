@@ -24,13 +24,13 @@ export default function VIPRegistryPage() {
         const email = order.customer.email.toLowerCase();
         if (!profiles[email]) {
           profiles[email] = {
-            name: `${order.customer.firstName} ${order.customer.lastName}`,
+            name: order.customer.firstName,
             email: email,
-            phone: order.customer.phone,
+            phone: order.customer.whatsapp,
             totalOrders: 0,
             totalSpent: 0,
             lastOrder: order.timestamp,
-            location: order.customer.address,
+            location: order.customer.addressHouse,
             orders: []
           };
         }

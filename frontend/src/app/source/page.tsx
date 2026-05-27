@@ -9,7 +9,7 @@ const INGREDIENTS = [
     brand: "Van Houten Couverture",
     story: "We use legendary Van Houten Couverture — the gold standard of chocolate since 1828. Unlike compound chocolate, our couverture is rich in pure cocoa butter, ensuring a silky, molten melt and a deep, complex snap in every bite.",
     image: "https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=1000", // VERIFIED DARK CHOCO
-    details: ["70% Dark Profile", "Pure Cocoa Butter", "Zero Vegetable Fats"]
+    details: ["55% Dark Profile", "Pure Cocoa Butter", "Zero Vegetable Fats"]
   },
   {
     title: "The Butter",
@@ -67,7 +67,7 @@ export default function SourcePage() {
           transition={{ delay: 0.3 }}
           className="text-cream/40 mt-8 max-w-xl mx-auto font-serif italic text-lg"
         >
-          "A masterpiece is only as good as its blueprint. Here is the DNA of The Legend."
+          "A masterpiece is only as good as its blueprint. Here is the DNA of SUNDAYS."
         </motion.p>
       </section>
 

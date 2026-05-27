@@ -1,11 +1,6 @@
 import { getDeliveryQuoteByPincode, normalizePincode } from "@/lib/delivery";
-import { NUTELLA_SURCHARGE_PER_COOKIE, PRODUCT_PRICE_BY_NAME } from "@/lib/products";
+import { PRODUCT_PRICE_BY_NAME } from "@/lib/products";
 import type { OrderItem } from "@/lib/storage";
-
-function getNutellaSurcharge(selections: Record<string, number> | undefined) {
-  const nutellaCount = Math.max(0, Number(selections?.["The Naughty Nutella"]) || 0);
-  return nutellaCount * NUTELLA_SURCHARGE_PER_COOKIE;
-}
 
 function isMiniBitesOnlyOrder(items: OrderItem[]) {
   return items.every((item) => item.name === "12 Mini Bites" || item.name === "24 Mini Bites" || item.name === "12 Bite-Size Box" || item.name === "24 Bite-Size Box");
@@ -24,11 +19,9 @@ export function calculateServerOrderPricing(items: OrderItem[], pincodeInput: st
       throw new Error(`Unknown product: ${item.name}`);
     }
 
-    const price = basePrice + getNutellaSurcharge(item.selections);
-
     return {
       ...item,
-      price,
+      price: basePrice,
       quantity,
     };
   });
