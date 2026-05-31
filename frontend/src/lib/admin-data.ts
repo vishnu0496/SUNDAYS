@@ -93,7 +93,9 @@ const BRANDED_NAMES: Record<string, string> = {
   'The Legend': 'Double Chocolate',
   'The Naughty Nutella': 'Oreo Strong',
   'The Citrus Cloud': 'The Citrus Cloud',
-  'Little Rebels': 'Little Rebels',
+  'Chocolate Chip Bites': 'Chocolate Chip Bites',
+  'Atta Jaggery Almond Bites': 'Atta Jaggery Almond Bites',
+  'Little Rebels': 'Chocolate Chip Bites',
   
   // Legacy / Samples (Mapping strictly based on brand identity)
   'The Lazy Legend': 'Double Chocolate',
@@ -114,9 +116,13 @@ const BRANDED_NAMES: Record<string, string> = {
   'Dark Cocoa Espresso': 'Salted Noir',
   'dark-cocoa': 'Salted Noir',
   
-  'Mini Chocolate Chip Bites': 'Little Rebels',
-  'Mini Cookies': 'Little Rebels',
-  'mini-cookies': 'Little Rebels'
+  'Mini Chocolate Chip Bites': 'Chocolate Chip Bites',
+  '12 Chocolate Chip Bites': 'Chocolate Chip Bites',
+  '24 Chocolate Chip Bites': 'Chocolate Chip Bites',
+  'Mini Cookies': 'Chocolate Chip Bites',
+  'mini-cookies': 'Chocolate Chip Bites',
+  '12 Atta Jaggery Almond Bites': 'Atta Jaggery Almond Bites',
+  '24 Atta Jaggery Almond Bites': 'Atta Jaggery Almond Bites'
 };
 
 export function normalizeProductName(name: string): string {
@@ -227,7 +233,7 @@ function calculateDropStats(orders: MergedOrder[], dropId: string) {
   
   dropOrders.forEach(o => {
     o.items.forEach(i => {
-      if (i.name === 'Little Rebels') {
+      if (i.name.includes('Bites') || i.name === 'Little Rebels') {
         packCount += i.quantity;
       } else {
         cookieCount += i.quantity;

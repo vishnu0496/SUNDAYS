@@ -1,8 +1,9 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function Header() {
   const [cartCount, setCartCount] = React.useState(0);
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     const handleUpdate = (event: Event) => {
@@ -13,6 +14,18 @@ export function Header() {
     window.addEventListener("cart-updated", handleUpdate);
     return () => window.removeEventListener("cart-updated", handleUpdate);
   }, []);
+
+  const closeMenu = () => setIsMenuOpen(false);
+
+  const openRitualGuide = () => {
+    closeMenu();
+    window.dispatchEvent(new CustomEvent("open-ritual-modal"));
+  };
+
+  const openCart = () => {
+    closeMenu();
+    window.dispatchEvent(new CustomEvent("open-cart"));
+  };
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
@@ -54,20 +67,17 @@ export function Header() {
 
           <div className="hidden md:flex gap-10 items-center text-[12px] tracking-widest font-bold text-cream uppercase">
             <a href="#menu" className="hover:text-gold transition-colors">Menu</a>
+            <a href="#reviews" className="hover:text-gold transition-colors">Reviews</a>
             <a href="#craft" className="hover:text-gold transition-colors">The Craft</a>
             <a href="#story" className="hover:text-gold transition-colors">Our Story</a>
             <button
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent("open-ritual-modal"));
-              }}
+              onClick={openRitualGuide}
               className="hover:text-gold transition-colors text-[12px] tracking-widest font-bold uppercase"
             >
               Ritual Guide
             </button>
             <button
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent("open-cart"));
-              }}
+              onClick={openCart}
               className="relative hover:text-gold transition-colors flex items-center gap-2"
             >
               Cart
@@ -76,7 +86,67 @@ export function Header() {
               )}
             </button>
           </div>
+
+          <div className="md:hidden flex items-center gap-2">
+            <a
+              href="#menu"
+              onClick={closeMenu}
+              className="rounded-full bg-tan px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-forest shadow-[0_0_18px_rgba(199,164,76,0.16)]"
+            >
+              Order
+            </a>
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen((current) => !current)}
+              className="rounded-full border border-gold/15 px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-gold transition-colors hover:border-gold/35 hover:bg-white/[0.03]"
+              aria-label="Open navigation menu"
+              aria-expanded={isMenuOpen}
+            >
+              {isMenuOpen ? "Close" : "More"}
+            </button>
+          </div>
         </div>
+
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
+              className="absolute right-4 top-[4.2rem] w-60 md:hidden rounded-2xl border border-gold/15 bg-[#07110D]/95 p-2 shadow-2xl backdrop-blur-xl"
+            >
+              <div className="divide-y divide-gold/10 text-[11px] font-bold uppercase tracking-[0.18em] text-cream">
+                <a onClick={closeMenu} href="#menu" className="block px-4 py-3.5 hover:text-gold">
+                  Order Menu
+                </a>
+                <a onClick={closeMenu} href="#reviews" className="block px-4 py-3.5 text-gold">
+                  Reviews
+                </a>
+                <a onClick={closeMenu} href="#craft" className="block px-4 py-3.5 hover:text-gold">
+                  The Craft
+                </a>
+                <a onClick={closeMenu} href="#story" className="block px-4 py-3.5 hover:text-gold">
+                  Our Story
+                </a>
+                <button
+                  type="button"
+                  onClick={openRitualGuide}
+                  className="block w-full px-4 py-3.5 text-left hover:text-gold"
+                >
+                  Ritual Guide
+                </button>
+                <button
+                  type="button"
+                  onClick={openCart}
+                  className="block w-full px-4 py-3.5 text-left hover:text-gold"
+                >
+                  Cart{cartCount > 0 ? ` (${cartCount})` : ""}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </header>
   );

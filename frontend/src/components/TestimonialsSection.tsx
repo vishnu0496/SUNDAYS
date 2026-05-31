@@ -21,6 +21,7 @@ type ReviewResponse = {
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 const UNRATED = 0;
+const DEFAULT_VISIBLE_REVIEWS = 4;
 
 function Stars({
   rating,
@@ -69,6 +70,7 @@ export function TestimonialsSection() {
   const [imageDataUrl, setImageDataUrl] = useState("");
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -128,7 +130,8 @@ export function TestimonialsSection() {
         throw new Error(data.error || "Could not save review.");
       }
 
-      setReviews((current) => [data.review!, ...current].slice(0, 6));
+      setReviews((current) => [data.review!, ...current].slice(0, 24));
+      setShowAllReviews(false);
       setName("");
       setRating(UNRATED);
       setMessage("");
@@ -141,7 +144,8 @@ export function TestimonialsSection() {
     }
   };
 
-  const featuredReviews = reviews.slice(0, 3);
+  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, DEFAULT_VISIBLE_REVIEWS);
+  const hasMoreReviews = reviews.length > DEFAULT_VISIBLE_REVIEWS;
 
   return (
     <section id="reviews" className="py-32 bg-deep-forest relative overflow-hidden">
@@ -253,7 +257,7 @@ export function TestimonialsSection() {
           </form>
 
           <div className="space-y-5">
-            {featuredReviews.length === 0 ? (
+            {visibleReviews.length === 0 ? (
               <div className="glass-card p-8 md:p-10 min-h-[280px] flex flex-col justify-center">
                 <Stars rating={5} />
                 <p className="mt-8 text-3xl md:text-4xl font-serif text-cream leading-tight">
@@ -264,7 +268,18 @@ export function TestimonialsSection() {
                 </p>
               </div>
             ) : (
-              featuredReviews.map((review) => (
+              <>
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-gold-muted text-[10px] tracking-[0.3em] uppercase font-bold">
+                    Latest Reviews
+                  </p>
+                  <p className="text-cream/35 text-sm font-serif italic">
+                    Showing {visibleReviews.length} of {reviews.length}
+                  </p>
+                </div>
+
+                <div className={`space-y-5 ${showAllReviews ? "lg:max-h-[760px] lg:overflow-y-auto lg:pr-2" : ""}`}>
+                  {visibleReviews.map((review) => (
                 <article key={review.id} className="glass-card p-6 flex gap-5">
                   {review.imageDataUrl && (
                     <div className="h-24 w-24 shrink-0 overflow-hidden rounded-[8px] border border-gold/10">
@@ -279,7 +294,19 @@ export function TestimonialsSection() {
                     </p>
                   </div>
                 </article>
-              ))
+                  ))}
+                </div>
+
+                {hasMoreReviews && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllReviews((current) => !current)}
+                    className="w-full rounded-[8px] border border-gold/15 bg-white/[0.03] px-5 py-4 text-[10px] font-black uppercase tracking-[0.22em] text-tan transition-colors hover:border-tan/50 hover:bg-tan/10"
+                  >
+                    {showAllReviews ? "Show Fewer Reviews" : `Show All ${reviews.length} Reviews`}
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>

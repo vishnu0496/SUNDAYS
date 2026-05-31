@@ -128,11 +128,19 @@ export function RitualModal({ isOpen, onClose }: RitualModalProps) {
                     </p>
                   </div>
 
-                  {/* Bite-Size Chocolate Chip */}
+                  {/* Chocolate Chip Bites */}
                   <div className="border-l-2 border-gold/20 pl-4 space-y-1">
-                    <h4 className="text-sm font-bold text-[#F6F0E7] uppercase tracking-wider">Bite-Size Chocolate Chip</h4>
+                    <h4 className="text-sm font-bold text-[#F6F0E7] uppercase tracking-wider">Chocolate Chip Bites</h4>
                     <p className="text-cream/50 text-xs leading-relaxed font-light">
                       Unsalted French Butter, Organic Sugars, Premium Wheat Flour, Van Houten 55% Couverture Dark Chocolate, Sea Salt, Curd (Yoghurt).
+                    </p>
+                  </div>
+
+                  {/* Atta Jaggery Almond Bites */}
+                  <div className="border-l-2 border-gold/20 pl-4 space-y-1">
+                    <h4 className="text-sm font-bold text-[#F6F0E7] uppercase tracking-wider">Atta Jaggery Almond Bites</h4>
+                    <p className="text-cream/50 text-xs leading-relaxed font-light">
+                      Whole wheat flour, jaggery, almonds, coconut, warm spices, butter, and curd.
                     </p>
                   </div>
                 </div>

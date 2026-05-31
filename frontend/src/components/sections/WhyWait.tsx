@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 const reasons = [
   {
     num: "01",
-    title: "24-Hour Dough",
-    desc: "Cold-resting the dough for a full day lets the flavours develop slowly — creating depth that same-day baking simply can't achieve.",
+    title: "Balanced Dough",
+    desc: "Every dough is tuned for the right spread, chew, and softness before it goes into the oven.",
   },
   {
     num: "02",

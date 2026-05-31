@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://sundays-cookies.vercel.app"),
   title: "Sundays | The Cookie, Mastered",
-  description: "Small-batch, 24-hour cookies. Baked every Sunday in Hyderabad. Artisanal quality delivered in weekly drops.",
+  description: "Small-batch cookies baked fresh in Hyderabad. Artisanal quality delivered in weekly drops.",
   keywords: ["Sundays cookies", "Hyderabad bakery", "small-batch cookies", "weekly cookie drops", "artisanal cookies Hyderabad"],
   alternates: {
     canonical: "/",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         url: "/images/hero.png",
         width: 1200,
         height: 630,
-        alt: "Sundays Cookies - The 24-Hour Cookie",
+        alt: "Sundays Cookies - The Cookie, Mastered",
       },
     ],
     locale: "en_IN",
@@ -70,7 +70,7 @@ export default function RootLayout({
       "addressRegion": "Telangana",
       "addressCountry": "IN"
     },
-    "description": "Premium small-batch cookies in Hyderabad. The 24-hour cookie, mastered.",
+    "description": "Premium small-batch cookies in Hyderabad. The cookie, mastered.",
     "sameAs": [
       "https://instagram.com/sundays.hyd"
     ]

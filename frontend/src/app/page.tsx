@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { ReviewSpotlight } from "@/components/ReviewSpotlight";
 import { PackSection } from "@/components/PackSection";
 import { CraftSection } from "@/components/CraftSection";
 import { StorySection } from "@/components/StorySection";
@@ -70,6 +71,7 @@ export default function Home() {
     <main className="min-h-screen relative bg-[#030A08]">
       <Header />
       <Hero />
+      <ReviewSpotlight />
       <PackSection onAddToCart={handleAddToCart} />
       <CraftSection />
       <RitualSection />

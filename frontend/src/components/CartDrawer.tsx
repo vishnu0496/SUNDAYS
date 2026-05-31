@@ -8,6 +8,7 @@ import {
   getDeliveryQuoteByPincode,
   normalizePincode,
 } from "@/lib/delivery";
+import { STANDALONE_BITE_PRODUCT_NAMES } from "@/lib/products";
 
 interface OrderItem {
   packName: string;
@@ -101,9 +102,9 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
   const isBelowMinimum = missingMinimum > 0;
   const isMiniBitesOnlyOrder =
     cart.length > 0 &&
-    cart.every((item) => item.packName === "12 Mini Bites" || item.packName === "24 Mini Bites" || item.packName === "12 Bite-Size Box" || item.packName === "24 Bite-Size Box");
+    cart.every((item) => STANDALONE_BITE_PRODUCT_NAMES.includes(item.packName as typeof STANDALONE_BITE_PRODUCT_NAMES[number]));
   const isMiniOnlyBlocked = hasCompletePincode && Boolean(deliveryQuote) && deliveryQuote?.zoneId !== "zone1" && isMiniBitesOnlyOrder;
-  const miniOnlyBlockedMessage = "Mini Bites are standalone only in Zone 1. Add a regular pack or choose The Sunday Starter combo.";
+  const miniOnlyBlockedMessage = "Bites are standalone only in Zone 1. Add a regular pack or choose The Sunday Starter combo.";
   const deliveryFee = calculatedDeliveryFee ?? 0;
   const total = subtotal + deliveryFee;
   const deliveryLabel =
@@ -120,11 +121,18 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
               : `₹${deliveryFee}`;
 
   const deliveryProgress = Math.min((subtotal / deliveryGoal) * 100, 100);
+  const freeDeliveryRemaining = Math.max(deliveryGoal - subtotal, 0);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState("");
   const isCheckoutBlocked = isProcessing || !hasCompletePincode || calculatedDeliveryFee === null || isBelowMinimum || isMiniOnlyBlocked;
+  const checkoutButtonLabel =
+    isUnsupportedPincode ? "Delivery unavailable" :
+    !hasCompletePincode ? "Enter pincode to continue" :
+    isMiniOnlyBlocked ? "Add regular pack or combo" :
+    isBelowMinimum ? `Add ₹${missingMinimum} more` :
+    `Pay ₹${total} with Razorpay`;
 
   const initializeRazorpay = () => {
     if (window.Razorpay) {
@@ -330,14 +338,14 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
             <div className="fixed inset-0 bg-black/80 z-[100]" onClick={onClose} />
             <motion.div 
               initial={{ x: "100%" }} animate={{ x: 0 }}
-              className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-[#050D0A] z-[101] flex flex-col items-center justify-center p-12 text-center"
+              className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-[#050D0A] z-[101] flex flex-col items-center justify-center p-6 text-center sm:p-12"
             >
               <div className="w-24 h-24 bg-gold/10 rounded-full flex items-center justify-center mb-8 border border-gold/20">
                 <svg className="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
               </div>
-              <h2 className="text-4xl font-serif text-white mb-4">Order Reserved</h2>
-              <p className="text-tan/60 text-lg mb-10 font-serif italic">Check your email for your receipt. We are preparing your box of joy!</p>
-              <button onClick={onClose} className="premium-button w-full py-6">Back to Sundays</button>
+              <h2 className="text-3xl sm:text-4xl font-serif text-white mb-4">Order Reserved</h2>
+              <p className="text-tan/60 text-base sm:text-lg mb-8 sm:mb-10 font-serif italic">Check your email for your receipt. We are preparing your box of joy!</p>
+              <button onClick={onClose} className="premium-button w-full py-4 sm:py-6">Back to Sundays</button>
             </motion.div>
           </>
         )}
@@ -366,13 +374,13 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
             className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-[#050D0A] border-l border-gold/10 z-[101] shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="p-8 border-b border-gold/10 flex justify-between items-center">
+            <div className="px-5 py-4 sm:p-8 border-b border-gold/10 flex justify-between items-center gap-4">
               <div>
-                <p className="text-[11px] tracking-[0.3em] font-bold text-[#C7A44C]/75 uppercase mb-1">
+                <p className="text-[9px] sm:text-[11px] tracking-[0.25em] sm:tracking-[0.3em] font-bold text-[#C7A44C]/75 uppercase mb-1">
                   {stage === 'cart' ? 'Your Selection' : 'Place Your Order'}
                 </p>
-                <h2 className="text-3xl font-serif text-white">
-                  {stage === 'cart' ? 'Order Summary' : 'Almost There'}
+                <h2 className="text-2xl sm:text-3xl font-serif text-white">
+                  {stage === 'cart' ? 'Your Cart' : 'Almost There'}
                 </h2>
               </div>
               <button onClick={onClose} className="text-[#C7A44C]/75 hover:text-white transition-colors">
@@ -382,15 +390,16 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
 
             {/* Stages Container */}
             <div className="flex-grow overflow-y-auto">
-              <div className="p-8 space-y-10">
+              <div className="px-4 py-5 space-y-6 sm:p-8 sm:space-y-10">
                 {stage === 'cart' ? (
-                  <div className="space-y-10">
+                  <div className="space-y-6 sm:space-y-10">
                     {/* Rewards Tracker */}
-                    <div className="space-y-5 pb-8 border-b border-gold/5">
-                      <div className="flex justify-between text-[11px] tracking-widest uppercase font-bold">
+                    <div className="rounded-2xl border border-gold/10 bg-white/[0.025] p-4 space-y-3">
+                      <div className="flex justify-between gap-4 text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-widest uppercase font-bold">
                         <span className={subtotal >= deliveryGoal ? "text-green-500" : "text-gold-muted"}>
-                          {subtotal >= deliveryGoal ? "Free Delivery Unlocked" : `₹${deliveryGoal - subtotal} more for Free Delivery`}
+                          {subtotal >= deliveryGoal ? "Free Delivery Unlocked" : `Add ₹${freeDeliveryRemaining} for Free Delivery`}
                         </span>
+                        <span className="text-cream/35">₹{deliveryGoal}</span>
                       </div>
                       <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                         <div className={`h-full ${subtotal >= deliveryGoal ? "bg-green-500" : "bg-gold"}`} style={{ width: `${deliveryProgress}%` }} />
@@ -398,40 +407,41 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                     </div>
 
                     {/* Cart Items */}
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {cart.length === 0 ? (
                         <p className="text-white/20 font-serif italic text-center py-20 text-xl">Your selection is empty.</p>
                       ) : (
                         cart.map((item, index) => (
-                          <div key={index} className="bg-white/[0.03] border border-gold/5 rounded-2xl p-6 space-y-4 relative overflow-hidden group">
-                            <span className="absolute -right-2 -top-4 text-7xl font-serif text-white/[0.02] italic select-none">
+                          <div key={index} className="bg-white/[0.03] border border-gold/5 rounded-2xl p-4 space-y-4 relative overflow-hidden group sm:p-6">
+                            <span className="absolute -right-2 -top-4 hidden text-7xl font-serif text-white/[0.02] italic select-none sm:block">
                               {index + 1}
                             </span>
 
-                            <div className="flex justify-between items-center">
-                              <span className="text-tan text-[12px] tracking-[0.3em] font-bold uppercase">Box #{index + 1}</span>
+                            <div className="flex justify-between items-center gap-3">
+                              <span className="text-tan text-[10px] sm:text-[12px] tracking-[0.24em] sm:tracking-[0.3em] font-bold uppercase">Box #{index + 1}</span>
                               <button onClick={() => onUpdateQuantity(index, -1)} className="text-white/40 hover:text-red-400 transition-colors text-[11px] uppercase tracking-widest font-bold">Remove</button>
                             </div>
 
-                            <div className="flex justify-between items-baseline">
-                              <h3 className="text-2xl font-serif text-white">{item.packName}</h3>
-                              <span className="text-white font-serif text-xl">₹{item.price}</span>
+                            <div className="flex items-start justify-between gap-3">
+                              <h3 className="text-xl sm:text-2xl leading-tight font-serif text-white">{item.packName}</h3>
+                              <span className="shrink-0 rounded-full border border-gold/10 bg-forest/60 px-3 py-1 text-tan font-serif text-lg sm:text-xl">₹{item.price}</span>
                             </div>
 
-                            <div className="space-y-3 pt-3 border-l-2 border-gold/10 pl-6">
+                            <div className="space-y-2.5 rounded-xl border border-gold/5 bg-black/10 p-3 sm:border-l-2 sm:border-y-0 sm:border-r-0 sm:rounded-none sm:bg-transparent sm:py-0 sm:pr-0 sm:pl-6 sm:pt-3">
                               {Object.entries(item.selections).filter(([, count]) => count > 0).map(([name, count]) => (
-                                <div key={name} className="flex justify-between text-sm">
-                                  <div className="flex items-center gap-3">
+                                <div key={name} className="flex items-center justify-between gap-3 text-sm">
+                                  <div className="flex min-w-0 items-center gap-3">
                                     <div 
-                                      className="w-2 h-2 rounded-full" 
+                                      className="w-2 h-2 rounded-full shrink-0" 
                                       style={{ 
                                         backgroundColor: name === "Double Chocolate" ? "#5B2D1F" :
-                                                        name === "Oreo Strong" ? "#E8D9B8" : "#FDFD96"
+                                                        name === "Oreo Strong" ? "#E8D9B8" :
+                                                        name === "Atta Jaggery Almond Bites" ? "#C7A44C" : "#FDFD96"
                                       }} 
                                     />
-                                    <span className="text-white/60 italic font-serif text-lg">{name}</span>
+                                    <span className="text-white/65 italic font-serif text-base sm:text-lg leading-snug">{name}</span>
                                   </div>
-                                  <span className="text-tan font-bold">x{count}</span>
+                                  <span className="text-tan font-bold shrink-0">x{count}</span>
                                 </div>
                               ))}
                             </div>
@@ -441,36 +451,36 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-10">
-                    <button onClick={() => setStage('cart')} className="text-gold-muted hover:text-white transition-colors text-[11px] tracking-widest uppercase font-bold flex items-center gap-2 mb-8">
-                      ← Back to Selection
+                  <div className="space-y-6 sm:space-y-10">
+                    <button onClick={() => setStage('cart')} className="text-gold-muted hover:text-white transition-colors text-[11px] tracking-widest uppercase font-bold flex items-center gap-2">
+                      ← Back to Cart
                     </button>
-                    <p className="-mt-5 rounded-xl border border-gold/10 bg-white/[0.03] px-4 py-3 text-sm font-serif italic text-white/45">
+                    <p className="rounded-xl border border-gold/10 bg-white/[0.03] px-4 py-3 text-sm font-serif italic text-white/45">
                       Delivery charges are calculated by pincode at checkout.
                     </p>
 
-                    <div className="space-y-10">
+                    <div className="space-y-6 sm:space-y-10">
                       <div>
-                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Your Name</label>
-                        <input required type="text" placeholder="Full name" className="input-premium h-14 text-base" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                        <label className="block text-gold-muted text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-bold mb-3 sm:mb-4">Your Name</label>
+                        <input required type="text" placeholder="Full name" className="input-premium h-12 sm:h-14 text-base" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                       </div>
                       <div>
-                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Email Address</label>
-                        <input required type="email" placeholder="hello@example.com" className="input-premium h-14 text-base" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                        <label className="block text-gold-muted text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-bold mb-3 sm:mb-4">Email Address</label>
+                        <input required type="email" placeholder="hello@example.com" className="input-premium h-12 sm:h-14 text-base" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
                       </div>
                       <div>
-                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">WhatsApp Number</label>
-                        <input required type="tel" placeholder="+91 98765 43210" className="input-premium h-14 text-base" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                        <label className="block text-gold-muted text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-bold mb-3 sm:mb-4">WhatsApp Number</label>
+                        <input required type="tel" placeholder="+91 98765 43210" className="input-premium h-12 sm:h-14 text-base" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
                       </div>
                       <div>
-                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Delivery Pincode</label>
+                        <label className="block text-gold-muted text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-bold mb-3 sm:mb-4">Delivery Pincode</label>
                         <input
                           required
                           type="text"
                           inputMode="numeric"
                           maxLength={6}
                           placeholder="500085"
-                          className="input-premium h-14 text-base"
+                          className="input-premium h-12 sm:h-14 text-base"
                           value={formData.pincode}
                           onChange={(e) => {
                             setFormData({ ...formData, pincode: normalizePincode(e.target.value) });
@@ -490,13 +500,52 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                         </p>
                       </div>
                       <div>
-                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Delivery Address</label>
-                        <textarea required placeholder="Full address, Hyderabad" className="input-premium min-h-[140px] py-4 text-base" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
+                        <label className="block text-gold-muted text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-bold mb-3 sm:mb-4">Delivery Address</label>
+                        <textarea required placeholder="Full address, Hyderabad" className="input-premium min-h-[110px] sm:min-h-[140px] py-4 text-base" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
                       </div>
                       <div>
-                        <label className="block text-gold-muted text-[11px] tracking-[0.2em] uppercase font-bold mb-4">Note (Optional)</label>
-                        <input type="text" placeholder="Any special requests?" className="input-premium h-14 text-base" value={formData.note} onChange={(e) => setFormData({...formData, note: e.target.value})} />
+                        <label className="block text-gold-muted text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-bold mb-3 sm:mb-4">Note (Optional)</label>
+                        <input type="text" placeholder="Any special requests?" className="input-premium h-12 sm:h-14 text-base" value={formData.note} onChange={(e) => setFormData({...formData, note: e.target.value})} />
                       </div>
+                    </div>
+
+                    <div className="sm:hidden rounded-2xl border border-gold/10 bg-white/[0.025] p-4 space-y-4">
+                      <p className="text-[10px] tracking-[0.22em] uppercase font-bold text-gold-muted">
+                        Final Amount
+                      </p>
+                      <div className="space-y-2.5 border-b border-gold/10 pb-4 text-sm">
+                        <div className="flex justify-between text-white/50">
+                          <span>Subtotal</span>
+                          <span>₹{subtotal}</span>
+                        </div>
+                        <div className="flex justify-between text-white/50">
+                          <span>Delivery fee</span>
+                          <span>{!hasCompletePincode ? "Enter pincode above" : deliveryLabel}</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-white/40 uppercase tracking-widest text-[11px] font-bold">
+                          Grand Total
+                        </span>
+                        <span className="text-tan text-2xl font-serif font-bold">₹{total}</span>
+                      </div>
+                      {paymentError && (
+                        <p className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-center text-sm text-red-300">
+                          {paymentError}
+                        </p>
+                      )}
+                      <button
+                        onClick={handleCompleteOrder}
+                        disabled={isCheckoutBlocked}
+                        className="premium-button w-full py-4 flex items-center justify-center gap-3 disabled:opacity-50"
+                      >
+                        {isProcessing ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Opening Razorpay...
+                          </>
+                        ) : checkoutButtonLabel}
+                      </button>
                     </div>
                   </div>
                 )}
@@ -504,29 +553,30 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
             </div>
 
             {/* Footer */}
-            <div className="p-8 border-t border-gold/10 bg-white/[0.02]">
+            <div className={`${stage === 'checkout' ? 'hidden sm:block' : ''} px-4 py-4 sm:p-8 border-t border-gold/10 bg-[#07110D]/95 backdrop-blur`}>
               {cart.length > 0 && (
-                <div className="mb-5 rounded-2xl border border-gold/10 bg-white/[0.01] p-4 text-[11px] text-cream/50 leading-relaxed font-serif italic">
-                  💡 <strong>Sunday Reheat Ritual:</strong> Warm cookies in an air fryer or oven at 160°C for 2 mins (or microwave for 10s) to restore the signature gooey, molten chocolate center.
-                </div>
-              )}
-              {cart.length > 0 && (
-                <div className="mb-6 space-y-3 border-b border-gold/10 pb-6 text-sm">
+                <div className="mb-4 sm:mb-6 space-y-2.5 sm:space-y-3 border-b border-gold/10 pb-4 sm:pb-6 text-sm">
                   <div className="flex justify-between text-white/50">
-                    <span>Subtotal</span>
+                    <span>{stage === 'cart' ? 'Cookie subtotal' : 'Subtotal'}</span>
                     <span>₹{subtotal}</span>
                   </div>
-                  <div className="flex justify-between text-white/50">
-                    <span>Delivery</span>
-                    <span>{deliveryLabel}</span>
-                  </div>
+                  {stage === 'cart' ? (
+                    <p className="text-white/35 font-serif italic">
+                      Delivery is calculated after you enter your pincode.
+                    </p>
+                  ) : (
+                    <div className="flex justify-between text-white/50">
+                      <span>Delivery fee</span>
+                      <span>{!hasCompletePincode ? "Enter pincode above" : deliveryLabel}</span>
+                    </div>
+                  )}
                 </div>
               )}
-              <div className="flex justify-between items-center mb-8">
+              <div className="flex justify-between items-center mb-5 sm:mb-8">
                 <span className="text-white/40 uppercase tracking-widest text-[11px] font-bold">
-                  {stage === 'cart' ? 'Total Selection' : 'Grand Total'}
+                  {stage === 'cart' ? 'Cookie Total' : 'Grand Total'}
                 </span>
-                <span className="text-tan text-3xl font-serif font-bold">₹{total}</span>
+                <span className="text-tan text-2xl sm:text-3xl font-serif font-bold">₹{stage === 'cart' ? subtotal : total}</span>
               </div>
               {paymentError && (
                 <p className="mb-5 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-center text-sm text-red-300">
@@ -541,28 +591,22 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onClearCar
                     setStage('checkout');
                   }}
                   disabled={cart.length === 0}
-                  className="premium-button w-full py-6 disabled:opacity-20"
+                  className="premium-button w-full py-4 sm:py-6 disabled:opacity-20"
                 >
-                  Continue to Payment
+                  Continue to Delivery Details
                 </button>
               ) : (
                 <button 
                   onClick={handleCompleteOrder}
                   disabled={isCheckoutBlocked}
-                  className="premium-button w-full py-6 flex items-center justify-center gap-3 disabled:opacity-50"
+                  className="premium-button w-full py-4 sm:py-6 flex items-center justify-center gap-3 disabled:opacity-50"
                 >
                   {isProcessing ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Opening Razorpay...
                     </>
-                  ) : (
-                    isUnsupportedPincode ? "Delivery unavailable" :
-                    !hasCompletePincode ? "Enter pincode to continue" :
-                    isMiniOnlyBlocked ? "Add regular pack or combo" :
-                    isBelowMinimum ? `Add ₹${missingMinimum} more` :
-                    `Pay ₹${total} with Razorpay`
-                  )}
+                  ) : checkoutButtonLabel}
                 </button>
               )}
             </div>

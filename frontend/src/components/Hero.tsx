@@ -62,6 +62,14 @@ export function Hero() {
           >
             ORDER NOW
           </a>
+
+          <a
+            href="#reviews"
+            className="mt-5 inline-flex items-center gap-3 rounded-full border border-gold/20 bg-black/25 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-cream/75 backdrop-blur-sm transition-all hover:border-gold/50 hover:text-gold"
+          >
+            <span className="text-tan">{"\u2605".repeat(5)}</span>
+            <span>5-star reviews</span>
+          </a>
           
           <div className="mt-12 flex flex-col items-center">
             <a 

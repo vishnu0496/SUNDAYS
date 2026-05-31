@@ -17,7 +17,8 @@ const MENU: Cookie[] = [
   { id: 'lazy-legend', name: 'The Lazy Legend', description: 'Classic Choco Chip. Crisp edges, soft center, generous chocolate pools.', price: 180, image: '/images/lazy-legend.png' },
   { id: 'golden-affair', name: 'The Golden Affair', description: 'Lotus Biscoff. Caramelized Biscoff richness with a slow-melting finish.', price: 220, image: '/images/golden-affair.png' },
   { id: 'salted-noir', name: 'Salted Noir', description: 'Dark Chocolate + Flaky Sea Salt. Deep dark chocolate lifted with flakes of sea salt.', price: 220, image: '/images/salted-noir.png' },
-  { id: 'little-rebels', name: 'Little Rebels', description: 'Mini Cookies. Small-batch mini cookies made for quick cravings and easy sharing.', price: 250, image: '/images/little-rebels.png' },
+  { id: 'chocolate-chip-bites', name: 'Chocolate Chip Bites', description: 'Classic chocolate chip bites baked for sharing.', price: 299, image: '/images/mini-chocolate-chip-bites.png' },
+  { id: 'atta-jaggery-almond-bites', name: 'Atta Jaggery Almond Bites', description: 'Whole wheat bites with jaggery, almonds, coconut, and warm spices.', price: 299, image: '/images/little-rebels.png' },
 ];
 
 const DELIVERY_CHARGE = 50;

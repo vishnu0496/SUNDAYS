@@ -1,9 +1,14 @@
 import { getDeliveryQuoteByPincode, normalizePincode } from "@/lib/delivery";
-import { PRODUCT_PRICE_BY_NAME } from "@/lib/products";
+import {
+  FULL_SUNDAY_WHEAT_BITE_UPGRADE,
+  PRODUCT_NAMES,
+  PRODUCT_PRICE_BY_NAME,
+  STANDALONE_BITE_PRODUCT_NAMES,
+} from "@/lib/products";
 import type { OrderItem } from "@/lib/storage";
 
 function isMiniBitesOnlyOrder(items: OrderItem[]) {
-  return items.every((item) => item.name === "12 Mini Bites" || item.name === "24 Mini Bites" || item.name === "12 Bite-Size Box" || item.name === "24 Bite-Size Box");
+  return items.every((item) => STANDALONE_BITE_PRODUCT_NAMES.includes(item.name as typeof STANDALONE_BITE_PRODUCT_NAMES[number]));
 }
 
 export function calculateServerOrderPricing(items: OrderItem[], pincodeInput: string | number | null | undefined) {
@@ -12,7 +17,10 @@ export function calculateServerOrderPricing(items: OrderItem[], pincodeInput: st
   }
 
   const normalizedItems = items.map((item) => {
-    const basePrice = PRODUCT_PRICE_BY_NAME[item.name];
+    const isFullSundayWheatUpgrade =
+      item.name === PRODUCT_NAMES.fullSunday &&
+      Number(item.selections?.["Atta Jaggery Almond Bites"]) === 24;
+    const basePrice = PRODUCT_PRICE_BY_NAME[item.name] + (isFullSundayWheatUpgrade ? FULL_SUNDAY_WHEAT_BITE_UPGRADE : 0);
     const quantity = Math.max(1, Number(item.quantity) || 1);
 
     if (!basePrice) {

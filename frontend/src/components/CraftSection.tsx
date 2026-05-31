@@ -10,8 +10,8 @@ const ITEMS = [
   },
   {
     num: "02",
-    title: "24-Hour Cold Rest",
-    desc: "The dough rests a full 24 hours in the fridge — developing complex flavour, crispy edges, and a fudgy centre."
+    title: "Balanced Dough",
+    desc: "We tune each dough for the right spread, chew, and softness so every box lands with a rich bakery-style centre."
   },
   {
     num: "03",

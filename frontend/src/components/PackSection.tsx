@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { PRODUCT_NAMES, PRODUCT_PRICES } from "@/lib/products";
+import { FULL_SUNDAY_WHEAT_BITE_UPGRADE, PRODUCT_NAMES, PRODUCT_PRICES } from "@/lib/products";
 import { VegSeal } from "./ui/VegSeal";
 import { BatchIndicator } from "./ui/BatchIndicator";
 
 type CookieType = "Double Chocolate" | "Oreo Strong";
+type ComboBiteChoice = "chocolate" | "atta";
 
 interface Pack {
   id: string;
@@ -21,7 +22,7 @@ interface Pack {
   priceNote?: string;
 }
 
-interface MiniOption {
+interface BiteOption {
   id: string;
   name: string;
   subtitle: string;
@@ -30,6 +31,16 @@ interface MiniOption {
   badge: string;
   compareAt?: number;
   savings?: string;
+}
+
+interface BiteCollection {
+  id: string;
+  title: string;
+  eyebrow: string;
+  description: string;
+  image: string;
+  selectionName: string;
+  options: BiteOption[];
 }
 
 interface Combo {
@@ -43,10 +54,12 @@ interface Combo {
   badge: string;
   regularCookies: number;
   miniBites: number;
+  allowBiteChoice?: boolean;
   featured?: boolean;
 }
 
-const MINI_COOKIE_NAME = "Bite-Size Chocolate Chip";
+const CHOCOLATE_BITE_NAME = "Chocolate Chip Bites";
+const ATTA_JAGGERY_BITE_NAME = "Atta Jaggery Almond Bites";
 
 const COOKIES: { name: CookieType; flavor: string; description: string }[] = [
   { name: "Double Chocolate", flavor: "Dark Chocolate", description: "Double chocolate chunks, brown sugar dough, sea salt finish" },
@@ -78,24 +91,62 @@ const PACKS: Pack[] = [
   },
 ];
 
-const MINI_OPTIONS: MiniOption[] = [
+const BITE_COLLECTIONS: BiteCollection[] = [
   {
-    id: "12-mini-bites",
-    name: PRODUCT_NAMES.mini12,
-    subtitle: "Classic Sundays chocolate chip, baked bite-sized for sharing.",
-    price: PRODUCT_PRICES.mini12,
-    count: 12,
-    badge: "CHIP MINIS",
+    id: "chocolate-chip-bites",
+    title: "Chocolate Chip Bites",
+    eyebrow: "Classic chocolate chip",
+    description: "Classic chocolate chip cookies, baked for sharing.",
+    image: "/images/mini-chocolate-chip-bites.png",
+    selectionName: CHOCOLATE_BITE_NAME,
+    options: [
+      {
+        id: "12-chocolate-chip-bites",
+        name: PRODUCT_NAMES.mini12,
+        subtitle: "12 bites box",
+        price: PRODUCT_PRICES.mini12,
+        count: 12,
+        badge: "12 BITES",
+      },
+      {
+        id: "24-chocolate-chip-bites",
+        name: PRODUCT_NAMES.mini24,
+        subtitle: "24 bites box",
+        price: PRODUCT_PRICES.mini24,
+        count: 24,
+        badge: "BEST VALUE",
+        compareAt: PRODUCT_PRICES.mini12 * 2,
+        savings: "Save \u20b9149",
+      },
+    ],
   },
   {
-    id: "24-mini-bites",
-    name: PRODUCT_NAMES.mini24,
-    subtitle: "A bigger box of bite-size chocolate chip cookies for gifting and parties.",
-    price: PRODUCT_PRICES.mini24,
-    count: 24,
-    badge: "BEST VALUE",
-    compareAt: PRODUCT_PRICES.mini12 * 2,
-    savings: "Save \u20b9139 vs 2x12 packs",
+    id: "atta-jaggery-almond-bites",
+    title: "Atta Jaggery Almond Bites",
+    eyebrow: "Whole wheat + jaggery",
+    description: "Whole wheat cookies with jaggery, almonds, coconut and warm spices.",
+    image: "/images/little-rebels.png",
+    selectionName: "Atta Jaggery Almond Bites",
+    options: [
+      {
+        id: "12-atta-jaggery-almond-bites",
+        name: PRODUCT_NAMES.attaJaggery12,
+        subtitle: "12 bites box",
+        price: PRODUCT_PRICES.attaJaggery12,
+        count: 12,
+        badge: "12 BITES",
+      },
+      {
+        id: "24-atta-jaggery-almond-bites",
+        name: PRODUCT_NAMES.attaJaggery24,
+        subtitle: "24 bites box",
+        price: PRODUCT_PRICES.attaJaggery24,
+        count: 24,
+        badge: "BEST VALUE",
+        compareAt: PRODUCT_PRICES.attaJaggery12 * 2,
+        savings: "Save \u20b999",
+      },
+    ],
   },
 ];
 
@@ -103,39 +154,42 @@ const COMBOS: Combo[] = [
   {
     id: "sunday-starter",
     name: PRODUCT_NAMES.starter,
-    contents: "3 regular cookies + 12 mini bites",
+    contents: "3 big cookies + 12 bites",
     price: PRODUCT_PRICES.starter,
     compareAt: PRODUCT_PRICES.trio + PRODUCT_PRICES.mini12,
-    savings: "Save \u20b969",
+    savings: "Save \u20b999",
     tag: "Perfect first order",
     badge: "STARTER",
     regularCookies: 3,
     miniBites: 12,
-  },
-  {
-    id: "full-sunday",
-    name: PRODUCT_NAMES.fullSunday,
-    contents: "6 regular cookies + 24 mini bites",
-    price: PRODUCT_PRICES.fullSunday,
-    compareAt: PRODUCT_PRICES.halfDozen + PRODUCT_PRICES.mini24,
-    savings: "Save \u20b999",
-    tag: "Best Deal - biggest Sunday box",
-    badge: "BEST DEAL",
-    regularCookies: 6,
-    miniBites: 24,
-    featured: true,
+    allowBiteChoice: true,
   },
   {
     id: "gift-box",
     name: PRODUCT_NAMES.giftBox,
-    contents: "6 regular cookies + 12 mini bites",
+    contents: "6 big cookies + 12 bites",
     price: PRODUCT_PRICES.giftBox,
     compareAt: PRODUCT_PRICES.halfDozen + PRODUCT_PRICES.mini12,
-    savings: "Save \u20b969",
+    savings: "Save \u20b999",
     tag: "Perfect for gifting",
     badge: "GIFT BOX",
     regularCookies: 6,
     miniBites: 12,
+    allowBiteChoice: true,
+  },
+  {
+    id: "full-sunday",
+    name: PRODUCT_NAMES.fullSunday,
+    contents: "6 big cookies + 24 Chocolate Chip Bites",
+    price: PRODUCT_PRICES.fullSunday,
+    compareAt: PRODUCT_PRICES.halfDozen + PRODUCT_PRICES.mini24,
+    savings: "Save \u20b9149",
+    tag: "Best Deal - biggest Sunday box",
+    badge: "BEST DEAL",
+    regularCookies: 6,
+    miniBites: 24,
+    allowBiteChoice: true,
+    featured: true,
   },
 ];
 
@@ -154,15 +208,20 @@ const EMPTY_COMBO_SELECTIONS: Record<string, Record<CookieType, number>> = COMBO
   {} as Record<string, Record<CookieType, number>>
 );
 
+const EMPTY_COMBO_BITE_CHOICES: Record<string, ComboBiteChoice> = COMBOS.reduce(
+  (acc, combo) => ({ ...acc, [combo.id]: "chocolate" }),
+  {} as Record<string, ComboBiteChoice>
+);
+
 function getSelectionTotal(selection: Record<CookieType, number>) {
   return Object.values(selection).reduce((a, b) => a + b, 0);
 }
 
-function getActiveSelections(selection: Record<CookieType, number>, miniBites = 0) {
+function getActiveSelections(selection: Record<CookieType, number>, biteName = CHOCOLATE_BITE_NAME, miniBites = 0) {
   const entries: [string, number][] = Object.entries(selection).filter(([, count]) => count > 0);
 
   if (miniBites > 0) {
-    entries.push([MINI_COOKIE_NAME, miniBites]);
+    entries.push([biteName, miniBites]);
   }
 
   return Object.fromEntries(entries);
@@ -171,6 +230,7 @@ function getActiveSelections(selection: Record<CookieType, number>, miniBites = 
 export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selections: Record<string, number>) => void }) {
   const [selections, setSelections] = useState<Record<string, Record<CookieType, number>>>(EMPTY_SELECTIONS);
   const [comboSelections, setComboSelections] = useState<Record<string, Record<CookieType, number>>>(EMPTY_COMBO_SELECTIONS);
+  const [comboBiteChoices, setComboBiteChoices] = useState<Record<string, ComboBiteChoice>>(EMPTY_COMBO_BITE_CHOICES);
 
   const updatePackQuantity = (packId: string, cookieName: CookieType, delta: number) => {
     const pack = PACKS.find((p) => p.id === packId);
@@ -222,6 +282,10 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
       ...prev,
       [comboId]: { ...EMPTY_COOKIE_SELECTION },
     }));
+    setComboBiteChoices((prev) => ({
+      ...prev,
+      [comboId]: "chocolate",
+    }));
   };
 
   const addRegularPack = (pack: Pack) => {
@@ -236,23 +300,27 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
 
   const addCombo = (combo: Combo) => {
     const selected = comboSelections[combo.id];
+    const biteChoice = comboBiteChoices[combo.id] || "chocolate";
+    const isWheatUpgrade = combo.id === "full-sunday" && biteChoice === "atta";
+    const biteName = biteChoice === "atta" ? ATTA_JAGGERY_BITE_NAME : CHOCOLATE_BITE_NAME;
+    const price = combo.price + (isWheatUpgrade ? FULL_SUNDAY_WHEAT_BITE_UPGRADE : 0);
 
     onAddToCart(
       {
         id: combo.id,
         name: combo.name,
         subtitle: combo.contents,
-        price: combo.price,
+        price,
         maxCookies: combo.regularCookies + combo.miniBites,
         image: "/images/mini-chocolate-chip-bites.png",
         badge: combo.badge,
       },
-      getActiveSelections(selected, combo.miniBites)
+      getActiveSelections(selected, biteName, combo.miniBites)
     );
     resetCombo(combo.id);
   };
 
-  const addMiniBox = (option: MiniOption) => {
+  const addBiteBox = (collection: BiteCollection, option: BiteOption) => {
     onAddToCart(
       {
         id: option.id,
@@ -260,31 +328,57 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
         subtitle: option.subtitle,
         price: option.price,
         maxCookies: option.count,
-        image: "/images/mini-chocolate-chip-bites.png",
+        image: collection.image,
         badge: option.badge,
       },
-      { [MINI_COOKIE_NAME]: option.count }
+      { [collection.selectionName]: option.count }
     );
   };
 
   return (
     <section id="menu" className="py-20 md:py-24 bg-forest relative overflow-hidden">
       <div className="container mx-auto px-5 md:px-6">
-        <div className="text-center mb-12 md:mb-14">
-          <p className="text-gold-muted tracking-[0.4em] uppercase text-[10px] font-bold mb-gap-sm">CHOOSE YOUR PACK</p>
-          <h2 className="text-5xl md:text-7xl font-serif text-cream">Pick. Mix. Devour.</h2>
+        <div className="text-center mb-10 md:mb-12">
+          <p className="text-gold-muted tracking-[0.4em] uppercase text-[10px] font-bold mb-gap-sm">MOST ORDERED BOXES</p>
+          <h2 className="text-5xl md:text-7xl font-serif text-cream">Choose your Sunday.</h2>
           <p className="text-cream/60 mt-gap-sm font-serif italic text-lg max-w-xl mx-auto leading-relaxed">
-            Choose your big-cookie mix, or add bite-size chocolate chip boxes for sharing and gifting.
+            Start with a curated combo, or build your own box if you already know what you love.
           </p>
           <div className="flex justify-center mt-7">
             <BatchIndicator />
           </div>
         </div>
 
+        <div className="max-w-5xl mx-auto mb-10 rounded-[12px] border border-gold/10 bg-white/[0.025] p-4 md:p-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-tan text-[11px] tracking-[0.32em] uppercase font-bold">Not sure what to pick?</p>
+              <p className="mt-1 font-serif-display text-cream/50 italic">Choose by occasion. This is the fastest way to order.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:min-w-[620px]">
+              {[
+                ["First time", "Sunday Starter", "sunday-starter"],
+                ["Gifting", "Gift Box", "gift-box"],
+                ["Family sharing", "Full Sunday", "full-sunday"],
+                ["Only big cookies", "Half Dozen", "half-dozen"],
+              ].map(([occasion, pick, targetId]) => (
+                <a
+                  key={occasion}
+                  href={`#${targetId}`}
+                  className="rounded-[10px] border border-gold/10 bg-forest/50 px-3 py-3 transition-colors hover:border-tan/50"
+                >
+                  <p className="text-cream/35 text-[9px] tracking-[0.2em] uppercase font-bold">{occasion}</p>
+                  <p className="mt-1 text-tan font-serif text-lg leading-tight">{pick}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-5xl mx-auto mb-8 md:mb-10">
           <div className="flex items-center gap-4 mb-5">
             <span className="h-px flex-1 bg-gold/15" />
-            <p className="text-tan text-[11px] tracking-[0.35em] uppercase font-bold">Combos</p>
+            <p className="text-tan text-[11px] tracking-[0.35em] uppercase font-bold">Most Ordered Boxes</p>
             <span className="h-px flex-1 bg-gold/15" />
           </div>
 
@@ -293,15 +387,20 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
               const selected = comboSelections[combo.id];
               const selectedCount = getSelectionTotal(selected);
               const isComplete = selectedCount === combo.regularCookies;
+              const biteChoice = comboBiteChoices[combo.id] || "chocolate";
+              const isWheatUpgrade = combo.id === "full-sunday" && biteChoice === "atta";
+              const displayedPrice = combo.price + (isWheatUpgrade ? FULL_SUNDAY_WHEAT_BITE_UPGRADE : 0);
+              const displayedCompareAt = combo.compareAt + (isWheatUpgrade ? PRODUCT_PRICES.attaJaggery24 - PRODUCT_PRICES.mini24 : 0);
 
               return (
                 <motion.div
                   key={combo.id}
+                  id={combo.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.7, delay: idx * 0.12 }}
-                  className={`rounded-[8px] border bg-white/[0.03] p-5 lg:p-5 flex flex-col ${
+                  className={`scroll-mt-28 rounded-[8px] border bg-white/[0.03] p-5 lg:p-5 flex flex-col ${
                     combo.featured
                       ? "border-tan/70 shadow-[0_0_35px_rgba(199,164,76,0.16)]"
                       : "border-gold/10"
@@ -321,11 +420,11 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                   <div className="flex items-end justify-between gap-3 py-5 my-5 border-y border-gold/10">
                     <div>
                       <p className="text-cream/35 text-[10px] tracking-widest uppercase">Worth</p>
-                      <p className="text-cream/45 text-lg font-serif line-through">&#8377;{combo.compareAt}</p>
+                      <p className="text-cream/45 text-lg font-serif line-through">&#8377;{displayedCompareAt}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-cream/35 text-[10px] tracking-widest uppercase">Now</p>
-                      <p className="text-tan text-[2.15rem] lg:text-[2.35rem] font-serif">&#8377;{combo.price}</p>
+                      <p className="text-tan text-[2.15rem] lg:text-[2.35rem] font-serif">&#8377;{displayedPrice}</p>
                     </div>
                   </div>
 
@@ -360,8 +459,49 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                         </div>
                       </div>
                     ))}
+                    {combo.allowBiteChoice && (
+                      <div className="rounded-[8px] border border-gold/10 bg-forest/30 p-3 space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-tan text-[10px] tracking-[0.2em] uppercase font-bold">
+                            Choose Bites
+                          </p>
+                          {combo.id === "full-sunday" && (
+                            <p className="text-cream/40 text-[11px] font-serif italic">
+                              Wheat +&#8377;{FULL_SUNDAY_WHEAT_BITE_UPGRADE}
+                            </p>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: "chocolate" as ComboBiteChoice, label: "Chocolate Chip" },
+                            { id: "atta" as ComboBiteChoice, label: "Atta Jaggery" },
+                          ].map((option) => {
+                            const isSelected = biteChoice === option.id;
+                            return (
+                              <button
+                                key={option.id}
+                                type="button"
+                                onClick={() =>
+                                  setComboBiteChoices((prev) => ({
+                                    ...prev,
+                                    [combo.id]: option.id,
+                                  }))
+                                }
+                                className={`rounded-[8px] border px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] transition-colors ${
+                                  isSelected
+                                    ? "border-tan bg-tan text-forest"
+                                    : "border-gold/10 bg-white/[0.03] text-cream/45 hover:border-tan/50 hover:text-tan"
+                                }`}
+                              >
+                                {option.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                     <p className="text-cream/35 text-xs font-serif italic pt-1">
-                      Includes {combo.miniBites} chocolate chip mini bites.
+                      Includes {combo.miniBites} {biteChoice === "atta" ? "atta jaggery almond bites" : "chocolate chip bites"}.
                     </p>
                   </div>
 
@@ -378,6 +518,17 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
           </div>
         </div>
 
+        <div className="max-w-5xl mx-auto mb-5 md:mb-6">
+          <div className="flex items-center gap-4 mb-4">
+            <span className="h-px flex-1 bg-gold/15" />
+            <p className="text-tan text-[11px] tracking-[0.35em] uppercase font-bold">Build Your Own Box</p>
+            <span className="h-px flex-1 bg-gold/15" />
+          </div>
+          <p className="mx-auto max-w-2xl text-center font-serif-display text-cream/45 italic">
+            Want only big cookies or a standalone bite box? Customize below.
+          </p>
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-5 md:gap-6 max-w-5xl mx-auto">
           {PACKS.map((pack, idx) => {
             const selected = selections[pack.id];
@@ -386,11 +537,12 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
             return (
               <motion.div
                 key={pack.id}
+                id={pack.id}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.75, delay: idx * 0.16 }}
-                className="glass-card group overflow-hidden flex flex-col"
+                className="glass-card group overflow-hidden flex flex-col scroll-mt-28"
               >
                 <div className="relative aspect-[16/10] lg:aspect-[16/7.5] overflow-hidden">
                   <img
@@ -528,75 +680,70 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
             );
           })}
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.75, delay: 0.32 }}
-            className="glass-card group overflow-hidden flex flex-col lg:col-span-2"
-          >
-            <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="relative min-h-[280px] lg:min-h-[300px] overflow-hidden">
+          {BITE_COLLECTIONS.map((collection, idx) => (
+            <motion.div
+              key={collection.id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.75, delay: 0.32 + idx * 0.12 }}
+              className="glass-card group overflow-hidden flex flex-col"
+            >
+              <div className="relative aspect-[16/9] overflow-hidden">
                 <img
-                  src="/images/mini-chocolate-chip-bites.png"
-                  alt="Bite-size chocolate chip cookies"
+                  src={collection.image}
+                  alt={collection.title}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-forest/90 via-forest/20 to-transparent opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/25 to-transparent opacity-90" />
                 <VegSeal className="absolute top-5 left-5 z-10" />
                 <span className="absolute top-5 right-5 bg-tan text-forest text-[9px] font-bold px-4 py-2 rounded-full tracking-[0.2em] uppercase shadow-2xl">
-                  CHIP MINIS
+                  BAKED FOR SHARING
                 </span>
               </div>
 
-              <div className="p-6 md:p-7 lg:p-7 flex flex-col justify-center">
+              <div className="p-6 md:p-7 flex flex-col flex-grow">
                 <p className="text-tan text-[11px] tracking-[0.3em] uppercase font-bold mb-3">
-                  Chocolate chip only
+                  {collection.eyebrow}
                 </p>
-                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
-                  <div>
-                    <h3 className="text-3xl md:text-[2.4rem] font-serif text-cream">Bite-Size Chocolate Chip</h3>
-                    <p className="font-serif-display text-cream/50 text-base mt-2 max-w-2xl">
-                      No stuffing, just classic Sundays chocolate chip baked bite-sized for sharing.
-                    </p>
-                    <p className="text-tan/75 text-[11px] tracking-[0.18em] uppercase font-bold mt-3">
-                      Standalone mini boxes are Zone 1 only
-                    </p>
-                  </div>
-                  <span className="text-tan text-2xl md:text-3xl font-serif whitespace-nowrap">From &#8377;269</span>
-                </div>
+                <h3 className="text-3xl md:text-[2.2rem] font-serif text-cream leading-tight">{collection.title}</h3>
+                <p className="font-serif-display text-cream/50 text-base mt-2">
+                  {collection.description}
+                </p>
+                <p className="text-tan/75 text-[11px] tracking-[0.18em] uppercase font-bold mt-3">
+                  Standalone bite boxes are Zone 1 only
+                </p>
 
                 <div className="mt-5 space-y-4">
-                  {MINI_OPTIONS.map((option) => (
+                  {collection.options.map((option) => (
                     <div
                       key={option.id}
-                      className="rounded-[8px] border border-gold/10 bg-white/[0.03] p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                      className="rounded-[8px] border border-gold/10 bg-white/[0.03] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                     >
                       <div>
                         <div className="flex flex-wrap items-center gap-3 mb-2">
-                          <h4 className="text-[1.7rem] md:text-[1.9rem] font-serif text-cream">{option.name}</h4>
+                          <h4 className="text-[1.45rem] md:text-[1.65rem] font-serif text-cream">{option.subtitle}</h4>
                           <span className="bg-tan/10 text-tan text-[9px] font-bold px-3 py-1 rounded-full tracking-[0.2em] uppercase">
                             {option.badge}
                           </span>
                         </div>
-                        <p className="font-serif-display text-cream/45 italic">{option.subtitle}</p>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-cream/50 text-[12px] tracking-widest uppercase">
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-cream/50 text-[12px] tracking-widest uppercase">
                           <span>Included: <span className="text-tan font-bold">{option.count} cookies</span></span>
                           {option.savings && <span className="text-tan font-bold">{option.savings}</span>}
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between md:justify-end gap-4">
+                      <div className="flex items-center justify-between sm:justify-end gap-4">
                         <div className="text-right">
                           {option.compareAt && (
-                            <p className="text-cream/35 text-lg font-serif line-through">&#8377;{option.compareAt}</p>
+                            <p className="text-cream/35 text-base font-serif line-through">&#8377;{option.compareAt}</p>
                           )}
-                          <span className="text-tan text-[2rem] md:text-[2.2rem] font-serif">&#8377;{option.price}</span>
+                          <span className="text-tan text-[2rem] font-serif">&#8377;{option.price}</span>
                         </div>
                         <motion.button
                           whileTap={{ scale: 0.94 }}
-                          onClick={() => addMiniBox(option)}
-                          className="premium-button min-w-[140px] py-4 px-5 flex items-center justify-center gap-2"
+                          onClick={() => addBiteBox(collection, option)}
+                          className="premium-button min-w-[128px] py-4 px-5 flex items-center justify-center gap-2"
                         >
                           <span className="text-lg leading-none">+</span>
                           Add Box
@@ -606,8 +753,8 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                   ))}
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          ))}
         </div>
 
         <div className="max-w-5xl mx-auto mt-8 rounded-[8px] border border-gold/10 bg-white/[0.03] p-5 md:p-6">
@@ -625,15 +772,8 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                 ["Zone 3", "₹149", "₹599 min."],
                 ["Free", "₹1099+", "Any zone"],
               ].map(([zone, fee, min]) => {
-                const displayFee =
-                  zone === "Zone 1" ? "\u20b949" :
-                  zone === "Zone 2" ? "\u20b999" :
-                  zone === "Zone 3" ? "\u20b9149" :
-                  "\u20b9899+";
-                const displayMinimum =
-                  zone === "Zone 2" ? "\u20b9399 min." :
-                  zone === "Zone 3" ? "\u20b9599 min." :
-                  min;
+                const displayFee = zone === "Free" ? "\u20b91099+" : fee;
+                const displayMinimum = zone === "Free" ? "Any zone" : min;
 
                 return (
                 <div key={zone} className="rounded-[8px] border border-gold/10 bg-forest/40 px-4 py-3">

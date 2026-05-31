@@ -149,7 +149,7 @@ export async function POST(req: Request) {
 
     if (error instanceof Error && error.message === "MINI_STANDALONE_NOT_AVAILABLE") {
       return NextResponse.json(
-        { success: false, error: "Mini Bites are available as a standalone order only in Zone 1. Add a regular cookie pack or choose The Sunday Starter combo." },
+        { success: false, error: "Bites are available as a standalone order only in Zone 1. Add a regular cookie pack or choose The Sunday Starter combo." },
         { status: 400 }
       );
     }
