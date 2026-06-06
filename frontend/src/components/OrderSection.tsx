@@ -44,7 +44,7 @@ export function OrderSection({ cart }: { cart: OrderItem[] }) {
     message += `*Delivery:* ${deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}%0A`;
     message += `*Total:* ₹${total}%0A`;
 
-    window.open(`https://wa.me/919999999999?text=${message}`, "_blank");
+    window.open(`https://wa.me/916304462787?text=${message}`, "_blank");
   };
 
   return (

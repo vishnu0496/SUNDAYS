@@ -3,7 +3,7 @@
 export function WhatsAppButton() {
   return (
     <a 
-      href="https://wa.me/919177155540" 
+      href="https://wa.me/916304462787" 
       target="_blank"
       className="fixed bottom-6 right-6 z-50 bg-[#25D366] p-4 rounded-full shadow-2xl hover:scale-110 active:scale-90 transition-all group"
     >
@@ -35,7 +35,7 @@ export function Footer() {
           >
             Ritual Guide
           </button>
-          <a href="https://wa.me/919177155540" target="_blank" className="hover:text-gold transition-colors">WhatsApp</a>
+          <a href="https://wa.me/916304462787" target="_blank" className="hover:text-gold transition-colors">WhatsApp</a>
           <a href="mailto:sundayshyd@gmail.com" className="hover:text-gold transition-colors">Email</a>
         </div>
         

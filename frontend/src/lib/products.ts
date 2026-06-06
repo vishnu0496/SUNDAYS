@@ -15,15 +15,24 @@ export const PRODUCT_PRICES = {
   halfDozen: 599,
   mini12: 299,
   mini24: 449,
-  attaJaggery12: 299,
-  attaJaggery24: 499,
+  attaJaggery12: 449,
+  attaJaggery24: 799,
   starter: 599,
   fullSunday: 899,
-  fullSundayAttaJaggery: 949,
+  fullSundayAttaJaggery: 1249,
   giftBox: 799,
 } as const;
 
-export const FULL_SUNDAY_WHEAT_BITE_UPGRADE = 50;
+export const ATTA_JAGGERY_BITE_UPGRADE_BY_COUNT = {
+  12: PRODUCT_PRICES.attaJaggery12 - PRODUCT_PRICES.mini12,
+  24: PRODUCT_PRICES.attaJaggery24 - PRODUCT_PRICES.mini24,
+} as const;
+
+export function getAttaJaggeryBiteUpgrade(count: number) {
+  return ATTA_JAGGERY_BITE_UPGRADE_BY_COUNT[
+    count as keyof typeof ATTA_JAGGERY_BITE_UPGRADE_BY_COUNT
+  ] ?? 0;
+}
 
 export const STANDALONE_BITE_PRODUCT_NAMES = [
   PRODUCT_NAMES.mini12,

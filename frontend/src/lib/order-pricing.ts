@@ -1,11 +1,17 @@
 import { getDeliveryQuoteByPincode, normalizePincode } from "@/lib/delivery";
 import {
-  FULL_SUNDAY_WHEAT_BITE_UPGRADE,
   PRODUCT_NAMES,
   PRODUCT_PRICE_BY_NAME,
   STANDALONE_BITE_PRODUCT_NAMES,
+  getAttaJaggeryBiteUpgrade,
 } from "@/lib/products";
 import type { OrderItem } from "@/lib/storage";
+
+const COMBO_PRODUCT_NAMES = new Set<string>([
+  PRODUCT_NAMES.starter,
+  PRODUCT_NAMES.giftBox,
+  PRODUCT_NAMES.fullSunday,
+]);
 
 function isMiniBitesOnlyOrder(items: OrderItem[]) {
   return items.every((item) => STANDALONE_BITE_PRODUCT_NAMES.includes(item.name as typeof STANDALONE_BITE_PRODUCT_NAMES[number]));
@@ -17,10 +23,11 @@ export function calculateServerOrderPricing(items: OrderItem[], pincodeInput: st
   }
 
   const normalizedItems = items.map((item) => {
-    const isFullSundayWheatUpgrade =
-      item.name === PRODUCT_NAMES.fullSunday &&
-      Number(item.selections?.["Atta Jaggery Almond Bites"]) === 24;
-    const basePrice = PRODUCT_PRICE_BY_NAME[item.name] + (isFullSundayWheatUpgrade ? FULL_SUNDAY_WHEAT_BITE_UPGRADE : 0);
+    const attaJaggeryBiteCount = Number(item.selections?.["Atta Jaggery Almond Bites"]) || 0;
+    const attaJaggeryUpgrade = COMBO_PRODUCT_NAMES.has(item.name)
+      ? getAttaJaggeryBiteUpgrade(attaJaggeryBiteCount)
+      : 0;
+    const basePrice = PRODUCT_PRICE_BY_NAME[item.name] + attaJaggeryUpgrade;
     const quantity = Math.max(1, Number(item.quantity) || 1);
 
     if (!basePrice) {

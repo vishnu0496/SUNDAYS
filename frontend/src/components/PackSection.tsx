@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FULL_SUNDAY_WHEAT_BITE_UPGRADE, PRODUCT_NAMES, PRODUCT_PRICES } from "@/lib/products";
+import { PRODUCT_NAMES, PRODUCT_PRICES, getAttaJaggeryBiteUpgrade } from "@/lib/products";
 import { VegSeal } from "./ui/VegSeal";
 import { BatchIndicator } from "./ui/BatchIndicator";
 
@@ -301,9 +301,9 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
   const addCombo = (combo: Combo) => {
     const selected = comboSelections[combo.id];
     const biteChoice = comboBiteChoices[combo.id] || "chocolate";
-    const isWheatUpgrade = combo.id === "full-sunday" && biteChoice === "atta";
+    const attaJaggeryUpgrade = biteChoice === "atta" ? getAttaJaggeryBiteUpgrade(combo.miniBites) : 0;
     const biteName = biteChoice === "atta" ? ATTA_JAGGERY_BITE_NAME : CHOCOLATE_BITE_NAME;
-    const price = combo.price + (isWheatUpgrade ? FULL_SUNDAY_WHEAT_BITE_UPGRADE : 0);
+    const price = combo.price + attaJaggeryUpgrade;
 
     onAddToCart(
       {
@@ -388,9 +388,10 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
               const selectedCount = getSelectionTotal(selected);
               const isComplete = selectedCount === combo.regularCookies;
               const biteChoice = comboBiteChoices[combo.id] || "chocolate";
-              const isWheatUpgrade = combo.id === "full-sunday" && biteChoice === "atta";
-              const displayedPrice = combo.price + (isWheatUpgrade ? FULL_SUNDAY_WHEAT_BITE_UPGRADE : 0);
-              const displayedCompareAt = combo.compareAt + (isWheatUpgrade ? PRODUCT_PRICES.attaJaggery24 - PRODUCT_PRICES.mini24 : 0);
+              const attaJaggeryUpgrade = getAttaJaggeryBiteUpgrade(combo.miniBites);
+              const isAttaJaggeryUpgrade = biteChoice === "atta";
+              const displayedPrice = combo.price + (isAttaJaggeryUpgrade ? attaJaggeryUpgrade : 0);
+              const displayedCompareAt = combo.compareAt + (isAttaJaggeryUpgrade ? attaJaggeryUpgrade : 0);
 
               return (
                 <motion.div
@@ -465,9 +466,9 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                           <p className="text-tan text-[10px] tracking-[0.2em] uppercase font-bold">
                             Choose Bites
                           </p>
-                          {combo.id === "full-sunday" && (
+                          {attaJaggeryUpgrade > 0 && (
                             <p className="text-cream/40 text-[11px] font-serif italic">
-                              Wheat +&#8377;{FULL_SUNDAY_WHEAT_BITE_UPGRADE}
+                              Atta Jaggery +&#8377;{attaJaggeryUpgrade}
                             </p>
                           )}
                         </div>

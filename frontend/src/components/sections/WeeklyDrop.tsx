@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
+import { PRODUCT_NAMES, PRODUCT_PRICES } from "@/lib/products";
 
 type Cookie = {
   id: string;
@@ -17,8 +18,8 @@ const MENU: Cookie[] = [
   { id: 'lazy-legend', name: 'The Lazy Legend', description: 'Classic Choco Chip. Crisp edges, soft center, generous chocolate pools.', price: 180, image: '/images/lazy-legend.png' },
   { id: 'golden-affair', name: 'The Golden Affair', description: 'Lotus Biscoff. Caramelized Biscoff richness with a slow-melting finish.', price: 220, image: '/images/golden-affair.png' },
   { id: 'salted-noir', name: 'Salted Noir', description: 'Dark Chocolate + Flaky Sea Salt. Deep dark chocolate lifted with flakes of sea salt.', price: 220, image: '/images/salted-noir.png' },
-  { id: 'chocolate-chip-bites', name: 'Chocolate Chip Bites', description: 'Classic chocolate chip bites baked for sharing.', price: 299, image: '/images/mini-chocolate-chip-bites.png' },
-  { id: 'atta-jaggery-almond-bites', name: 'Atta Jaggery Almond Bites', description: 'Whole wheat bites with jaggery, almonds, coconut, and warm spices.', price: 299, image: '/images/little-rebels.png' },
+  { id: 'chocolate-chip-bites', name: PRODUCT_NAMES.mini12, description: 'Classic chocolate chip bites baked for sharing.', price: PRODUCT_PRICES.mini12, image: '/images/mini-chocolate-chip-bites.png' },
+  { id: 'atta-jaggery-almond-bites', name: PRODUCT_NAMES.attaJaggery12, description: 'Whole wheat bites with jaggery, almonds, coconut, and warm spices.', price: PRODUCT_PRICES.attaJaggery12, image: '/images/little-rebels.png' },
 ];
 
 const DELIVERY_CHARGE = 50;
