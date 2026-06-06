@@ -37,7 +37,7 @@ export function Header() {
               <span className="text-gold/30 text-[14px]">*</span>
               <span>HYDERABAD DELIVERY FROM &#8377;49</span>
               <span className="text-gold/30 text-[14px]">*</span>
-              <span>FREE DELIVERY ABOVE &#8377;1099</span>
+              <span>FREE DELIVERY ABOVE &#8377;1499</span>
               <span className="text-gold/30 text-[14px]">*</span>
               <span>SUNDAYS - COOKIES, MASTERED.</span>
               <span className="text-gold/30 text-[14px]">*</span>

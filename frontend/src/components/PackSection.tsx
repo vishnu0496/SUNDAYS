@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { FREE_DELIVERY_THRESHOLD } from "@/lib/delivery";
 import { PRODUCT_NAMES, PRODUCT_PRICES, getAttaJaggeryBiteUpgrade } from "@/lib/products";
 import { VegSeal } from "./ui/VegSeal";
 import { BatchIndicator } from "./ui/BatchIndicator";
@@ -771,9 +772,9 @@ export function PackSection({ onAddToCart }: { onAddToCart: (pack: Pack, selecti
                 ["Zone 1", "₹49", "No min."],
                 ["Zone 2", "₹99", "₹399 min."],
                 ["Zone 3", "₹149", "₹599 min."],
-                ["Free", "₹1099+", "Any zone"],
+                ["Free", `₹${FREE_DELIVERY_THRESHOLD}+`, "Any zone"],
               ].map(([zone, fee, min]) => {
-                const displayFee = zone === "Free" ? "\u20b91099+" : fee;
+                const displayFee = zone === "Free" ? `\u20b9${FREE_DELIVERY_THRESHOLD}+` : fee;
                 const displayMinimum = zone === "Free" ? "Any zone" : min;
 
                 return (

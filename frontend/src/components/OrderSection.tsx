@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FREE_DELIVERY_THRESHOLD } from "@/lib/delivery";
 
 interface OrderItem {
   packName: string;
@@ -17,7 +18,7 @@ export function OrderSection({ cart }: { cart: OrderItem[] }) {
   });
 
   const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-  const deliveryFee = subtotal >= 1099 || subtotal === 0 ? 0 : 49;
+  const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD || subtotal === 0 ? 0 : 49;
   const total = subtotal + deliveryFee;
 
   const handleWhatsAppOrder = () => {
