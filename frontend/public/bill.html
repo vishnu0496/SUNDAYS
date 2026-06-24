@@ -1,0 +1,2825 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d3325" />
+  <title>Sundays Bill Generator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fbfaf7;
+      --ink: #15251e;
+      --muted: #6a716b;
+      --line: #ddd9ce;
+      --panel: #ffffff;
+      --soft: #f1eee7;
+      --green: #0d5c3f;
+      --green-dark: #0a3728;
+      --gold: #a87c26;
+      --gold-soft: #efe2c8;
+      --blue: #33658a;
+      --danger: #aa3f38;
+      --shadow: 0 18px 42px rgba(20, 31, 25, 0.1);
+      --radius: 8px;
+      --tap: 44px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100%;
+      margin: 0;
+      background:
+        linear-gradient(140deg, rgba(13, 92, 63, 0.07), transparent 32rem),
+        linear-gradient(320deg, rgba(51, 101, 138, 0.06), transparent 28rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 0 14px 96px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 0 -14px 18px;
+      padding: calc(env(safe-area-inset-top) + 14px) 16px 14px;
+      background: rgba(251, 250, 247, 0.92);
+      border-bottom: 1px solid rgba(21, 37, 30, 0.1);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      color: var(--green);
+      background: var(--panel);
+      border: 1px solid rgba(168, 124, 38, 0.35);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 22px rgba(13, 92, 63, 0.08);
+    }
+
+    .mark svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--green-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(23px, 7vw, 34px);
+      font-weight: 700;
+      line-height: 0.98;
+    }
+
+    .subline {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex: none;
+    }
+
+    .icon-btn,
+    .small-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: var(--tap);
+      height: var(--tap);
+      padding: 0 12px;
+      color: var(--green-dark);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 16px rgba(20, 31, 25, 0.06);
+    }
+
+    .icon-btn svg,
+    .small-btn svg,
+    .action svg {
+      width: 18px;
+      height: 18px;
+      flex: none;
+    }
+
+    .small-btn {
+      gap: 8px;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .two-col {
+      grid-template-columns: 1fr;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(21, 37, 30, 0.11);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px;
+      border-bottom: 1px solid rgba(21, 37, 30, 0.09);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      color: var(--green-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .section-title svg {
+      width: 21px;
+      height: 21px;
+      flex: none;
+      color: var(--green);
+    }
+
+    .section-body {
+      padding: 15px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      position: relative;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: var(--tap);
+      color: var(--ink);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      outline: none;
+    }
+
+    input,
+    select {
+      padding: 0 12px;
+    }
+
+    textarea {
+      min-height: 84px;
+      padding: 12px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(13, 92, 63, 0.65);
+      box-shadow: 0 0 0 3px rgba(13, 92, 63, 0.1);
+    }
+
+    input[type="number"] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
+
+    .products {
+      display: grid;
+      gap: 10px;
+    }
+
+    .product-row {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      background: var(--panel);
+      border: 1px solid rgba(21, 37, 30, 0.1);
+      border-radius: var(--radius);
+    }
+
+    .product-top {
+      display: grid;
+      grid-template-columns: 1fr var(--tap);
+      gap: 10px;
+      align-items: end;
+    }
+
+    .product-bottom {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+      gap: 8px;
+      align-items: end;
+    }
+
+    .delete-btn {
+      color: var(--danger);
+      background: #fff8f7;
+      border-color: rgba(170, 63, 56, 0.22);
+      box-shadow: none;
+    }
+
+    .qty {
+      display: grid;
+      grid-template-columns: var(--tap) minmax(38px, 1fr) var(--tap);
+      height: var(--tap);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .qty button {
+      display: grid;
+      place-items: center;
+      width: var(--tap);
+      height: var(--tap);
+      padding: 0;
+      color: var(--green-dark);
+      background: var(--soft);
+      border: 0;
+    }
+
+    .qty input {
+      min-height: 0;
+      height: var(--tap);
+      padding: 0 4px;
+      text-align: center;
+      border: 0;
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .line-total {
+      display: grid;
+      align-content: center;
+      min-height: var(--tap);
+      padding: 0 10px;
+      color: var(--green-dark);
+      background: #f4f8f2;
+      border: 1px solid rgba(13, 92, 63, 0.14);
+      border-radius: var(--radius);
+      font-weight: 850;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .totals {
+      display: grid;
+      gap: 9px;
+      margin-top: 2px;
+      padding: 14px;
+      background: linear-gradient(145deg, #ffffff, #f7f5ef);
+      border: 1px solid rgba(21, 37, 30, 0.1);
+      border-radius: var(--radius);
+    }
+
+    .total-line {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grand {
+      margin-top: 5px;
+      padding-top: 12px;
+      color: var(--ink);
+      border-top: 1px dashed rgba(21, 37, 30, 0.18);
+      font-size: 19px;
+      font-weight: 850;
+    }
+
+    .grand strong {
+      color: var(--green);
+      font-size: 30px;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1;
+    }
+
+    .preview {
+      min-height: 310px;
+      color: #25302b;
+      background: #fffefa;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .actions {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1.25fr;
+      gap: 8px;
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 10px 12px calc(env(safe-area-inset-bottom) + 10px);
+      background: rgba(251, 250, 247, 0.94);
+      border-top: 1px solid rgba(21, 37, 30, 0.12);
+      backdrop-filter: blur(18px);
+    }
+
+    .action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 52px;
+      padding: 0 10px;
+      color: var(--green-dark);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 850;
+      text-decoration: none;
+      box-shadow: 0 8px 22px rgba(20, 31, 25, 0.08);
+    }
+
+    .action.primary {
+      color: white;
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .action:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: calc(env(safe-area-inset-bottom) + 82px);
+      z-index: 40;
+      max-width: min(360px, calc(100vw - 32px));
+      padding: 12px 14px;
+      color: white;
+      background: var(--green-dark);
+      border-radius: var(--radius);
+      box-shadow: 0 16px 34px rgba(10, 55, 40, 0.24);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 180ms ease, transform 180ms ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .empty {
+      color: var(--muted);
+      background: rgba(241, 238, 231, 0.75);
+      border: 1px dashed rgba(21, 37, 30, 0.18);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .helper-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .hide-sm {
+      display: none;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.open {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: calc(env(safe-area-inset-top) + 14px) 16px 14px;
+      background: rgba(251, 250, 247, 0.92);
+      border-bottom: 1px solid rgba(21, 37, 30, 0.1);
+      backdrop-filter: blur(18px);
+      flex: none;
+    }
+
+    .modal-title {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin: 0;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 96px);
+    }
+
+    .search-box {
+      margin-bottom: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--bg);
+      padding: 8px 0;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .history-item {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: 0 4px 12px rgba(20, 31, 25, 0.04);
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .history-item-info {
+      min-width: 0;
+    }
+
+    .history-item-title {
+      font-weight: 750;
+      color: var(--green-dark);
+      font-size: 16px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-item-meta {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    .history-item-balance {
+      font-weight: 850;
+      color: var(--green);
+      font-size: 15px;
+    }
+
+    .history-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .detail-bill-preview {
+      width: 100%;
+      min-height: 400px;
+      margin-bottom: 16px;
+    }
+
+    .autocomplete-items {
+      position: absolute;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      z-index: 99;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--panel);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .autocomplete-items div {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(21, 37, 30, 0.07);
+      font-size: 13px;
+    }
+
+    .autocomplete-items div:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-items div:hover {
+      background-color: var(--soft);
+    }
+
+    .toggle-checkbox {
+      width: 16px !important;
+      height: 16px !important;
+      min-height: auto !important;
+      margin: 0 !important;
+      cursor: pointer;
+    }
+
+    .pos-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 15px;
+      background: #f5f3ed;
+      border-bottom: 1px solid rgba(21, 37, 30, 0.08);
+      scrollbar-width: none;
+    }
+
+    .pos-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pos-tab {
+      flex: none;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pos-tab:hover {
+      background: var(--soft);
+    }
+
+    .pos-tab.active {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+
+    .pos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      padding: 15px;
+    }
+
+    .pos-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(20, 31, 25, 0.04);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .pos-card:hover {
+      border-color: rgba(13, 92, 63, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .pos-card.active {
+      border-color: var(--green);
+      background: #f7faf6;
+      box-shadow: 0 8px 20px rgba(13, 92, 63, 0.08);
+    }
+
+    .pos-card-title {
+      font-weight: 800;
+      color: var(--green-dark);
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .pos-card-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.2;
+    }
+
+    .pos-card-price {
+      font-weight: 750;
+      color: var(--gold);
+      font-size: 13px;
+      margin-top: auto;
+    }
+
+    .pos-card-controls {
+      margin-top: 4px;
+    }
+
+    @media (min-width: 680px) {
+      .app {
+        padding-right: 22px;
+        padding-left: 22px;
+      }
+
+      .topbar {
+        margin-right: -22px;
+        margin-left: -22px;
+        padding-right: 24px;
+        padding-left: 24px;
+      }
+
+      .two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .product-bottom {
+        grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+      }
+
+      .hide-sm {
+        display: inline;
+      }
+
+      .preview {
+        font-size: 14px;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .main-layout {
+        grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+        align-items: start;
+      }
+
+      .sticky-panel {
+        position: sticky;
+        top: 86px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .app {
+        padding-right: 10px;
+        padding-left: 10px;
+        padding-bottom: 212px;
+      }
+
+      .topbar {
+        margin-right: -10px;
+        margin-left: -10px;
+      }
+
+      .product-bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .line-total {
+        text-align: left;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .helper-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printReceipt, #printReceipt * {
+        visibility: visible;
+      }
+      #printReceipt {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        background: transparent;
+      }
+      @page {
+        size: auto;
+        margin: 15mm;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 16.5h16M6.2 16.5l1.2-9.2 3.2 4.1L12 5.4l1.4 6 3.2-4.1 1.2 9.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 20h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Sundays Bill Generator</h1>
+          <div class="subline">Offline bill text for WhatsApp</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="icon-btn" type="button" id="openHistoryBtn" title="View History" aria-label="View History">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="icon-btn" type="button" id="clearBill" title="Clear bill" aria-label="Clear bill">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7h16M9 7V5h6v2m-8 4v8m5-8v8m5-8v8M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="icon-btn" type="button" id="restoreDefaults" title="Restore default products" aria-label="Restore default products">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 12a8 8 0 1 0 2.34-5.66M4 5v5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="grid main-layout">
+      <div class="grid">
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Customer
+            </div>
+          </div>
+          <div class="section-body grid two-col">
+            <div class="field">
+              <label for="customerName">Customer name</label>
+              <input id="customerName" autocomplete="off" placeholder="Name" />
+              <div id="autocomplete-list" class="autocomplete-items" style="display: none;"></div>
+            </div>
+            <div class="field">
+              <label for="customerPhone">WhatsApp number</label>
+              <input id="customerPhone" inputmode="tel" autocomplete="tel" placeholder="+91 98765 43210" />
+            </div>
+            <div class="field">
+              <label for="billNumber">Bill number</label>
+              <input id="billNumber" />
+            </div>
+            <div class="field">
+              <label for="paymentStatus">Payment</label>
+              <select id="paymentStatus">
+                <option>Pending</option>
+                <option>Paid</option>
+                <option>Part paid</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8h8M8 12h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              WhatsApp Helper
+            </div>
+          </div>
+          <div class="section-body grid">
+            <div class="field">
+              <label for="incomingMessage">Paste customer's reply</label>
+              <textarea id="incomingMessage" placeholder="Example: 1 x 2, 4 x 6&#10;or: 2 roasted cashew and 6 jaggery laddu"></textarea>
+            </div>
+            <div class="helper-actions">
+              <button class="small-btn" type="button" id="copyWelcomeReply">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 12h16M4 6h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+                Copy welcome
+              </button>
+              <button class="small-btn" type="button" id="copySizeReply">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 7h16M7 4v6m10-6v6M6 14h4l2 3 2-6 2 3h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Copy sizes
+              </button>
+              <button class="small-btn" type="button" id="copyCustomerMenu">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M8 8h10v12H8V8ZM6 16H4V4h12v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Copy simple menu
+              </button>
+              <button class="small-btn" type="button" id="parseOrder">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="m5 12 4 4L19 6M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Fill quantities
+              </button>
+            </div>
+            <div class="muted">Send the simple menu first. Customer can reply with item numbers and quantities, or plain words like "2 cashew, 6 jaggery laddu".</div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 11h16v8H4v-8ZM7 11V8.8a5 5 0 0 1 10 0V11M8 15h.01M12 15h.01M16 15h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Products
+            </div>
+            <div class="toolbar" style="gap: 12px;">
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: normal; color: var(--muted); margin: 0;">
+                <input type="checkbox" id="showSelectedOnly" class="toggle-checkbox" />
+                <span>Selected only</span>
+              </label>
+              <button class="small-btn" type="button" id="addProduct">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Add<span class="hide-sm"> item</span>
+              </button>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="products" id="productList"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m20 12-8 8-8-8 8-8 8 8ZM12 8v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Charges
+            </div>
+          </div>
+          <div class="section-body grid two-col">
+            <div class="field">
+              <label for="deliveryCharge">Delivery charge</label>
+              <input id="deliveryCharge" type="number" inputmode="numeric" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="discount">Discount</label>
+              <input id="discount" type="number" inputmode="numeric" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="advancePaid">Advance paid</label>
+              <input id="advancePaid" type="number" inputmode="numeric" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="orderNote">Note</label>
+              <input id="orderNote" placeholder="Optional" />
+            </div>
+            <div class="field">
+              <label for="sellerUpi">Your PhonePe/GPay UPI ID</label>
+              <input id="sellerUpi" placeholder="e.g. 9876543210@ybl" />
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid sticky-panel">
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 3h10l3 3v15H7a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3ZM16 3v4h4M8 11h8M8 15h8M8 19h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Summary
+            </div>
+            <div class="toolbar">
+              <button class="icon-btn" type="button" id="printReceiptBtn" title="Print / Save PDF Invoice" aria-label="Print Invoice">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-2-9v13H8V9Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="totals">
+              <div class="total-line"><span>Items total</span><strong id="itemsTotal">Rs. 0</strong></div>
+              <div class="total-line"><span>Delivery</span><strong id="deliveryTotal">Rs. 0</strong></div>
+              <div class="total-line"><span>Discount</span><strong id="discountTotal">-Rs. 0</strong></div>
+              <div class="total-line"><span>Advance</span><strong id="advanceTotal">Rs. 0</strong></div>
+              <div class="total-line grand"><span>Balance</span><strong id="balanceTotal">Rs. 0</strong></div>
+            </div>
+            <div id="upiQrContainer" style="display: none; margin-top: 14px; padding: 14px; text-align: center; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel);">
+              <div style="font-size: 11px; font-weight: 750; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Scan to Pay (Balance Due)</div>
+              <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+                <img id="upiQrImg" src="" alt="UPI QR Code" style="width: 150px; height: 150px; border: 1px solid var(--line); border-radius: 4px; padding: 4px; background: white;" />
+              </div>
+              <div id="upiQrLimitWarning" style="display: none; font-size: 11px; color: var(--danger); font-weight: bold; margin-bottom: 8px; line-height: 1.35;">
+                ⚠️ Amount > Rs. 2,000:<br/>Please enter amount manually after scanning.
+              </div>
+              <div style="font-size: 12px; font-weight: 750; color: var(--green-dark);">
+                <a id="upiPayLink" href="#" style="color: var(--green); text-decoration: underline;" target="_blank">Open UPI App (Mobile Only)</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20.5 11.8a8.5 8.5 0 0 1-12.4 7.5L4 20.5l1.2-4.1a8.5 8.5 0 1 1 15.3-4.6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9.2 8.8c.2 3.4 2.5 5.6 6 6 .5.1 1-.2 1.2-.7l.3-.8c.1-.4-.1-.8-.5-.9l-1.6-.5a.8.8 0 0 0-.8.2l-.4.4a5.9 5.9 0 0 1-2.1-2.1l.4-.4a.8.8 0 0 0 .2-.8l-.5-1.6a.8.8 0 0 0-.9-.5l-.8.3c-.4.2-.7.7-.7 1.2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Bill Text
+            </div>
+          </div>
+          <div class="section-body">
+            <textarea id="billPreview" class="preview" readonly></textarea>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Hidden Print Template -->
+  <div id="printReceipt" style="display: none;">
+    <div style="font-family: Georgia, serif; text-align: center; margin-bottom: 20px;">
+      <h1 style="color: #0d5c3f; margin: 0; font-size: 28px;">SUNDAYS</h1>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: #6a716b; font-style: italic;">Premium Homemade Delights</p>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 15px; border-bottom: 2px solid #0d5c3f; padding-bottom: 10px;">
+      <div>
+        <strong>Invoice To:</strong> <span id="printCustName">-</span><br/>
+        <strong>Phone:</strong> <span id="printCustPhone">-</span>
+      </div>
+      <div style="text-align: right;">
+        <strong>Invoice No:</strong> <span id="printBillNo">-</span><br/>
+        <strong>Date:</strong> <span id="printDate">-</span>
+      </div>
+    </div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px;">
+      <thead>
+        <tr style="border-bottom: 1px solid #ddd9ce; text-align: left; background: #fbfaf7;">
+          <th style="padding: 8px 4px;">Item Description</th>
+          <th style="padding: 8px 4px; text-align: right;">Price</th>
+          <th style="padding: 8px 4px; text-align: center;">Qty</th>
+          <th style="padding: 8px 4px; text-align: right;">Total</th>
+        </tr>
+      </thead>
+      <tbody id="printItemsBody">
+        <!-- items will be injected here -->
+      </tbody>
+    </table>
+    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-top: 15px;">
+      <div style="width: 50%;">
+        <div id="printUpiDetails" style="display: none; padding: 10px; border: 1px solid #ddd9ce; border-radius: 6px; background: #fffefa; text-align: center; max-width: 180px;">
+          <div style="font-size: 10px; font-weight: bold; color: #6a716b; margin-bottom: 6px;">SCAN TO PAY VIA UPI</div>
+          <img id="printUpiQr" src="" style="width: 120px; height: 120px; border: 1px solid #ddd9ce;" alt="UPI QR" />
+          <div id="printUpiLimitWarning" style="display: none; font-size: 9px; color: #aa3f38; font-weight: bold; margin-top: 4px; line-height: 1.2;">
+            ⚠️ Enter amount manually after scanning.
+          </div>
+          <div style="font-size: 11px; margin-top: 4px; font-weight: bold; color: #0d5c3f;" id="printUpiIdText"></div>
+        </div>
+      </div>
+      <div style="width: 45%; text-align: right;">
+        <div style="margin-bottom: 4px;">Items Total: <span id="printItemsTotal">Rs. 0</span></div>
+        <div id="printDeliveryRow" style="margin-bottom: 4px; display: none;">Delivery: <span id="printDelivery">Rs. 0</span></div>
+        <div id="printDiscountRow" style="margin-bottom: 4px; display: none; color: #aa3f38;">Discount: -<span id="printDiscount">Rs. 0</span></div>
+        <div id="printAdvanceRow" style="margin-bottom: 4px; display: none;">Advance Paid: <span id="printAdvance">Rs. 0</span></div>
+        <div style="font-size: 16px; font-weight: bold; border-top: 1px dashed #ddd9ce; padding-top: 8px; margin-top: 8px; color: #0d5c3f;">
+          Balance Due: <span id="printBalance">Rs. 0</span>
+        </div>
+        <div style="font-size: 12px; margin-top: 6px; color: #6a716b;">Payment Status: <span id="printPaymentStatus" style="font-weight: bold;">Pending</span></div>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 40px; font-size: 11px; color: #6a716b; border-top: 1px solid #ddd9ce; padding-top: 15px;">
+      Thank you for choosing Sundays. Have a sweet day!
+    </div>
+  </div>
+
+  <nav class="actions" aria-label="Bill actions">
+    <button class="action" type="button" id="saveBillBtn">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Save
+    </button>
+    <button class="action" type="button" id="copyBill">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M8 8h10v12H8V8ZM6 16H4V4h12v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Copy
+    </button>
+    <button class="action" type="button" id="shareBill">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M18 8a3 3 0 1 0-2.8-4M6 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8.6 10.6l6.8 4.1M15.4 7.3l-6.8 3.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Share
+    </button>
+    <a class="action primary" id="whatsAppLink" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20.5 11.8a8.5 8.5 0 0 1-12.4 7.5L4 20.5l1.2-4.1a8.5 8.5 0 1 1 15.3-4.6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9.2 8.8c.2 3.4 2.5 5.6 6 6 .5.1 1-.2 1.2-.7l.3-.8c.1-.4-.1-.8-.5-.9l-1.6-.5a.8.8 0 0 0-.8.2l-.4.4a5.9 5.9 0 0 1-2.1-2.1l.4-.4a.8.8 0 0 0 .2-.8l-.5-1.6a.8.8 0 0 0-.9-.5l-.8.3c-.4.2-.7.7-.7 1.2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      WhatsApp
+    </a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- History List Modal -->
+  <div class="modal-overlay" id="historyModal" aria-hidden="true">
+    <div class="modal-header">
+      <h2 class="modal-title">Bill History</h2>
+      <div class="toolbar">
+        <button class="small-btn" type="button" id="exportBackupBtn">Export</button>
+        <button class="small-btn" type="button" id="importBackupBtn">Import</button>
+        <button class="icon-btn" type="button" id="closeHistoryBtn" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="search-box">
+        <input type="text" id="historySearch" placeholder="Search by customer name..." />
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <!-- History Detail Modal -->
+  <div class="modal-overlay" id="historyDetailModal" aria-hidden="true">
+    <div class="modal-header">
+      <h2 class="modal-title" id="historyDetailTitle">Bill Detail</h2>
+      <button class="icon-btn" type="button" id="closeHistoryDetailBtn" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5m7 7-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <textarea id="historyDetailPreview" class="preview detail-bill-preview" readonly></textarea>
+      <div class="helper-actions">
+        <button class="action" type="button" id="historyCopyBtn">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M8 8h10v12H8V8ZM6 16H4V4h12v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Copy Bill
+        </button>
+        <a class="action primary" id="historyWhatsAppBtn" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20.5 11.8a8.5 8.5 0 0 1-12.4 7.5L4 20.5l1.2-4.1a8.5 8.5 0 1 1 15.3-4.6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.2 8.8c.2 3.4 2.5 5.6 6 6 .5.1 1-.2 1.2-.7l.3-.8c.1-.4-.1-.8-.5-.9l-1.6-.5a.8.8 0 0 0-.8.2l-.4.4a5.9 5.9 0 0 1-2.1-2.1l.4-.4a.8.8 0 0 0 .2-.8l-.5-1.6a.8.8 0 0 0-.9-.5l-.8.3c-.4.2-.7.7-.7 1.2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="importFileInput" accept="application/json" style="display: none;" />
+
+  <script>
+    // QrCreator Library (Offline QR Generation)
+    /*
+ jquery-qrcode v0.14.0 - https://larsjung.de/jquery-qrcode/ */
+'use strict';let G=null;class H{}H.render=function(w,B){G(w,B)};self.QrCreator=H;
+(function(w){function B(t,c,a,e){var b={},h=w(a,c);h.u(t);h.J();e=e||0;var r=h.h(),d=h.h()+2*e;b.text=t;b.level=c;b.version=a;b.O=d;b.a=function(b,a){b-=e;a-=e;return 0>b||b>=r||0>a||a>=r?!1:h.a(b,a)};return b}function C(t,c,a,e,b,h,r,d,g,x){function u(b,a,f,c,d,r,g){b?(t.lineTo(a+r,f+g),t.arcTo(a,f,c,d,h)):t.lineTo(a,f)}r?t.moveTo(c+h,a):t.moveTo(c,a);u(d,e,a,e,b,-h,0);u(g,e,b,c,b,0,-h);u(x,c,b,c,a,h,0);u(r,c,a,e,a,0,h)}function z(t,c,a,e,b,h,r,d,g,x){function u(b,a,c,d){t.moveTo(b+c,a);t.lineTo(b,
+a);t.lineTo(b,a+d);t.arcTo(b,a,b+c,a,h)}r&&u(c,a,h,h);d&&u(e,a,-h,h);g&&u(e,b,-h,-h);x&&u(c,b,h,-h)}function A(t,c){var a=c.fill;if("string"===typeof a)t.fillStyle=a;else{var e=a.type,b=a.colorStops;a=a.position.map((b)=>Math.round(b*c.size));if("linear-gradient"===e)var h=t.createLinearGradient.apply(t,a);else if("radial-gradient"===e)h=t.createRadialGradient.apply(t,a);else throw Error("Unsupported fill");b.forEach(([b,a])=>{h.addColorStop(b,a)});t.fillStyle=h}}function y(t,c){a:{var a=c.text,e=
+c.v,b=c.N,h=c.K,r=c.P;b=Math.max(1,b||1);for(h=Math.min(40,h||40);b<=h;b+=1)try{var d=B(a,e,b,r);break a}catch(J){}d=void 0}if(!d)return null;a=t.getContext("2d");c.background&&(a.fillStyle=c.background,a.fillRect(c.left,c.top,c.size,c.size));e=d.O;h=c.size/e;a.beginPath();for(r=0;r<e;r+=1)for(b=0;b<e;b+=1){var g=a,x=c.left+b*h,u=c.top+r*h,p=r,q=b,f=d.a,k=x+h,m=u+h,D=p-1,E=p+1,n=q-1,l=q+1,y=Math.floor(Math.min(.5,Math.max(0,c.R))*h),v=f(p,q),I=f(D,n),w=f(D,q);D=f(D,l);var F=f(p,l);l=f(E,l);q=f(E,
+q);E=f(E,n);p=f(p,n);x=Math.round(x);u=Math.round(u);k=Math.round(k);m=Math.round(m);v?C(g,x,u,k,m,y,!w&&!p,!w&&!F,!q&&!F,!q&&!p):z(g,x,u,k,m,y,w&&p&&I,w&&F&&D,q&&F&&l,q&&p&&E)}A(a,c);a.fill();return t}var v={minVersion:1,maxVersion:40,ecLevel:"L",left:0,top:0,size:200,fill:"#000",background:null,text:"no text",radius:.5,quiet:0};G=function(t,c){var a={};Object.assign(a,v,t);a.N=a.minVersion;a.K=a.maxVersion;a.v=a.ecLevel;a.left=a.left;a.top=a.top;a.size=a.size;a.fill=a.fill;a.background=a.background;
+a.text=a.text;a.R=a.radius;a.P=a.quiet;if(c instanceof HTMLCanvasElement){if(c.width!==a.size||c.height!==a.size)c.width=a.size,c.height=a.size;c.getContext("2d").clearRect(0,0,c.width,c.height);y(c,a)}else t=document.createElement("canvas"),t.width=a.size,t.height=a.size,a=y(t,a),c.appendChild(a)}})(function(){function w(c){var a=C.s(c);return{S:function(){return 4},b:function(){return a.length},write:function(c){for(var b=0;b<a.length;b+=1)c.put(a[b],8)}}}function B(){var c=[],a=0,e={B:function(){return c},
+c:function(b){return 1==(c[Math.floor(b/8)]>>>7-b%8&1)},put:function(b,h){for(var a=0;a<h;a+=1)e.m(1==(b>>>h-a-1&1))},f:function(){return a},m:function(b){var h=Math.floor(a/8);c.length<=h&&c.push(0);b&&(c[h]|=128>>>a%8);a+=1}};return e}function C(c,a){function e(b,h){for(var a=-1;7>=a;a+=1)if(!(-1>=b+a||d<=b+a))for(var c=-1;7>=c;c+=1)-1>=h+c||d<=h+c||(r[b+a][h+c]=0<=a&&6>=a&&(0==c||6==c)||0<=c&&6>=c&&(0==a||6==a)||2<=a&&4>=a&&2<=c&&4>=c?!0:!1)}function b(b,a){for(var f=d=4*c+17,k=Array(f),m=0;m<
+f;m+=1){k[m]=Array(f);for(var p=0;p<f;p+=1)k[m][p]=null}r=k;e(0,0);e(d-7,0);e(0,d-7);f=y.G(c);for(k=0;k<f.length;k+=1)for(m=0;m<f.length;m+=1){p=f[k];var q=f[m];if(null==r[p][q])for(var n=-2;2>=n;n+=1)for(var l=-2;2>=l;l+=1)r[p+n][q+l]=-2==n||2==n||-2==l||2==l||0==n&&0==l}for(f=8;f<d-8;f+=1)null==r[f][6]&&(r[f][6]=0==f%2);for(f=8;f<d-8;f+=1)null==r[6][f]&&(r[6][f]=0==f%2);f=y.w(h<<3|a);for(k=0;15>k;k+=1)m=!b&&1==(f>>k&1),r[6>k?k:8>k?k+1:d-15+k][8]=m,r[8][8>k?d-k-1:9>k?15-k:14-k]=m;r[d-8][8]=!b;if(7<=
+c){f=y.A(c);for(k=0;18>k;k+=1)m=!b&&1==(f>>k&1),r[Math.floor(k/3)][k%3+d-8-3]=m;for(k=0;18>k;k+=1)m=!b&&1==(f>>k&1),r[k%3+d-8-3][Math.floor(k/3)]=m}if(null==g){b=t.I(c,h);f=B();for(k=0;k<x.length;k+=1)m=x[k],f.put(4,4),f.put(m.b(),y.f(4,c)),m.write(f);for(k=m=0;k<b.length;k+=1)m+=b[k].j;if(f.f()>8*m)throw Error("code length overflow. ("+f.f()+">"+8*m+")");for(f.f()+4<=8*m&&f.put(0,4);0!=f.f()%8;)f.m(!1);for(;!(f.f()>=8*m);){f.put(236,8);if(f.f()>=8*m)break;f.put(17,8)}var u=0;m=k=0;p=Array(b.length);
+q=Array(b.length);for(n=0;n<b.length;n+=1){var v=b[n].j,w=b[n].o-v;k=Math.max(k,v);m=Math.max(m,w);p[n]=Array(v);for(l=0;l<p[n].length;l+=1)p[n][l]=255&f.B()[l+u];u+=v;l=y.C(w);v=z(p[n],l.b()-1).l(l);q[n]=Array(l.b()-1);for(l=0;l<q[n].length;l+=1)w=l+v.b()-q[n].length,q[n][l]=0<=w?v.c(w):0}for(l=f=0;l<b.length;l+=1)f+=b[l].o;f=Array(f);for(l=u=0;l<k;l+=1)for(n=0;n<b.length;n+=1)l<p[n].length&&(f[u]=p[n][l],u+=1);for(l=0;l<m;l+=1)for(n=0;n<b.length;n+=1)l<q[n].length&&(f[u]=q[n][l],u+=1);g=f}b=g;f=
+-1;k=d-1;m=7;p=0;a=y.F(a);for(q=d-1;0<q;q-=2)for(6==q&&--q;;){for(n=0;2>n;n+=1)null==r[k][q-n]&&(l=!1,p<b.length&&(l=1==(b[p]>>>m&1)),a(k,q-n)&&(l=!l),r[k][q-n]=l,--m,-1==m&&(p+=1,m=7));k+=f;if(0>k||d<=k){k-=f;f=-f;break}}}var h=A[a],r=null,d=0,g=null,x=[],u={u:function(b){b=w(b);x.push(b);g=null},a:function(b,a){if(0>b||d<=b||0>a||d<=a)throw Error(b+","+a);return r[b][a]},h:function(){return d},J:function(){for(var a=0,h=0,c=0;8>c;c+=1){b(!0,c);var d=y.D(u);if(0==c||a>d)a=d,h=c}b(!1,h)}};return u}
+function z(c,a){if("undefined"==typeof c.length)throw Error(c.length+"/"+a);var e=function(){for(var b=0;b<c.length&&0==c[b];)b+=1;for(var r=Array(c.length-b+a),d=0;d<c.length-b;d+=1)r[d]=c[d+b];return r}(),b={c:function(b){return e[b]},b:function(){return e.length},multiply:function(a){for(var h=Array(b.b()+a.b()-1),c=0;c<b.b();c+=1)for(var g=0;g<a.b();g+=1)h[c+g]^=v.i(v.g(b.c(c))+v.g(a.c(g)));return z(h,0)},l:function(a){if(0>b.b()-a.b())return b;for(var c=v.g(b.c(0))-v.g(a.c(0)),h=Array(b.b()),
+g=0;g<b.b();g+=1)h[g]=b.c(g);for(g=0;g<a.b();g+=1)h[g]^=v.i(v.g(a.c(g))+c);return z(h,0).l(a)}};return b}C.s=function(c){for(var a=[],e=0;e<c.length;e++){var b=c.charCodeAt(e);128>b?a.push(b):2048>b?a.push(192|b>>6,128|b&63):55296>b||57344<=b?a.push(224|b>>12,128|b>>6&63,128|b&63):(e++,b=65536+((b&1023)<<10|c.charCodeAt(e)&1023),a.push(240|b>>18,128|b>>12&63,128|b>>6&63,128|b&63))}return a};var A={L:1,M:0,Q:3,H:2},y=function(){function c(b){for(var a=0;0!=b;)a+=1,b>>>=1;return a}var a=[[],[6,18],
+[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],
+[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e={w:function(b){for(var a=b<<10;0<=c(a)-c(1335);)a^=1335<<c(a)-c(1335);return(b<<10|a)^21522},A:function(b){for(var a=b<<12;0<=c(a)-c(7973);)a^=7973<<c(a)-c(7973);return b<<12|a},G:function(b){return a[b-1]},F:function(b){switch(b){case 0:return function(b,a){return 0==(b+a)%2};case 1:return function(b){return 0==b%2};case 2:return function(b,a){return 0==a%3};case 3:return function(b,a){return 0==
+(b+a)%3};case 4:return function(b,a){return 0==(Math.floor(b/2)+Math.floor(a/3))%2};case 5:return function(b,a){return 0==b*a%2+b*a%3};case 6:return function(b,a){return 0==(b*a%2+b*a%3)%2};case 7:return function(b,a){return 0==(b*a%3+(b+a)%2)%2};default:throw Error("bad maskPattern:"+b);}},C:function(b){for(var a=z([1],0),c=0;c<b;c+=1)a=a.multiply(z([1,v.i(c)],0));return a},f:function(b,a){if(4!=b||1>a||40<a)throw Error("mode: "+b+"; type: "+a);return 10>a?8:16},D:function(b){for(var a=b.h(),c=0,
+d=0;d<a;d+=1)for(var g=0;g<a;g+=1){for(var e=0,t=b.a(d,g),p=-1;1>=p;p+=1)if(!(0>d+p||a<=d+p))for(var q=-1;1>=q;q+=1)0>g+q||a<=g+q||(0!=p||0!=q)&&t==b.a(d+p,g+q)&&(e+=1);5<e&&(c+=3+e-5)}for(d=0;d<a-1;d+=1)for(g=0;g<a-1;g+=1)if(e=0,b.a(d,g)&&(e+=1),b.a(d+1,g)&&(e+=1),b.a(d,g+1)&&(e+=1),b.a(d+1,g+1)&&(e+=1),0==e||4==e)c+=3;for(d=0;d<a;d+=1)for(g=0;g<a-6;g+=1)b.a(d,g)&&!b.a(d,g+1)&&b.a(d,g+2)&&b.a(d,g+3)&&b.a(d,g+4)&&!b.a(d,g+5)&&b.a(d,g+6)&&(c+=40);for(g=0;g<a;g+=1)for(d=0;d<a-6;d+=1)b.a(d,g)&&!b.a(d+
+1,g)&&b.a(d+2,g)&&b.a(d+3,g)&&b.a(d+4,g)&&!b.a(d+5,g)&&b.a(d+6,g)&&(c+=40);for(g=e=0;g<a;g+=1)for(d=0;d<a;d+=1)b.a(d,g)&&(e+=1);return c+=Math.abs(100*e/a/a-50)/5*10}};return e}(),v=function(){for(var c=Array(256),a=Array(256),e=0;8>e;e+=1)c[e]=1<<e;for(e=8;256>e;e+=1)c[e]=c[e-4]^c[e-5]^c[e-6]^c[e-8];for(e=0;255>e;e+=1)a[c[e]]=e;return{g:function(b){if(1>b)throw Error("glog("+b+")");return a[b]},i:function(b){for(;0>b;)b+=255;for(;256<=b;)b-=255;return c[b]}}}(),t=function(){function c(b,c){switch(c){case A.L:return a[4*
+(b-1)];case A.M:return a[4*(b-1)+1];case A.Q:return a[4*(b-1)+2];case A.H:return a[4*(b-1)+3]}}var a=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,
+2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,
+45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,
+151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],
+[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],
+[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],e={I:function(b,a){var e=c(b,a);if("undefined"==
+typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e.length/3;a=[];for(var d=0;d<b;d+=1)for(var g=e[3*d],h=e[3*d+1],t=e[3*d+2],p=0;p<g;p+=1){var q=t,f={};f.o=h;f.j=q;a.push(f)}return a}};return e}();return C}());
+//# sourceMappingURL=qr-creator.min.js.map
+
+
+    const STORAGE_KEY = "sundays.billGenerator.v3";
+    const HISTORY_KEY = "sundays.billGenerator.history.v1";
+    const COUNTER_KEY = "sundays.billGenerator.counter";
+    const SHOW_SELECTED_KEY = "sundays.billGenerator.showSelectedOnly";
+    const UPI_KEY = "sundays.billGenerator.upi";
+
+    const DEFAULT_PRODUCTS = [
+      // Cashews
+      { id: "cashew-peri-250g", name: "Roasted Cashew", category: "cashew", flavor: "Peri Peri", weight: "250g", price: 449, qty: 0 },
+      { id: "cashew-peri-500g", name: "Roasted Cashew", category: "cashew", flavor: "Peri Peri", weight: "500g", price: 849, qty: 0 },
+      { id: "cashew-peri-1kg", name: "Roasted Cashew", category: "cashew", flavor: "Peri Peri", weight: "1kg", price: 1699, qty: 0 },
+      { id: "cashew-chilli-250g", name: "Roasted Cashew", category: "cashew", flavor: "Chilli (Masala)", weight: "250g", price: 449, qty: 0 },
+      { id: "cashew-chilli-500g", name: "Roasted Cashew", category: "cashew", flavor: "Chilli (Masala)", weight: "500g", price: 849, qty: 0 },
+      { id: "cashew-chilli-1kg", name: "Roasted Cashew", category: "cashew", flavor: "Chilli (Masala)", weight: "1kg", price: 1699, qty: 0 },
+      { id: "cashew-plain-250g", name: "Roasted Cashew", category: "cashew", flavor: "Plain Roasted", weight: "250g", price: 449, qty: 0 },
+      { id: "cashew-plain-500g", name: "Roasted Cashew", category: "cashew", flavor: "Plain Roasted", weight: "500g", price: 849, qty: 0 },
+      { id: "cashew-plain-1kg", name: "Roasted Cashew", category: "cashew", flavor: "Plain Roasted", weight: "1kg", price: 1699, qty: 0 },
+
+      // Laddus
+      { id: "laddu-dryfruit-500g", name: "Premium Dry Fruit Laddu", category: "laddu", flavor: "", weight: "500g", price: 799, qty: 0 },
+      { id: "laddu-dryfruit-1kg", name: "Premium Dry Fruit Laddu", category: "laddu", flavor: "", weight: "1kg", price: 1499, qty: 0 },
+      { id: "laddu-jaggery-500g", name: "Sesame & Flaxseed Jaggery Laddu", category: "laddu", flavor: "", weight: "500g", price: 449, qty: 0 },
+      { id: "laddu-jaggery-1kg", name: "Sesame & Flaxseed Jaggery Laddu", category: "laddu", flavor: "", weight: "1kg", price: 799, qty: 0 },
+      { id: "laddu-sununda-500g", name: "Sununda", category: "laddu", flavor: "", weight: "500g", price: 550, qty: 0 },
+      { id: "laddu-sununda-1kg", name: "Sununda", category: "laddu", flavor: "", weight: "1kg", price: 1000, qty: 0 },
+      { id: "laddu-puff-12pcs", name: "Traditional Borugumuddalu", category: "laddu", flavor: "", weight: "12 Pieces", price: 119, qty: 0 },
+
+      // Cookies
+      { id: "cookie-trio-doublechoc", name: "Trio (3 Big Cookies)", category: "cookie", flavor: "Double Chocolate", weight: "", price: 399, qty: 0 },
+      { id: "cookie-trio-oreo", name: "Trio (3 Big Cookies)", category: "cookie", flavor: "Oreo", weight: "", price: 399, qty: 0 },
+      { id: "cookie-trio-assorted", name: "Trio (3 Big Cookies)", category: "cookie", flavor: "Assorted Mix", weight: "", price: 399, qty: 0 },
+      { id: "cookie-dozen-doublechoc", name: "Half Dozen (6 Big Cookies)", category: "cookie", flavor: "Double Chocolate", weight: "", price: 699, qty: 0 },
+      { id: "cookie-dozen-oreo", name: "Half Dozen (6 Big Cookies)", category: "cookie", flavor: "Oreo", weight: "", price: 699, qty: 0 },
+      { id: "cookie-dozen-assorted", name: "Half Dozen (6 Big Cookies)", category: "cookie", flavor: "Assorted Mix", weight: "", price: 699, qty: 0 },
+      { id: "cookie-chocchip-12box", name: "Chocolate Chip Cookies", category: "cookie", flavor: "", weight: "12 Cookies Box", price: 299, qty: 0 },
+      { id: "cookie-chocchip-24box", name: "Chocolate Chip Cookies", category: "cookie", flavor: "", weight: "24 Cookies Box", price: 449, qty: 0 },
+      { id: "cookie-atta-12box", name: "Atta Jaggery Almond Cookies", category: "cookie", flavor: "", weight: "12 Cookies Box", price: 449, qty: 0 },
+      { id: "cookie-atta-24box", name: "Atta Jaggery Almond Cookies", category: "cookie", flavor: "", weight: "24 Cookies Box", price: 799, qty: 0 },
+
+      // Combos
+      { id: "combo-starter", name: "The Sunday Starter Combo", category: "combo", flavor: "", weight: "", price: 599, qty: 0 },
+      { id: "combo-giftbox", name: "The Gift Box Combo", category: "combo", flavor: "", weight: "", price: 799, qty: 0 },
+      { id: "combo-fullsunday", name: "The Full Sunday Combo", category: "combo", flavor: "", weight: "", price: 899, qty: 0 },
+
+      // Others
+      { id: "container-250g", name: "Airtight Storage Container", category: "other", flavor: "", weight: "250g Container", price: 70, qty: 0 }
+
+    ];
+
+    const DEFAULT_STATE = {
+      customerName: "",
+      customerPhone: "",
+      billNumber: makeBillNumber(),
+      paymentStatus: "Pending",
+      deliveryCharge: 0,
+      discount: 0,
+      advancePaid: 0,
+      orderNote: "",
+      incomingMessage: "",
+      products: DEFAULT_PRODUCTS
+    };
+
+    const ALIASES_BY_ID = {
+      "roasted-cashew": ["cashew", "kaju", "roasted cashew", "peri peri", "periberry", "chilli", "masala", "mashala", "plain roasted", "plain cashew"],
+      "dry-fruit-laddu": ["dry fruit", "dryfruit", "dry fruit laddu", "dryfruit laddu", "premium dry fruit laddu"],
+      "sununda": ["sununda", "sunnunda", "sunundalu", "sunnundalu"],
+      "jaggery-laddu": ["jaggery", "jaggery laddu", "sesame", "flax", "nuvvula laddu", "sesame & flaxseed"],
+      "rice-puff-balls": ["rice puff", "rice puff ball", "rice puff balls", "murmura", "murmura laddu", "borugumuddalu", "traditional borugumuddalu"],
+      "trio": ["trio", "3 pack", "3 cookie", "trio cookies"],
+      "half-dozen": ["half dozen", "6 pack", "6 cookie", "half dozen cookies"],
+      "chocolate-chip-cookies": ["chocolate chip", "choco chip", "classic cookie", "chocolate chip cookies"],
+      "atta-jaggery-almond-cookies": ["atta jaggery", "atta jaggery almond", "atta cookies", "almond cookies"],
+      "sunday-starter": ["sunday starter", "starter combo"],
+      "gift-box": ["gift box", "gift combo"],
+      "full-sunday": ["full sunday", "full combo"]
+    };
+
+
+    const els = {
+      productList: document.getElementById("productList"),
+      customerName: document.getElementById("customerName"),
+      customerPhone: document.getElementById("customerPhone"),
+      billNumber: document.getElementById("billNumber"),
+      paymentStatus: document.getElementById("paymentStatus"),
+      deliveryCharge: document.getElementById("deliveryCharge"),
+      discount: document.getElementById("discount"),
+      advancePaid: document.getElementById("advancePaid"),
+      orderNote: document.getElementById("orderNote"),
+      incomingMessage: document.getElementById("incomingMessage"),
+      itemsTotal: document.getElementById("itemsTotal"),
+      deliveryTotal: document.getElementById("deliveryTotal"),
+      discountTotal: document.getElementById("discountTotal"),
+      advanceTotal: document.getElementById("advanceTotal"),
+      balanceTotal: document.getElementById("balanceTotal"),
+      billPreview: document.getElementById("billPreview"),
+      whatsAppLink: document.getElementById("whatsAppLink"),
+      addProduct: document.getElementById("addProduct"),
+      clearBill: document.getElementById("clearBill"),
+      restoreDefaults: document.getElementById("restoreDefaults"),
+      copyWelcomeReply: document.getElementById("copyWelcomeReply"),
+      copySizeReply: document.getElementById("copySizeReply"),
+      copyCustomerMenu: document.getElementById("copyCustomerMenu"),
+      parseOrder: document.getElementById("parseOrder"),
+      copyBill: document.getElementById("copyBill"),
+      shareBill: document.getElementById("shareBill"),
+      toast: document.getElementById("toast"),
+      saveBillBtn: document.getElementById("saveBillBtn"),
+      openHistoryBtn: document.getElementById("openHistoryBtn"),
+      closeHistoryBtn: document.getElementById("closeHistoryBtn"),
+      historyModal: document.getElementById("historyModal"),
+      historyList: document.getElementById("historyList"),
+      historySearch: document.getElementById("historySearch"),
+      historyDetailModal: document.getElementById("historyDetailModal"),
+      historyDetailTitle: document.getElementById("historyDetailTitle"),
+      closeHistoryDetailBtn: document.getElementById("closeHistoryDetailBtn"),
+      historyDetailPreview: document.getElementById("historyDetailPreview"),
+      historyCopyBtn: document.getElementById("historyCopyBtn"),
+      historyWhatsAppBtn: document.getElementById("historyWhatsAppBtn"),
+      exportBackupBtn: document.getElementById("exportBackupBtn"),
+      importBackupBtn: document.getElementById("importBackupBtn"),
+      importFileInput: document.getElementById("importFileInput"),
+      sellerUpi: document.getElementById("sellerUpi"),
+      printReceiptBtn: document.getElementById("printReceiptBtn")
+    };
+
+    let historyState = loadHistory();
+    let currentHistoryDetailId = null;
+    let warnedAboutSavedBill = false;
+    let state = loadState();
+    let toastTimer = 0;
+    let showSelectedOnly = localStorage.getItem(SHOW_SELECTED_KEY) === "true";
+    let currentTab = "all";
+
+    bindStaticEvents();
+    syncFieldsFromState();
+    render();
+
+    function bindStaticEvents() {
+      els.customerName.addEventListener("change", () => {
+         if (!warnedAboutSavedBill && historyState.some(h => h.billNumber === state.billNumber)) {
+            showToast("Editing a saved bill — tap Clear bill to start a new order.");
+            warnedAboutSavedBill = true;
+         }
+      });
+
+      [
+        "customerName",
+        "customerPhone",
+        "billNumber",
+        "paymentStatus",
+        "deliveryCharge",
+        "discount",
+        "advancePaid",
+        "orderNote",
+        "incomingMessage"
+      ].forEach((key) => {
+        els[key].addEventListener("input", () => {
+          state[key] = numberField(key) ? cleanNumber(els[key].value) : els[key].value;
+          if (key === "incomingMessage") {
+            applyIncomingOrder(state.incomingMessage);
+            syncFieldsFromState();
+            saveState();
+            render();
+          } else {
+            saveState();
+            renderTotalsAndBill();
+          }
+        });
+      });
+
+      els.addProduct.addEventListener("click", () => {
+        const product = {
+          id: makeId(),
+          name: "Custom Item",
+          category: "custom",
+          flavor: "",
+          weight: "",
+          price: 0,
+          qty: 1
+        };
+        state.products.push(product);
+        currentTab = "custom";
+        saveAndRender();
+        requestAnimationFrame(() => {
+          const input = document.querySelector(`[data-product="${product.id}"][data-field="name"]`);
+          if (input) {
+            input.focus();
+            input.select();
+          }
+        });
+      });
+
+      els.clearBill.addEventListener("click", () => {
+        state.customerName = "";
+        state.customerPhone = "";
+        state.billNumber = makeBillNumber();
+        state.paymentStatus = "Pending";
+        state.deliveryCharge = 0;
+        state.discount = 0;
+        state.advancePaid = 0;
+        state.orderNote = "";
+        state.incomingMessage = "";
+        state.products = state.products.map((product) => ({ ...product, qty: 0 }));
+        warnedAboutSavedBill = false;
+        syncFieldsFromState();
+        saveAndRender();
+        showToast("Bill cleared");
+      });
+
+      els.restoreDefaults.addEventListener("click", () => {
+        state.products = DEFAULT_PRODUCTS.map((product) => ({
+          ...product
+        }));
+        saveAndRender();
+        showToast("Default products restored");
+      });
+
+      els.copyWelcomeReply.addEventListener("click", async () => {
+        await copyText(buildWelcomeReply());
+      });
+
+      els.copySizeReply.addEventListener("click", async () => {
+        await copyText(buildSizeReply());
+      });
+
+      els.copyCustomerMenu.addEventListener("click", async () => {
+        await copyText(buildCustomerMenu());
+      });
+
+      els.parseOrder.addEventListener("click", () => {
+        const matched = applyIncomingOrder(state.incomingMessage);
+        syncFieldsFromState();
+        saveAndRender();
+        showToast(matched ? `${matched} item${matched === 1 ? "" : "s"} filled` : "No matching items found");
+      });
+
+      els.copyBill.addEventListener("click", async () => {
+        await copyText(els.billPreview.value);
+      });
+
+      els.saveBillBtn.addEventListener("click", () => {
+        saveToHistory();
+      });
+
+      els.whatsAppLink.addEventListener("click", () => {
+        if (selectedProducts().length > 0) {
+          saveToHistory();
+        }
+      });
+
+      els.shareBill.addEventListener("click", async () => {
+        saveToHistory();
+        const text = els.billPreview.value;
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: "Sundays Bill", text });
+            return;
+          } catch (error) {
+            if (error && error.name === "AbortError") return;
+          }
+        }
+        await copyText(text);
+      });
+
+      els.openHistoryBtn.addEventListener("click", () => {
+        renderHistoryList();
+        els.historyModal.classList.add("open");
+      });
+
+      els.closeHistoryBtn.addEventListener("click", () => {
+        els.historyModal.classList.remove("open");
+      });
+
+      els.closeHistoryDetailBtn.addEventListener("click", () => {
+        els.historyDetailModal.classList.remove("open");
+      });
+
+      els.historySearch.addEventListener("input", () => {
+        renderHistoryList();
+      });
+
+      els.historyCopyBtn.addEventListener("click", async () => {
+        await copyText(els.historyDetailPreview.value);
+      });
+
+      els.exportBackupBtn.addEventListener("click", exportBackup);
+      els.importBackupBtn.addEventListener("click", () => els.importFileInput.click());
+      els.importFileInput.addEventListener("change", importBackup);
+
+      els.sellerUpi.addEventListener("input", () => {
+        setSellerUpi(els.sellerUpi.value);
+        renderTotalsAndBill();
+      });
+
+      const showSelToggle = document.getElementById("showSelectedOnly");
+      if (showSelToggle) {
+        showSelToggle.checked = showSelectedOnly;
+        showSelToggle.addEventListener("change", (e) => {
+          showSelectedOnly = e.target.checked;
+          localStorage.setItem(SHOW_SELECTED_KEY, showSelectedOnly.toString());
+          render();
+        });
+      }
+
+      if (els.printReceiptBtn) {
+        els.printReceiptBtn.addEventListener("click", () => {
+          window.print();
+        });
+      }
+
+      initAutocomplete();
+    }
+
+    function render() {
+      renderProducts();
+      renderTotalsAndBill();
+    }
+
+    function renderProducts() {
+      if (!state.products.length) {
+        els.productList.innerHTML = '<div class="empty">No products added.</div>';
+        return;
+      }
+
+      if (showSelectedOnly) {
+        // Render Checkout Cart View (Only selected items)
+        const selected = state.products.filter((product) => cleanNumber(product.qty) > 0);
+        if (!selected.length) {
+          els.productList.innerHTML = '<div class="empty">No active items. Uncheck "Selected only" to browse the catalog.</div>';
+          return;
+        }
+
+        els.productList.innerHTML = selected.map((product) => {
+          const displayName = productDisplayName(product);
+          const price = productPrice(product);
+          const total = price * cleanNumber(product.qty);
+          const isDefault = DEFAULT_PRODUCTS.some(p => p.id === product.id);
+          return `
+            <article class="product-row" style="display: flex; flex-direction: column; gap: 8px; padding: 12px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 750; color: var(--green-dark); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${escapeAttr(displayName)}
+                  </div>
+                  <div class="muted" style="font-size: 11px;">
+                    Price: ${formatMoney(price)}
+                  </div>
+                </div>
+                ${!isDefault ? `
+                  <button class="icon-btn delete-btn" type="button" data-delete="${escapeAttr(product.id)}" title="Delete custom product" aria-label="Delete">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M4 7h16M9 7V5h6v2m-8 4v8m5-8v8m5-8v8M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                ` : `<div style="width: 44px; height: 44px; flex: none;"></div>`}
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+                <div class="qty" style="flex: none;">
+                  <button type="button" data-qty="${escapeAttr(product.id)}" data-delta="-1" aria-label="Decrease">-</button>
+                  <input data-product="${escapeAttr(product.id)}" data-field="qty" value="${cleanNumber(product.qty)}" type="number" inputmode="numeric" min="0" step="1" aria-label="Quantity" />
+                  <button type="button" data-qty="${escapeAttr(product.id)}" data-delta="1" aria-label="Increase">+</button>
+                </div>
+                <div style="font-weight: 850; color: var(--green-dark); font-size: 15px;">
+                  Total: ${formatMoney(total)}
+                </div>
+              </div>
+              <div style="width: 100%; margin-top: 4px;">
+                <input data-product="${escapeAttr(product.id)}" data-field="details" value="${escapeAttr(product.details || '')}" placeholder="Flavor mix / customization details..." style="height: 28px; min-height: 28px; font-size: 12px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 4px; background: #fffcf8;" />
+              </div>
+            </article>
+          `;
+        }).join("");
+
+        bindProductRowEvents();
+        return;
+      }
+
+      // Render POS Tabbed Catalog View
+      const categories = [
+        { id: "all", name: "All" },
+        { id: "cashew", name: "Cashews" },
+        { id: "laddu", name: "Laddus" },
+        { id: "cookie", name: "Cookies" },
+        { id: "combo", name: "Combos" },
+        { id: "custom", name: "Custom" }
+      ];
+
+      const tabHeaderHTML = `
+        <div class="pos-tabs" id="posTabs" style="margin: -15px -15px 15px -15px;">
+          ${categories.map(cat => `
+            <button type="button" class="pos-tab ${currentTab === cat.id ? "active" : ""}" data-category="${cat.id}">
+              ${escapeAttr(cat.name)}
+            </button>
+          `).join("")}
+        </div>
+      `;
+
+      let catalogProducts = state.products;
+      if (currentTab !== "all") {
+        catalogProducts = state.products.filter(p => p.category === currentTab);
+      }
+
+      let gridHTML = "";
+      if (currentTab === "custom") {
+        const customItems = catalogProducts;
+        gridHTML = `
+          <div style="display: grid; gap: 12px; width: 100%;">
+            <button class="action primary" type="button" id="addCustomProductBtn" style="min-height: 44px; width: 100%;">
+              + Add Custom Item
+            </button>
+            ${customItems.length === 0 ? `
+              <div class="empty">No custom items added. Use the button above to add one.</div>
+            ` : customItems.map(product => `
+              <article class="product-row" style="display: flex; flex-direction: column; gap: 10px; padding: 12px;">
+                <div style="display: flex; gap: 8px;">
+                  <div class="field" style="flex: 1;">
+                    <label>Custom Name</label>
+                    <input data-product="${escapeAttr(product.id)}" data-field="name" value="${escapeAttr(product.name)}" placeholder="Item name" />
+                  </div>
+                  <button class="icon-btn delete-btn" type="button" data-delete="${escapeAttr(product.id)}" title="Delete">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M4 7h16M9 7V5h6v2m-8 4v8m5-8v8m5-8v8M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: flex-end;">
+                  <div class="field" style="flex: 1;">
+                    <label>Price</label>
+                    <input data-product="${escapeAttr(product.id)}" data-field="price" value="${product.price}" type="number" inputmode="numeric" />
+                  </div>
+                  <div class="field" style="flex: 1;">
+                    <label>Qty</label>
+                    <div class="qty">
+                      <button type="button" data-qty="${escapeAttr(product.id)}" data-delta="-1">-</button>
+                      <input data-product="${escapeAttr(product.id)}" data-field="qty" value="${product.qty}" type="number" inputmode="numeric" />
+                      <button type="button" data-qty="${escapeAttr(product.id)}" data-delta="1">+</button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+        `;
+      } else {
+        gridHTML = `
+          <div class="pos-grid" style="margin: 0 -15px -15px -15px;">
+            ${catalogProducts.map(product => {
+              const cardInfo = posCardInfo(product);
+              const isSelected = product.qty > 0;
+              return `
+                <div class="pos-card ${isSelected ? "active" : ""}">
+                  <div>
+                    <div class="pos-card-title">${escapeAttr(cardInfo.title)}</div>
+                    <div class="pos-card-subtitle">${escapeAttr(cardInfo.subtitle)}</div>
+                  </div>
+                  <div class="pos-card-price">${formatMoney(product.price)}</div>
+                  <div class="pos-card-controls" style="display: flex; flex-direction: column; gap: 6px;">
+                    <div class="qty" style="grid-template-columns: 28px minmax(20px, 1fr) 28px; height: 28px;">
+                      <button type="button" data-qty="${escapeAttr(product.id)}" data-delta="-1" style="width: 28px; height: 28px;">-</button>
+                      <input data-product="${escapeAttr(product.id)}" data-field="qty" value="${cleanNumber(product.qty)}" type="number" inputmode="numeric" min="0" style="height: 28px;" />
+                      <button type="button" data-qty="${escapeAttr(product.id)}" data-delta="1" style="width: 28px; height: 28px;">+</button>
+                    </div>
+                    ${isSelected ? `
+                      <input data-product="${escapeAttr(product.id)}" data-field="details" value="${escapeAttr(product.details || '')}" placeholder="Flavor mix / details..." style="height: 22px; min-height: 22px; font-size: 10px; padding: 2px 4px; border: 1px solid var(--line); border-radius: 4px; background: white; margin-top: 2px;" />
+                    ` : ""}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+      }
+
+      els.productList.innerHTML = tabHeaderHTML + gridHTML;
+      bindPOSCatalogEvents();
+    }
+
+    function posCardInfo(product) {
+      let title = product.name;
+      let subtitle = "";
+
+      if (product.category === "cashew") {
+        title = `${product.flavor} - ${product.weight}`;
+        subtitle = product.name;
+      } else if (product.category === "cookie") {
+        if (product.flavor) {
+          title = `${product.name.replace(" (3 Big Cookies)", "").replace(" (6 Big Cookies)", "")} - ${product.flavor}`;
+          subtitle = product.name.includes("3 Big") ? "3 Big Cookies" : "6 Big Cookies";
+        } else {
+          title = product.name;
+          subtitle = product.weight;
+        }
+      } else {
+        title = product.name;
+        subtitle = product.weight || "";
+      }
+      return { title, subtitle };
+    }
+
+    function bindProductRowEvents() {
+      // qty controls inside cart
+      els.productList.querySelectorAll("button[data-qty]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const product = findProduct(button.dataset.qty);
+          if (!product) return;
+          product.qty = Math.max(0, cleanNumber(product.qty) + Number(button.dataset.delta || 0));
+          saveAndRender();
+        });
+      });
+
+      // qty inputs inside cart
+      els.productList.querySelectorAll("[data-product][data-field='qty']").forEach((control) => {
+        control.addEventListener("input", () => {
+          const product = findProduct(control.dataset.product);
+          if (!product) return;
+          product.qty = cleanNumber(control.value);
+          saveState();
+          renderTotalsAndBill();
+        });
+      });
+
+      // delete custom items inside cart
+      els.productList.querySelectorAll("button[data-delete]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.products = state.products.filter((product) => product.id !== button.dataset.delete);
+          saveAndRender();
+        });
+      });
+
+      // details inputs inside cart
+      els.productList.querySelectorAll("[data-product][data-field='details']").forEach((control) => {
+        control.addEventListener("input", () => {
+          const product = findProduct(control.dataset.product);
+          if (!product) return;
+          product.details = control.value;
+          saveState();
+          renderTotalsAndBill();
+        });
+      });
+    }
+
+    function bindPOSCatalogEvents() {
+      // tab clicks
+      const tabContainer = document.getElementById("posTabs");
+      if (tabContainer) {
+        tabContainer.querySelectorAll(".pos-tab").forEach(tab => {
+          tab.addEventListener("click", () => {
+            currentTab = tab.dataset.category;
+            render();
+          });
+        });
+      }
+
+      // qty controls inside POS grid / custom list
+      els.productList.querySelectorAll("button[data-qty]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const product = findProduct(button.dataset.qty);
+          if (!product) return;
+          product.qty = Math.max(0, cleanNumber(product.qty) + Number(button.dataset.delta || 0));
+          saveAndRender();
+        });
+      });
+
+      // qty inputs inside POS grid / custom list
+      els.productList.querySelectorAll("[data-product][data-field='qty']").forEach((control) => {
+        control.addEventListener("input", () => {
+          const product = findProduct(control.dataset.product);
+          if (!product) return;
+          product.qty = cleanNumber(control.value);
+          saveState();
+          renderTotalsAndBill();
+        });
+      });
+
+      // custom product inline edits
+      els.productList.querySelectorAll("[data-product][data-field='name'], [data-product][data-field='price']").forEach((control) => {
+        control.addEventListener("input", () => {
+          const product = findProduct(control.dataset.product);
+          if (!product) return;
+          const field = control.dataset.field;
+          if (field === "price") {
+            product.price = cleanNumber(control.value);
+          } else {
+            product.name = control.value;
+          }
+          saveState();
+          renderTotalsAndBill();
+        });
+      });
+
+      // delete custom items
+      els.productList.querySelectorAll("button[data-delete]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.products = state.products.filter((product) => product.id !== button.dataset.delete);
+          saveAndRender();
+        });
+      });
+
+      // details inputs inside POS catalog
+      els.productList.querySelectorAll("[data-product][data-field='details']").forEach((control) => {
+        control.addEventListener("input", () => {
+          const product = findProduct(control.dataset.product);
+          if (!product) return;
+          product.details = control.value;
+          saveState();
+          renderTotalsAndBill();
+        });
+      });
+
+      // Add custom item button click
+      const addCustomBtn = document.getElementById("addCustomProductBtn");
+      if (addCustomBtn) {
+        addCustomBtn.addEventListener("click", () => {
+          const product = {
+            id: makeId(),
+            name: "Custom Item",
+            category: "custom",
+            flavor: "",
+            weight: "",
+            price: 0,
+            qty: 1
+          };
+          state.products.push(product);
+          saveAndRender();
+        });
+      }
+    }
+
+    function renderTotalsAndBill() {
+      const selected = selectedProducts();
+      const itemsTotal = selected.reduce((sum, product) => sum + productPrice(product) * cleanNumber(product.qty), 0);
+      const delivery = cleanNumber(state.deliveryCharge);
+      const discount = cleanNumber(state.discount);
+      const advance = cleanNumber(state.advancePaid);
+      const grandTotal = Math.max(0, itemsTotal + delivery - discount);
+      const balance = Math.max(0, grandTotal - advance);
+      const billText = buildBillText({ selected, itemsTotal, delivery, discount, advance, grandTotal, balance });
+
+      els.itemsTotal.textContent = formatMoney(itemsTotal);
+      els.deliveryTotal.textContent = formatMoney(delivery);
+      els.discountTotal.textContent = `-${formatMoney(discount)}`;
+      els.advanceTotal.textContent = formatMoney(advance);
+      els.balanceTotal.textContent = formatMoney(balance);
+      els.billPreview.value = billText;
+      els.whatsAppLink.href = makeWhatsAppUrl(billText);
+      els.whatsAppLink.setAttribute("aria-label", selected.length ? "Open WhatsApp with bill" : "Open WhatsApp");
+
+      // Handle UI UPI QR code
+      const upi = getSellerUpi();
+      const qrContainer = document.getElementById("upiQrContainer");
+      const qrImg = document.getElementById("upiQrImg");
+      const payLink = document.getElementById("upiPayLink");
+      const qrWarning = document.getElementById("upiQrLimitWarning");
+      
+      if (upi && balance > 0) {
+        const isOverLimit = balance > 2000;
+        const upiUrl = isOverLimit 
+          ? `upi://pay?pa=${encodeURIComponent(upi)}&pn=Sundays&cu=INR`
+          : `upi://pay?pa=${encodeURIComponent(upi)}&pn=Sundays&am=${balance}&cu=INR`;
+        
+        if (qrContainer && qrImg && payLink) {
+          qrContainer.style.display = "block";
+          qrImg.src = generateQrDataUrl(upiUrl, 150);
+          payLink.href = upiUrl;
+          if (qrWarning) {
+            qrWarning.style.display = isOverLimit ? "block" : "none";
+          }
+        }
+      } else {
+        if (qrContainer) qrContainer.style.display = "none";
+      }
+
+      // Populate hidden print template
+      populatePrintReceipt(selected, itemsTotal, delivery, discount, advance, balance);
+    }
+
+    function populatePrintReceipt(selected, itemsTotal, delivery, discount, advance, balance) {
+      const custName = document.getElementById("printCustName");
+      const custPhone = document.getElementById("printCustPhone");
+      const billNo = document.getElementById("printBillNo");
+      const dateEl = document.getElementById("printDate");
+      const itemsBody = document.getElementById("printItemsBody");
+      
+      const printItemsTotal = document.getElementById("printItemsTotal");
+      const printDelivery = document.getElementById("printDelivery");
+      const printDeliveryRow = document.getElementById("printDeliveryRow");
+      const printDiscount = document.getElementById("printDiscount");
+      const printDiscountRow = document.getElementById("printDiscountRow");
+      const printAdvance = document.getElementById("printAdvance");
+      const printAdvanceRow = document.getElementById("printAdvanceRow");
+      const printBalance = document.getElementById("printBalance");
+      const printPaymentStatus = document.getElementById("printPaymentStatus");
+      
+      const printUpiDetails = document.getElementById("printUpiDetails");
+      const printUpiQr = document.getElementById("printUpiQr");
+      const printUpiIdText = document.getElementById("printUpiIdText");
+
+      if (custName) custName.textContent = state.customerName || "Walk-in Customer";
+      if (custPhone) custPhone.textContent = state.customerPhone || "-";
+      if (billNo) billNo.textContent = state.billNumber || "-";
+      if (dateEl) dateEl.textContent = formatDate(new Date());
+
+      if (itemsBody) {
+        if (selected.length === 0) {
+          itemsBody.innerHTML = `<tr><td colspan="4" style="padding: 8px 4px; text-align: center; color: var(--muted);">No items selected</td></tr>`;
+        } else {
+          itemsBody.innerHTML = selected.map(product => {
+            const qty = cleanNumber(product.qty);
+            const price = productPrice(product);
+            const lineTotal = qty * price;
+            const displayName = productDisplayName(product);
+            const detailsText = product.details && product.details.trim() 
+              ? `<div style="font-size: 11px; color: #6a716b; font-style: italic; margin-top: 2px;">Details: ${escapeAttr(product.details.trim())}</div>` 
+              : '';
+            return `
+              <tr style="border-bottom: 1px solid #f1eee7;">
+                <td style="padding: 8px 4px;">
+                  <div><strong>${escapeAttr(displayName)}</strong></div>
+                  ${detailsText}
+                </td>
+                <td style="padding: 8px 4px; text-align: right;">${formatMoney(price)}</td>
+                <td style="padding: 8px 4px; text-align: center;">${qty}</td>
+                <td style="padding: 8px 4px; text-align: right; font-weight: bold;">${formatMoney(lineTotal)}</td>
+              </tr>
+            `;
+          }).join("");
+        }
+      }
+
+      if (printItemsTotal) printItemsTotal.textContent = formatMoney(itemsTotal);
+
+      if (delivery > 0) {
+        if (printDeliveryRow && printDelivery) {
+          printDeliveryRow.style.display = "block";
+          printDelivery.textContent = formatMoney(delivery);
+        }
+      } else {
+        if (printDeliveryRow) printDeliveryRow.style.display = "none";
+      }
+
+      if (discount > 0) {
+        if (printDiscountRow && printDiscount) {
+          printDiscountRow.style.display = "block";
+          printDiscount.textContent = formatMoney(discount);
+        }
+      } else {
+        if (printDiscountRow) printDiscountRow.style.display = "none";
+      }
+
+      if (advance > 0) {
+        if (printAdvanceRow && printAdvance) {
+          printAdvanceRow.style.display = "block";
+          printAdvance.textContent = formatMoney(advance);
+        }
+      } else {
+        if (printAdvanceRow) printAdvanceRow.style.display = "none";
+      }
+
+      if (printBalance) printBalance.textContent = formatMoney(balance);
+      if (printPaymentStatus) printPaymentStatus.textContent = state.paymentStatus || "Pending";
+
+      const upi = getSellerUpi();
+      if (upi && balance > 0) {
+        const isOverLimit = balance > 2000;
+        const upiUrl = isOverLimit 
+          ? `upi://pay?pa=${encodeURIComponent(upi)}&pn=Sundays&cu=INR`
+          : `upi://pay?pa=${encodeURIComponent(upi)}&pn=Sundays&am=${balance}&cu=INR`;
+        
+        if (printUpiDetails && printUpiQr && printUpiIdText) {
+          printUpiDetails.style.display = "block";
+          printUpiQr.src = generateQrDataUrl(upiUrl, 120);
+          printUpiIdText.textContent = upi;
+          const printWarning = document.getElementById("printUpiLimitWarning");
+          if (printWarning) {
+            printWarning.style.display = isOverLimit ? "block" : "none";
+          }
+        }
+      } else {
+        if (printUpiDetails) printUpiDetails.style.display = "none";
+      }
+    }
+
+    function updateProductLine(row, product) {
+      if (!row) return;
+      const priceInput = row.querySelector('[data-field="price"]');
+      if (priceInput) priceInput.value = productPrice(product);
+      const line = row.querySelector(".line-total");
+      if (line) line.textContent = formatMoney(productPrice(product) * cleanNumber(product.qty));
+    }
+
+    function renderSelectField(product, field, label, options) {
+      if (!Array.isArray(options) || !options.length) return "";
+      const selected = product[field] || options[0];
+      return `
+        <div class="field">
+          <label>${label}</label>
+          <select data-product="${escapeAttr(product.id)}" data-field="${field}">
+            ${options.map((option) => `
+              <option value="${escapeAttr(option)}"${option === selected ? " selected" : ""}>${escapeAttr(option)}</option>
+            `).join("")}
+          </select>
+        </div>
+      `;
+    }
+
+    function productPrice(product) {
+      return cleanNumber(product.price);
+    }
+
+    function setProductPrice(product, price) {
+      product.price = cleanNumber(price);
+    }
+
+    function productDisplayName(product) {
+      return [
+        product.name,
+        product.flavor,
+        product.weight
+      ].filter(Boolean).join(" - ");
+    }
+
+    function productHasOptions(product) {
+      return false;
+    }
+
+    function buildBillText(totals) {
+      const lines = [
+        "*Sundays - Bill*",
+        `Date: ${formatDate(new Date())}`,
+        `Bill No: ${state.billNumber || "-"}`,
+        `Customer: ${state.customerName || "-"}`,
+        `Phone: ${state.customerPhone || "-"}`,
+        "--------------------------------"
+      ];
+
+      if (totals.selected.length) {
+        totals.selected.forEach((product, index) => {
+          const qty = cleanNumber(product.qty);
+          const price = productPrice(product);
+          const lineTotal = qty * price;
+          lines.push(`${index + 1}. ${productDisplayName(product)}`);
+          if (product.details && product.details.trim()) {
+            lines.push(`   *Details: ${product.details.trim()}*`);
+          }
+          lines.push(`   ${qty} x ${formatMoney(price)} = ${formatMoney(lineTotal)}`);
+        });
+      } else {
+        lines.push("No items selected");
+      }
+
+      lines.push("--------------------------------");
+      if (totals.delivery > 0) lines.push(`Delivery: ${formatMoney(totals.delivery)}`);
+      if (totals.discount > 0) lines.push(`Discount: -${formatMoney(totals.discount)}`);
+      if (totals.advance > 0) lines.push(`Advance Paid: ${formatMoney(totals.advance)}`);
+      lines.push(`*Total Amount: ${formatMoney(totals.grandTotal)}*`);
+      lines.push(`*💳 Amount Payable: ${formatMoney(totals.balance)}*`);
+      if (state.orderNote && state.orderNote.trim()) lines.push(`Note: ${state.orderNote.trim()}`);
+
+      lines.push("");
+      lines.push("Thank you for choosing Sundays.");
+
+      return lines.join("\n");
+    }
+
+    function buildWelcomeReply() {
+      return [
+        "Hi! Welcome to Sundays.",
+        "",
+        "You can ask me any question. If you want to order, I can send a simple numbered menu.",
+        "",
+        "You can reply like this:",
+        "Masala cashew 250g x 1",
+        "or",
+        "4 x 2",
+        "",
+        "I will calculate the bill and confirm before packing."
+      ].join("\n");
+    }
+
+    function buildSizeReply() {
+      return [
+        "Available sizes:",
+        "",
+        "Roasted Cashews (Peri Peri, Chilli, Plain Roasted):",
+        "- 250g, 500g, 1kg",
+        "",
+        "Laddus & Sununda:",
+        "- 500g and 1kg",
+        "",
+        "Borugumuddalu:",
+        "- 12 Pieces",
+        "",
+        "Please tell me flavor + size + quantity. Example: Peri Peri Cashew 250g x 1."
+      ].join("\n");
+    }
+
+    function buildCustomerMenu() {
+      const lines = [
+        "Hi! To order from Sundays, just reply with item number and quantity.",
+        "",
+        "Example: 1 x 2, 4 x 6",
+        "",
+        "Menu:"
+      ];
+
+      state.products.forEach((product, index) => {
+        const displayName = productDisplayName(product);
+        const price = productPrice(product);
+        lines.push(`${index + 1}. ${displayName}${price ? ` - ${formatMoney(price)}` : ""}`);
+      });
+
+      lines.push("");
+      lines.push("You can also reply like: Masala cashew 250g x 1.");
+      return lines.join("\n");
+    }
+
+    function parseMetadataFromMessage(message) {
+      const result = { name: '', phone: '', address: '' };
+      if (!message) return result;
+
+      const lines = message.split('\n').map(l => l.trim());
+
+      // 1. Parse Phone Number (10 digits starting with 6, 7, 8, 9)
+      const phoneRegex = /(?:\+?91|0)?[-\s]?([6-9]\d{4}[-\s]?\d{5})\b/;
+      const phoneMatch = message.match(phoneRegex);
+      if (phoneMatch) {
+        result.phone = phoneMatch[1].replace(/[-\s]/g, '');
+      }
+
+      // 2. Parse Name
+      const nameRegexes = [
+        /^(?:customer\s*)?name\s*[:|-]\s*(.+)$/i,
+        /^deliver\s*to\s*[:|-]\s*(.+)$/i,
+        /^to\s*[:|-]\s*(.+)$/i,
+        /^(?:customer)\s*[:|-]\s*(.+)$/i
+      ];
+      
+      for (const line of lines) {
+        for (const regex of nameRegexes) {
+          const match = line.match(regex);
+          if (match) {
+            result.name = match[1].trim();
+            break;
+          }
+        }
+        if (result.name) break;
+      }
+
+      // Helper to check if a line looks like a product item line
+      function isProductLine(line) {
+        if (!line) return false;
+        if (/^(?:\d+[\.)]|-|\*)\s+/i.test(line)) return true;
+        if (/(?:x|\*)\s*\d+/i.test(line)) return true;
+        
+        const lower = line.toLowerCase();
+        const productKeywords = ['cashew', 'kaju', 'laddu', 'ladoo', 'cookie', 'bites', 'combo', 'container', 'borugumuddalu', 'sununda'];
+        return productKeywords.some(keyword => lower.includes(keyword));
+      }
+
+      // 3. Parse Address / Delivery details
+      let addressStartIndex = -1;
+      const addressRegexes = [
+        /^(?:delivery\s*)?address\s*[:|-]/i,
+        /^location\s*[:|-]/i,
+        /^addr\s*[:|-]/i
+      ];
+
+      for (let i = 0; i < lines.length; i++) {
+        for (const regex of addressRegexes) {
+          if (regex.test(lines[i])) {
+            addressStartIndex = i;
+            break;
+          }
+        }
+        if (addressStartIndex !== -1) break;
+      }
+
+      if (addressStartIndex !== -1) {
+        const addressLines = [];
+        const firstLine = lines[addressStartIndex].replace(/^(?:delivery\s*)?address\s*[:|-]\s*/i, '').replace(/^location\s*[:|-]\s*/i, '').replace(/^addr\s*[:|-]\s*/i, '').trim();
+        if (firstLine) addressLines.push(firstLine);
+
+        for (let i = addressStartIndex + 1; i < lines.length; i++) {
+          const line = lines[i];
+          if (!line) break; 
+          if (/^(?:items|order|products|qty)\b/i.test(line)) break;
+          if (isProductLine(line)) break;
+          addressLines.push(line);
+        }
+        result.address = addressLines.join(', ');
+      } else {
+        const pincodeMatch = message.match(/\b(500\d{3})\b/);
+        if (pincodeMatch) {
+          const pinIndex = lines.findIndex(l => l.includes(pincodeMatch[1]));
+          if (pinIndex !== -1) {
+            const start = Math.max(0, pinIndex - 2);
+            const end = Math.min(lines.length - 1, pinIndex + 1);
+            const addressLines = [];
+            for (let i = start; i <= end; i++) {
+              const line = lines[i];
+              if (/^(?:name|phone|mobile|tel|items|order)\b/i.test(line)) continue;
+              if (line.includes(result.phone) || line.includes(result.name)) continue;
+              if (isProductLine(line)) continue;
+              addressLines.push(line);
+            }
+            result.address = addressLines.join(', ');
+          }
+        }
+      }
+
+      return result;
+    }
+
+    function applyIncomingOrder(message) {
+      // Extract metadata (Name, Phone, Address)
+      const metadata = parseMetadataFromMessage(message);
+      if (metadata.name) state.customerName = metadata.name;
+      if (metadata.phone) state.customerPhone = metadata.phone;
+      if (metadata.address) {
+        if (!state.orderNote || !state.orderNote.includes(metadata.address)) {
+          state.orderNote = state.orderNote 
+            ? `${state.orderNote}\nAddress: ${metadata.address}`
+            : `Address: ${metadata.address}`;
+        }
+      }
+
+      const text = normalizeText(message);
+      if (!text) return 0;
+
+      const segments = orderSegments(message);
+      const found = new Map();
+      state.products.forEach((product, index) => {
+        const byNumber = findQuantityByMenuNumber(text, index + 1);
+        if (byNumber > 0) {
+          found.set(product.id, byNumber);
+          return;
+        }
+
+        for (const segment of segments) {
+          if (matchSegmentToProduct(segment, product)) {
+            const qty = quantityFromSegment(segment);
+            if (qty > 0) {
+              found.set(product.id, qty);
+              break;
+            }
+          }
+        }
+      });
+
+      state.products = state.products.map((product) => ({
+        ...product,
+        qty: found.has(product.id) ? found.get(product.id) : product.qty
+      }));
+
+      return found.size;
+    }
+
+    function findQuantityByMenuNumber(text, number) {
+      const escaped = String(number).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const patterns = [
+        new RegExp(`(?:^|[^a-z0-9])${escaped}(?![a-z0-9])\\s*(?:x|\\*|-|:)?\\s*(\\d{1,3})(?![a-z0-9])(?:[^a-z0-9]|$)`)
+      ];
+
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) return cleanNumber(match[1]);
+      }
+
+      return 0;
+    }
+
+    function matchSegmentToProduct(segment, product) {
+      const nameAliases = aliasesForProduct(product);
+      const hasName = nameAliases.some(alias => containsPhrase(segment, alias));
+      if (!hasName) return false;
+
+      if (product.flavor) {
+        const cleanFlavor = normalizeText(product.flavor);
+        if (!containsPhrase(segment, cleanFlavor)) return false;
+      }
+
+      if (product.weight) {
+        const cleanWeight = normalizeText(product.weight);
+        if (!containsPhrase(segment, cleanWeight)) return false;
+      }
+
+      return true;
+    }
+
+    function containsPhrase(text, phrase) {
+      const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`(?:^|[^a-z0-9])${escaped}s?(?:[^a-z0-9]|$)`).test(text);
+    }
+
+    function quantityFromSegment(text) {
+      const afterX = text.match(/(?:^|[^a-z0-9])(?:x|\*)\s*(\d{1,3})(?![a-z0-9])(?:[^a-z0-9]|$)/);
+      if (afterX) return cleanNumber(afterX[1]);
+
+      const leading = text.match(/^\s*(\d{1,3})(?![a-z0-9])(?:\s|$)/);
+      if (leading) return cleanNumber(leading[1]);
+
+      const trailing = text.match(/(?:^|[^a-z0-9])(\d{1,3})(?![a-z0-9])\s*$/);
+      if (trailing) return cleanNumber(trailing[1]);
+
+      return 1;
+    }
+
+    function detectOption(text, options) {
+      if (!Array.isArray(options)) return "";
+      return options.find((option) => containsPhrase(text, normalizeText(option))) || "";
+    }
+
+    function orderSegments(message) {
+      return String(message || "")
+        .split(/\n|,|;|\s+\band\b\s+/i)
+        .map(normalizeText)
+        .filter(Boolean);
+    }
+
+    function aliasesForProduct(product) {
+      const aliases = ALIASES_BY_ID[product.id] || [];
+      return [product.name, product.id.replace(/-/g, " "), ...aliases]
+        .map(normalizeText)
+        .filter(Boolean)
+        .sort((a, b) => b.length - a.length);
+    }
+
+    function normalizeText(value) {
+      let text = String(value || "").toLowerCase();
+      text = text
+        .replace(/&/g, " and ")
+        .replace(/\bhalf[\s-]*kg\b/g, "500g")
+        .replace(/\bone[\s-]*kg\b/g, "1kg")
+        .replace(/\b1[\s-]*kg\b/g, "1kg")
+        .replace(/\b500[\s-]*g\b/g, "500g")
+        .replace(/\b250[\s-]*g\b/g, "250g")
+        .replace(/\bperi[\s-]*peri\b/g, "peri peri")
+        .replace(/\bperiperi\b/g, "peri peri")
+        .replace(/\bperiberry\b/g, "peri peri")
+        .replace(/\bmashala\b/g, "chilli (masala)")
+        .replace(/\bmasala\b/g, "chilli (masala)")
+        .replace(/\bchilli\b/g, "chilli (masala)")
+        .replace(/[₹,().:/_-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      return text;
+    }
+
+    function selectedProducts() {
+      return state.products.filter((product) => cleanNumber(product.qty) > 0 && String(product.name || "").trim());
+    }
+
+    function makeWhatsAppUrl(text) {
+      const cleanPhone = String(state.customerPhone || "").replace(/\D/g, "");
+      const phone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+      const base = phone ? `https://wa.me/${phone}` : "https://wa.me/";
+      return `${base}?text=${encodeURIComponent(text)}`;
+    }
+
+    async function copyText(text) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          textarea.remove();
+        }
+        showToast("Bill copied");
+      } catch (error) {
+        showToast("Select the bill text and copy manually");
+      }
+    }
+
+    function saveAndRender() {
+      saveState();
+      render();
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return cloneDefaultState();
+        const parsed = JSON.parse(raw);
+        const merged = {
+          ...cloneDefaultState(),
+          ...parsed,
+          products: Array.isArray(parsed.products) && parsed.products.length ? parsed.products : DEFAULT_PRODUCTS
+        };
+
+        // Auto-restore any missing default products
+        DEFAULT_PRODUCTS.forEach((defaultProd) => {
+          const exists = merged.products.some((p) => p.id === defaultProd.id);
+          if (!exists) {
+            merged.products.push({
+              ...defaultProd
+            });
+          }
+        });
+
+        // Filter out any default products from merged.products that are no longer in DEFAULT_PRODUCTS (e.g. deleted combos)
+        merged.products = merged.products.filter((p) => {
+          if (p.category === "custom") return true;
+          return DEFAULT_PRODUCTS.some((dp) => dp.id === p.id);
+        });
+
+        // Keep default products at their correct positions, and custom products at the bottom
+        merged.products.sort((a, b) => {
+          const idxA = DEFAULT_PRODUCTS.findIndex((p) => p.id === a.id);
+          const idxB = DEFAULT_PRODUCTS.findIndex((p) => p.id === b.id);
+          if (idxA === -1 && idxB === -1) return 0;
+          if (idxA === -1) return 1;
+          if (idxB === -1) return -1;
+          return idxA - idxB;
+        });
+
+        merged.products = merged.products.map(normalizeStoredProduct);
+        return merged;
+      } catch (error) {
+        return cloneDefaultState();
+      }
+    }
+
+    function normalizeStoredProduct(product) {
+      const defaultProduct = DEFAULT_PRODUCTS.find((item) => item.id === product.id);
+      if (defaultProduct) {
+        // For default products, force-sync metadata & default price from code definition.
+        // This ensures name/weight corrections and price updates are applied immediately.
+        return {
+          ...defaultProduct,
+          qty: cleanNumber(product.qty),
+          details: product.details || ""
+        };
+      }
+
+      // For custom products, preserve saved fields
+      return {
+        id: product.id || makeId(),
+        name: product.name || "New item",
+        category: product.category || "custom",
+        flavor: product.flavor || "",
+        weight: product.weight || "",
+        price: cleanNumber(product.price),
+        qty: cleanNumber(product.qty),
+        details: product.details || ""
+      };
+    }
+
+
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function cloneDefaultState() {
+      return {
+        ...DEFAULT_STATE,
+        products: DEFAULT_PRODUCTS.map((product) => ({
+          ...product
+        }))
+      };
+    }
+
+    function syncFieldsFromState() {
+      els.customerName.value = state.customerName || "";
+      els.customerPhone.value = state.customerPhone || "";
+      els.billNumber.value = state.billNumber || makeBillNumber();
+      els.paymentStatus.value = state.paymentStatus || "Pending";
+      els.deliveryCharge.value = cleanNumber(state.deliveryCharge);
+      els.discount.value = cleanNumber(state.discount);
+      els.advancePaid.value = cleanNumber(state.advancePaid);
+      els.orderNote.value = state.orderNote || "";
+      els.incomingMessage.value = state.incomingMessage || "";
+      if (els.sellerUpi) {
+        els.sellerUpi.value = getSellerUpi();
+      }
+    }
+
+    function findProduct(id) {
+      return state.products.find((product) => product.id === id);
+    }
+
+    function cleanNumber(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number) || number < 0) return 0;
+      return Math.round(number);
+    }
+
+    
+    function generateQrDataUrl(text, size) {
+      try {
+        const canvas = document.createElement("canvas");
+        QrCreator.render({
+          text: text,
+          radius: 0.0,
+          ecLevel: 'M',
+          fill: '#000000',
+          background: '#ffffff',
+          size: size
+        }, canvas);
+        return canvas.toDataURL("image/png");
+      } catch (e) {
+        console.error("QR Generation error:", e);
+        return "";
+      }
+    }
+
+    function formatMoney(value) {
+      return `Rs. ${cleanNumber(value).toLocaleString("en-IN")}`;
+    }
+
+    function formatDate(date) {
+      return new Intl.DateTimeFormat("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function makeBillNumber() {
+      let counter = parseInt(localStorage.getItem(COUNTER_KEY) || "0", 10);
+      return `SUN-${String(counter + 1).padStart(4, "0")}`;
+    }
+
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveHistory() {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(historyState));
+    }
+
+    function saveToHistory() {
+      const selected = selectedProducts();
+      if (!selected.length) return; // Don't save empty bills
+
+      const itemsTotal = selected.reduce((sum, product) => sum + productPrice(product) * cleanNumber(product.qty), 0);
+      const delivery = cleanNumber(state.deliveryCharge);
+      const discount = cleanNumber(state.discount);
+      const advance = cleanNumber(state.advancePaid);
+      const grandTotal = Math.max(0, itemsTotal + delivery - discount);
+      const balance = Math.max(0, grandTotal - advance);
+
+      const existingIdx = historyState.findIndex(h => h.billNumber === state.billNumber);
+      
+      const snapshot = {
+        id: existingIdx >= 0 ? historyState[existingIdx].id : makeId(),
+        timestamp: existingIdx >= 0 ? historyState[existingIdx].timestamp : Date.now(),
+        billNumber: state.billNumber,
+        customerName: state.customerName,
+        customerPhone: state.customerPhone,
+        balance: balance,
+        billText: els.billPreview.value
+      };
+      
+      if (existingIdx >= 0) {
+        historyState[existingIdx] = snapshot;
+      } else {
+        historyState.unshift(snapshot);
+        // Only increment counter if we are saving a brand new bill number that matches the next sequence
+        let currentCounter = parseInt(localStorage.getItem(COUNTER_KEY) || "0", 10);
+        let currentNext = `SUN-${String(currentCounter + 1).padStart(4, "0")}`;
+        if (state.billNumber === currentNext) {
+            localStorage.setItem(COUNTER_KEY, (currentCounter + 1).toString());
+        }
+      }
+      saveHistory();
+      renderHistoryList();
+      showToast("Bill saved");
+    }
+
+    function renderHistoryList() {
+      const query = els.historySearch.value.toLowerCase().trim();
+      const filtered = historyState.filter(h => {
+        if (!query) return true;
+        return String(h.customerName || "").toLowerCase().includes(query) || 
+               String(h.billNumber || "").toLowerCase().includes(query);
+      });
+
+      if (!filtered.length) {
+        els.historyList.innerHTML = '<div class="empty">No bills found.</div>';
+        return;
+      }
+
+      els.historyList.innerHTML = filtered.map(h => `
+        <div class="history-item" data-id="${escapeAttr(h.id)}">
+          <div class="history-item-info">
+            <div class="history-item-title">${escapeAttr(h.customerName || h.billNumber)}</div>
+            <div class="history-item-meta">
+              <span>${formatDate(new Date(h.timestamp))}</span>
+              <span>${escapeAttr(h.billNumber)}</span>
+            </div>
+          </div>
+          <div class="history-item-actions">
+            <div class="history-item-balance">${formatMoney(h.balance)}</div>
+            <button class="icon-btn delete-btn" type="button" data-delete-id="${escapeAttr(h.id)}" title="Delete" aria-label="Delete">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7h16M9 7V5h6v2m-8 4v8m5-8v8m5-8v8M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `).join("");
+
+      // Bind clicks
+      els.historyList.querySelectorAll(".history-item").forEach(item => {
+        item.addEventListener("click", (e) => {
+          if (e.target.closest(".delete-btn")) return; // handled separately
+          openHistoryDetail(item.dataset.id);
+        });
+      });
+
+      els.historyList.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.deleteId;
+          const h = historyState.find(x => x.id === id);
+          if (confirm(`Are you sure you want to delete bill ${h.billNumber}?`)) {
+            historyState = historyState.filter(x => x.id !== id);
+            saveHistory();
+            renderHistoryList();
+          }
+        });
+      });
+    }
+
+    function openHistoryDetail(id) {
+      const h = historyState.find(x => x.id === id);
+      if (!h) return;
+      currentHistoryDetailId = id;
+      els.historyDetailTitle.textContent = h.customerName ? `${h.customerName} - ${h.billNumber}` : h.billNumber;
+      els.historyDetailPreview.value = h.billText;
+      els.historyWhatsAppBtn.href = makeWhatsAppUrlForHistory(h.customerPhone, h.billText);
+      els.historyDetailModal.classList.add("open");
+    }
+
+    function makeWhatsAppUrlForHistory(phoneStr, text) {
+      const cleanPhone = String(phoneStr || "").replace(/\\D/g, "");
+      const phone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+      const base = phone ? `https://wa.me/${phone}` : "https://wa.me/";
+      return `${base}?text=${encodeURIComponent(text)}`;
+    }
+
+    function exportBackup() {
+      const data = {
+        appState: state,
+        historyState: historyState,
+        counter: parseInt(localStorage.getItem(COUNTER_KEY) || "0", 10),
+        exportDate: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `sundays_backup_${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function importBackup(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          if (data.appState) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data.appState));
+          }
+          if (data.historyState) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(data.historyState));
+          }
+          if (data.counter !== undefined) {
+            localStorage.setItem(COUNTER_KEY, data.counter.toString());
+          }
+          alert("Backup restored successfully. The page will now reload.");
+          window.location.reload();
+        } catch (err) {
+          alert("Invalid backup file.");
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = ""; // Reset input
+    }
+
+    function makeId() {
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
+      return `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function numberField(key) {
+      return ["deliveryCharge", "discount", "advancePaid"].includes(key);
+    }
+
+    function escapeAttr(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      toastTimer = window.setTimeout(() => els.toast.classList.remove("show"), 1800);
+    }
+
+    function getSellerUpi() {
+      return localStorage.getItem(UPI_KEY) || "";
+    }
+
+    function setSellerUpi(upi) {
+      localStorage.setItem(UPI_KEY, upi.trim());
+    }
+
+    function getUniqueCustomers() {
+      const seen = new Set();
+      const customers = [];
+      historyState.forEach((item) => {
+        if (!item.customerName) return;
+        const nameKey = item.customerName.toLowerCase().trim();
+        const phoneKey = (item.customerPhone || "").trim();
+        const key = `${nameKey}|${phoneKey}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          customers.push({
+            name: item.customerName.trim(),
+            phone: phoneKey
+          });
+        }
+      });
+      return customers;
+    }
+
+    function initAutocomplete() {
+      const input = els.customerName;
+      const listContainer = document.getElementById("autocomplete-list");
+      if (!listContainer || !input) return;
+
+      input.addEventListener("input", function () {
+        const val = this.value.toLowerCase().trim();
+        closeAllLists();
+        if (!val) return;
+
+        const customers = getUniqueCustomers();
+        const matches = customers.filter((c) => c.name.toLowerCase().includes(val));
+        if (!matches.length) return;
+
+        listContainer.style.display = "block";
+        listContainer.innerHTML = matches.map((c) => `
+          <div data-name="${escapeAttr(c.name)}" data-phone="${escapeAttr(c.phone)}">
+            <strong>${escapeAttr(c.name)}</strong>
+            ${c.phone ? `<span class="muted" style="font-size: 11px; margin-left: 8px;">${escapeAttr(c.phone)}</span>` : ""}
+          </div>
+        `).join("");
+
+        listContainer.querySelectorAll("div").forEach((div) => {
+          div.addEventListener("click", function () {
+            state.customerName = this.dataset.name;
+            state.customerPhone = this.dataset.phone;
+            syncFieldsFromState();
+            saveAndRender();
+            closeAllLists();
+          });
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (e.target !== input) {
+          closeAllLists();
+        }
+      });
+
+      function closeAllLists() {
+        listContainer.style.display = "none";
+        listContainer.innerHTML = "";
+      }
+    }
+  </script>
+</body>
+</html>
