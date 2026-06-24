@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Sundays" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0d3325" />
@@ -769,7 +772,7 @@
       .app {
         padding-right: 10px;
         padding-left: 10px;
-        padding-bottom: 212px;
+        padding-bottom: 96px;
       }
 
       .topbar {
@@ -785,9 +788,7 @@
         text-align: left;
       }
 
-      .actions {
-        grid-template-columns: 1fr;
-      }
+      
 
       .helper-actions {
         grid-template-columns: 1fr;
@@ -817,6 +818,57 @@
         margin: 15mm;
       }
     }
+  
+    /* PWA Mobile & Zoom wiggles optimization */
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      overscroll-behavior-x: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button,
+    a,
+    input,
+    select,
+    textarea,
+    .action,
+    .icon-btn,
+    .small-btn,
+    .qty button,
+    .pos-tab {
+      touch-action: manipulation;
+    }
+
+    @media (max-width: 768px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .actions {
+        grid-template-columns: auto auto auto 1fr !important;
+        gap: 8px !important;
+        padding: 8px 10px calc(env(safe-area-inset-bottom) + 8px) !important;
+      }
+      .action:not(.primary) {
+        min-width: 48px !important;
+        width: 48px !important;
+        padding: 0 !important;
+      }
+      .action:not(.primary) .btn-text {
+        display: none !important;
+      }
+      .action.primary {
+        padding: 0 12px !important;
+      }
+    }
+  
   </style>
 </head>
 <body>
@@ -1113,28 +1165,20 @@
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Save
-    </button>
+      </svg><span class="btn-text">Save</span></button>
     <button class="action" type="button" id="copyBill">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M8 8h10v12H8V8ZM6 16H4V4h12v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Copy
-    </button>
+      </svg><span class="btn-text">Copy</span></button>
     <button class="action" type="button" id="shareBill">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M18 8a3 3 0 1 0-2.8-4M6 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8.6 10.6l6.8 4.1M15.4 7.3l-6.8 3.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Share
-    </button>
+      </svg><span class="btn-text">Share</span></button>
     <a class="action primary" id="whatsAppLink" href="#" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M20.5 11.8a8.5 8.5 0 0 1-12.4 7.5L4 20.5l1.2-4.1a8.5 8.5 0 1 1 15.3-4.6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M9.2 8.8c.2 3.4 2.5 5.6 6 6 .5.1 1-.2 1.2-.7l.3-.8c.1-.4-.1-.8-.5-.9l-1.6-.5a.8.8 0 0 0-.8.2l-.4.4a5.9 5.9 0 0 1-2.1-2.1l.4-.4a.8.8 0 0 0 .2-.8l-.5-1.6a.8.8 0 0 0-.9-.5l-.8.3c-.4.2-.7.7-.7 1.2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      WhatsApp
-    </a>
+      </svg><span class="btn-text">WhatsApp</span></a>
   </nav>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
