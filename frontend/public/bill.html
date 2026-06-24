@@ -2275,6 +2275,11 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
         }
       }
 
+      // Reset all product quantities to 0 before parsing the text to avoid accumulation or stale items
+      state.products.forEach(p => {
+        p.qty = 0;
+      });
+
       const text = normalizeText(message);
       if (!text) return 0;
 
@@ -2363,7 +2368,7 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
 
     function orderSegments(message) {
       // Preprocess text to split weights followed by product names (handling missing commas)
-      const qtyWeightPattern = /\b(\d+\s*(?:g|kg|pcs|pieces|box)?|half\s*kg|one\s*kg|1\s*kg|500\s*g|250\s*g|x\s*\d+|\d+)\s+(?=(?:cashew|kaju|laddu|ladoo|laddoo|cookie|bites|combo|container|borugumuddalu|sununda|premium|traditional|sesame|dry|plain|roasted|peri|chilli|trio|dozen|storage|airtight)\b)/ig;
+      const qtyWeightPattern = /\b(\d+\s*(?:g|kg|pcs|pieces|box)?|half\s*kg|one\s*kg|1\s*kg|500\s*g|250\s*g|x\s*\d+|\d+)\s+(?=(?:cashew|kaju|laddu|ladoo|laddoo|cookie|bites|combo|container|borugumuddalu|sununda|premium|traditional|sesame|dry|plain|roasted|peri|chilli|trio|dozen|storage|airtight|sunday|starter|gift|box|full)\b)/ig;
       const preprocessedMessage = String(message || "").replace(qtyWeightPattern, "$1\n");
 
       const rawSegments = String(preprocessedMessage || "")
@@ -2401,9 +2406,8 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
         .replace(/&/g, " and ")
         .replace(/\bhalf[\s-]*kg\b/g, "500g")
         .replace(/\bone[\s-]*kg\b/g, "1kg")
-        .replace(/\b1[\s-]*kg\b/g, "1kg")
-        .replace(/\b500[\s-]*g\b/g, "500g")
-        .replace(/\b250[\s-]*g\b/g, "250g")
+        .replace(/\b(\d+)\s*(?:kilograms?|kilos?|kilo|kg)\b/g, "$1kg")
+        .replace(/\b(\d+)\s*(?:grams?|gms?|gm|g)\b/g, "$1g")
         .replace(/\bperi[\s-]*peri\b/g, "peri peri")
         .replace(/\bperiperi\b/g, "peri peri")
         .replace(/\bperiberry\b/g, "peri peri")
