@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Georgia&display=swap" rel="stylesheet" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Sundays" />
@@ -45,7 +48,7 @@
         linear-gradient(320deg, rgba(51, 101, 138, 0.06), transparent 28rem),
         var(--bg);
       color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Outfit, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 15px;
       letter-spacing: 0;
     }
@@ -869,7 +872,27 @@
       }
     }
   
-  </style>
+  
+    /* Haptic active state scaling feedback */
+    button:active,
+    .action:active,
+    .icon-btn:active,
+    .small-btn:active,
+    .pos-tab:active,
+    .qty button:active {
+      transform: scale(0.96) !important;
+    }
+    
+    button,
+    .action,
+    .icon-btn,
+    .small-btn,
+    .pos-tab,
+    .qty button {
+      transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+    }
+
+</style>
 </head>
 <body>
   <main class="app">
@@ -935,7 +958,6 @@
               <select id="paymentStatus">
                 <option>Pending</option>
                 <option>Paid</option>
-                <option>Part paid</option>
               </select>
             </div>
           </div>
@@ -1161,6 +1183,14 @@
   </div>
 
   <nav class="actions" aria-label="Bill actions">
+        <!-- WhatsApp Message Template Selector -->
+    <div style="grid-column: span 4; display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+      <label for="billTemplateSelect" style="font-size: 11px; font-weight: bold; color: var(--muted); white-space: nowrap;">MESSAGE TEMPLATE:</label>
+      <select id="billTemplateSelect" style="height: 28px; min-height: 28px; font-size: 12px; padding: 0 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel);">
+        <option value="invoice">Detailed WhatsApp Invoice</option>
+        <option value="delivery">Out For Delivery Message</option>
+      </select>
+    </div>
     <button class="action" type="button" id="saveBillBtn">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1198,6 +1228,38 @@
       </div>
     </div>
     <div class="modal-body">
+            <!-- Collapsible Sales Analytics Dashboard -->
+      <div id="salesAnalytics" style="background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(20, 31, 25, 0.04); touch-action: manipulation;">
+        <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="toggleAnalyticsBtn">
+          <span style="font-weight: 750; font-size: 14px; color: var(--green-dark); display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px; color: var(--green);" aria-hidden="true">
+              <path d="M12 20V10M18 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Sales Analytics Dashboard
+          </span>
+          <svg id="analyticsChevron" viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px; color: var(--muted); transition: transform 0.2s ease;" aria-hidden="true">
+            <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div id="analyticsBody" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; transition: max-height 0.25s ease, opacity 0.25s ease; max-height: 200px; opacity: 1; overflow: hidden;">
+          <div style="background: #f4f8f2; border: 1px solid rgba(13, 92, 63, 0.08); border-radius: 6px; padding: 10px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 750; color: var(--muted);">TODAY</div>
+            <div style="font-size: 16px; font-weight: 850; color: var(--green); margin-top: 2px;" id="salesToday">Rs. 0</div>
+          </div>
+          <div style="background: #fbfaf7; border: 1px solid var(--line); border-radius: 6px; padding: 10px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 750; color: var(--muted);">YESTERDAY</div>
+            <div style="font-size: 16px; font-weight: 850; color: var(--ink); margin-top: 2px;" id="salesYesterday">Rs. 0</div>
+          </div>
+          <div style="background: #fbfaf7; border: 1px solid var(--line); border-radius: 6px; padding: 10px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 750; color: var(--muted);">THIS WEEK</div>
+            <div style="font-size: 16px; font-weight: 850; color: var(--ink); margin-top: 2px;" id="salesWeek">Rs. 0</div>
+          </div>
+          <div style="background: #fbfaf7; border: 1px solid var(--line); border-radius: 6px; padding: 10px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 750; color: var(--muted);">THIS MONTH</div>
+            <div style="font-size: 16px; font-weight: 850; color: var(--ink); margin-top: 2px;" id="salesMonth">Rs. 0</div>
+          </div>
+        </div>
+      </div>
       <div class="search-box">
         <input type="text" id="historySearch" placeholder="Search by customer name..." />
       </div>
@@ -1452,10 +1514,11 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
         els[key].addEventListener("input", () => {
           state[key] = numberField(key) ? cleanNumber(els[key].value) : els[key].value;
           if (key === "incomingMessage") {
-            applyIncomingOrder(state.incomingMessage);
+            applyIncomingOrder(state.incomingMessage, false).then(() => {
             syncFieldsFromState();
             saveState();
             render();
+          });
           } else {
             saveState();
             renderTotalsAndBill();
@@ -1522,8 +1585,8 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
         await copyText(buildCustomerMenu());
       });
 
-      els.parseOrder.addEventListener("click", () => {
-        const matched = applyIncomingOrder(state.incomingMessage);
+      els.parseOrder.addEventListener("click", async () => {
+      const matched = await applyIncomingOrder(state.incomingMessage, true);
         syncFieldsFromState();
         saveAndRender();
         showToast(matched ? `${matched} item${matched === 1 ? "" : "s"} filled` : "No matching items found");
@@ -1929,7 +1992,11 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
       const advance = cleanNumber(state.advancePaid);
       const grandTotal = Math.max(0, itemsTotal + delivery - discount);
       const balance = Math.max(0, grandTotal - advance);
-      const billText = buildBillText({ selected, itemsTotal, delivery, discount, advance, grandTotal, balance });
+      const templateSelect = document.getElementById("billTemplateSelect");
+      const template = templateSelect ? templateSelect.value : "invoice";
+      const billText = template === "delivery" 
+        ? buildDeliveryUpdateText({ selected }) 
+        : buildBillText({ selected, itemsTotal, delivery, discount, advance, grandTotal, balance });
 
       els.itemsTotal.textContent = formatMoney(itemsTotal);
       els.deliveryTotal.textContent = formatMoney(delivery);
@@ -2306,7 +2373,7 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
       return result;
     }
 
-    function applyIncomingOrder(message) {
+    async function applyIncomingOrder(message, interactive = false) {
       // Extract metadata (Name, Phone, Address)
       const metadata = parseMetadataFromMessage(message);
       if (metadata.name) state.customerName = metadata.name;
@@ -2329,21 +2396,57 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
 
       const segments = orderSegments(message);
       const found = new Map();
+
+      // Loop through segments to match products
+      for (const segment of segments) {
+        const potentialProducts = [];
+        
+        // Find potential matches based on aliases
+        state.products.forEach(product => {
+          const nameAliases = aliasesForProduct(product);
+          let match = nameAliases.some(alias => containsPhrase(segment, alias));
+          
+          if (match) {
+            // Filter by flavor if product has one AND segment specifies a flavor
+            if (product.flavor) {
+              const cleanFlavor = normalizeText(product.flavor);
+              const hasFlavorSpecifier = /(?:peri|chilli|masala|plain)/i.test(segment);
+              if (hasFlavorSpecifier && !containsPhrase(segment, cleanFlavor)) match = false;
+            }
+            // Filter by weight if product has one AND segment specifies a weight
+            if (product.weight) {
+              const cleanWeight = normalizeText(product.weight);
+              const hasWeightSpecifier = /\b\d+\s*(?:g|kg)\b/i.test(segment);
+              if (hasWeightSpecifier && !containsPhrase(segment, cleanWeight)) match = false;
+            }
+          }
+          
+          if (match) {
+            potentialProducts.push(product);
+          }
+        });
+
+        if (potentialProducts.length === 1) {
+          const product = potentialProducts[0];
+          const qty = quantityFromSegment(segment);
+          if (qty > 0) {
+            found.set(product.id, qty);
+          }
+        } else if (potentialProducts.length > 1 && interactive) {
+          // Trigger interactive resolution in standalone overlay
+          const qty = quantityFromSegment(segment);
+          const chosenId = await resolveAmbiguity(segment, qty, potentialProducts);
+          if (chosenId) {
+            found.set(chosenId, qty);
+          }
+        }
+      }
+
+      // Check for menu number shorthand
       state.products.forEach((product, index) => {
         const byNumber = findQuantityByMenuNumber(text, index + 1);
         if (byNumber > 0) {
           found.set(product.id, byNumber);
-          return;
-        }
-
-        for (const segment of segments) {
-          if (matchSegmentToProduct(segment, product)) {
-            const qty = quantityFromSegment(segment);
-            if (qty > 0) {
-              found.set(product.id, qty);
-              break;
-            }
-          }
         }
       });
 
@@ -2423,14 +2526,24 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
       const result = [];
       const qtyWeightPatternOnly = /^(?:\d+\s*(?:g|kg|pcs|pieces|box)?|half\s*kg|one\s*kg|1\s*kg|500\s*g|250\s*g|x\s*\d+|\d+)$/i;
 
-      for (const seg of rawSegments) {
-        const trimmed = seg.trim();
+      for (let i = 0; i < rawSegments.length; i++) {
+        const trimmed = rawSegments[i].trim();
         if (!trimmed) continue;
 
-        if (qtyWeightPatternOnly.test(trimmed) && result.length > 0) {
-          result[result.length - 1] += " " + trimmed;
+        if (qtyWeightPatternOnly.test(trimmed)) {
+          // Merge standalone weights/quantities backward first if there is a preceding product segment
+          if (result.length > 0 && !qtyWeightPatternOnly.test(result[result.length - 1])) {
+            result[result.length - 1] += " " + trimmed;
+          } else {
+            result.push(trimmed);
+          }
         } else {
-          result.push(trimmed);
+          // Merge forward if the preceding item was an isolated weight/quantity
+          if (result.length > 0 && qtyWeightPatternOnly.test(result[result.length - 1])) {
+            result[result.length - 1] += " " + trimmed;
+          } else {
+            result.push(trimmed);
+          }
         }
       }
       return result;
@@ -2681,6 +2794,7 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
         customerName: state.customerName,
         customerPhone: state.customerPhone,
         balance: balance,
+        totalAmount: grandTotal,
         billText: els.billPreview.value
       };
       
@@ -2697,6 +2811,7 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
       }
       saveHistory();
       renderHistoryList();
+      calculateSalesAnalytics();
       showToast("Bill saved");
     }
 
@@ -2749,7 +2864,8 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
           if (confirm(`Are you sure you want to delete bill ${h.billNumber}?`)) {
             historyState = historyState.filter(x => x.id !== id);
             saveHistory();
-            renderHistoryList();
+      renderHistoryList();
+      calculateSalesAnalytics();
           }
         });
       });
@@ -2807,6 +2923,7 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
             localStorage.setItem(COUNTER_KEY, data.counter.toString());
           }
           alert("Backup restored successfully. The page will now reload.");
+          calculateSalesAnalytics();
           window.location.reload();
         } catch (err) {
           alert("Invalid backup file.");
@@ -2911,6 +3028,164 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
         listContainer.innerHTML = "";
       }
     }
-  </script>
+  
+    // --- ENTERPRISE UPGRADE IMPLEMENTATIONS (Prepaid & PWA) ---
+
+    let analyticsCollapsed = false;
+    function initAnalyticsToggle() {
+      const toggleBtn = document.getElementById("toggleAnalyticsBtn");
+      const body = document.getElementById("analyticsBody");
+      const chevron = document.getElementById("analyticsChevron");
+      if (!toggleBtn || !body || !chevron) return;
+
+      // Restore collapsed state from localStorage
+      analyticsCollapsed = localStorage.getItem("sundays.analyticsCollapsed") === "true";
+      if (analyticsCollapsed) {
+        body.style.maxHeight = "0px";
+        body.style.opacity = "0";
+        body.style.marginTop = "0px";
+        chevron.style.transform = "rotate(-90deg)";
+      }
+
+      toggleBtn.addEventListener("click", () => {
+        analyticsCollapsed = !analyticsCollapsed;
+        localStorage.setItem("sundays.analyticsCollapsed", analyticsCollapsed.toString());
+        if (analyticsCollapsed) {
+          body.style.maxHeight = "0px";
+          body.style.opacity = "0";
+          body.style.marginTop = "0px";
+          chevron.style.transform = "rotate(-90deg)";
+        } else {
+          body.style.maxHeight = "200px";
+          body.style.opacity = "1";
+          body.style.marginTop = "12px";
+          chevron.style.transform = "rotate(0deg)";
+        }
+      });
+    }
+
+    function calculateSalesAnalytics() {
+      let todaySum = 0;
+      let yesterdaySum = 0;
+      let weekSum = 0;
+      let monthSum = 0;
+
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const startOfYesterday = startOfToday - 24 * 60 * 60 * 1000;
+
+      // Calculate start of current week (Monday)
+      const day = now.getDay();
+      const diffToMonday = now.getDate() - day + (day === 0 ? -6 : 1);
+      const startOfWeek = new Date(now.getFullYear(), now.getMonth(), diffToMonday).getTime();
+
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+      historyState.forEach(h => {
+        const amt = h.totalAmount !== undefined ? h.totalAmount : h.balance;
+        const t = h.timestamp;
+
+        if (t >= startOfToday) {
+          todaySum += amt;
+        } else if (t >= startOfYesterday) {
+          yesterdaySum += amt;
+        }
+
+        if (t >= startOfWeek) {
+          weekSum += amt;
+        }
+
+        if (t >= startOfMonth) {
+          monthSum += amt;
+        }
+      });
+
+      const todayEl = document.getElementById("salesToday");
+      const yesterdayEl = document.getElementById("salesYesterday");
+      const weekEl = document.getElementById("salesWeek");
+      const monthEl = document.getElementById("salesMonth");
+
+      if (todayEl) todayEl.textContent = formatMoney(todaySum);
+      if (yesterdayEl) yesterdayEl.textContent = formatMoney(yesterdaySum);
+      if (weekEl) weekEl.textContent = formatMoney(weekSum);
+      if (monthEl) monthEl.textContent = formatMoney(monthSum);
+    }
+
+    function resolveAmbiguity(term, quantity, products) {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById("ambiguityOverlay");
+        const text = document.getElementById("ambiguityText");
+        const optionsContainer = document.getElementById("ambiguityOptions");
+        const cancelBtn = document.getElementById("cancelAmbiguityBtn");
+
+        if (!overlay || !optionsContainer) {
+          resolve(null);
+          return;
+        }
+
+        text.textContent = `For "${term}", we found multiple options. Please select which size/flavor:`;
+        
+        optionsContainer.innerHTML = products.map(p => {
+          const displayName = productDisplayName(p);
+          return `<button class="action" type="button" style="text-align: left; justify-content: flex-start; padding: 0 16px; min-height: 48px; background: var(--panel); border: 1px solid var(--line); color: var(--ink); font-weight: normal; width: 100%;" data-id="${escapeAttr(p.id)}">
+            <span style="font-weight: bold; color: var(--green); margin-right: 8px;">${quantity}x</span> &nbsp;${escapeAttr(displayName)} (${formatMoney(p.price)})
+          </button>`;
+        }).join("");
+
+        overlay.classList.add("open");
+
+        const buttons = optionsContainer.querySelectorAll("button");
+        buttons.forEach(btn => {
+          btn.addEventListener("click", () => {
+            overlay.classList.remove("open");
+            resolve(btn.dataset.id);
+          });
+        });
+
+        cancelBtn.onclick = () => {
+          overlay.classList.remove("open");
+          resolve(null);
+        };
+      });
+    }
+
+    function buildDeliveryUpdateText(totals) {
+      const lines = [
+        `Hi ${state.customerName || "there"}! Sundays order update: 🌸`,
+        "",
+        "Your Sundays order has been packed and is out for delivery! 🚀",
+        "",
+        "*Items list*:"
+      ];
+
+      if (totals.selected.length) {
+        totals.selected.forEach((product) => {
+          const qty = cleanNumber(product.qty);
+          lines.push(`- ${qty} x ${productDisplayName(product)}`);
+        });
+      } else {
+        lines.push("- No items selected");
+      }
+
+      lines.push("");
+      lines.push("It will reach you shortly. Have a sweet day! 🌸");
+
+      return lines.join("\n");
+    }
+
+    // --- END ENTERPRISE UPGRADE IMPLEMENTATIONS ---
+
+</script>
+  <!-- Smart Ambiguity Resolution Bottom Drawer Sheet -->
+  <div id="ambiguityOverlay" class="modal-overlay" style="z-index: 100; background: rgba(21, 37, 30, 0.4); backdrop-filter: blur(4px);">
+    <div style="margin-top: auto; background: var(--bg); border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 14px;">
+      <h3 id="ambiguityTitle" style="margin: 0; color: var(--green-dark); font-family: Georgia, serif; font-size: 18px;">Resolve Item</h3>
+      <p id="ambiguityText" style="margin: 0; font-size: 14px; color: var(--muted);"></p>
+      <div id="ambiguityOptions" style="display: grid; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
+        <!-- Ambiguous item choices are injected here -->
+      </div>
+      <button class="action" type="button" id="cancelAmbiguityBtn" style="min-height: 44px; margin-top: 6px; background: #fff8f7; color: var(--danger); border-color: rgba(170, 63, 56, 0.22);">Cancel</button>
+    </div>
+  </div>
 </body>
 </html>
