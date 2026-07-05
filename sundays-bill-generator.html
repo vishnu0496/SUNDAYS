@@ -1096,6 +1096,12 @@
                 <div style="display: flex; justify-content: center;">
                   <img id="paymentQrImg" src="" alt="UPI QR Code" style="width: 180px; height: 180px; border: 1px solid var(--line); border-radius: 4px; padding: 4px; background: white;" />
                 </div>
+                <button class="small-btn" type="button" id="shareQrBtn" style="margin-top: 10px;">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M20.5 11.8a8.5 8.5 0 0 1-12.4 7.5L4 20.5l1.2-4.1a8.5 8.5 0 1 1 15.3-4.6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Send QR to Customer
+                </button>
               </div>
               <div id="paymentPhonePeSection" style="display: none;">
                 <div style="font-size: 11px; font-weight: 750; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Pay via PhonePe</div>
@@ -1512,7 +1518,8 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
       exportBackupBtn: document.getElementById("exportBackupBtn"),
       importBackupBtn: document.getElementById("importBackupBtn"),
       importFileInput: document.getElementById("importFileInput"),
-      printReceiptBtn: document.getElementById("printReceiptBtn")
+      printReceiptBtn: document.getElementById("printReceiptBtn"),
+      shareQrBtn: document.getElementById("shareQrBtn")
     };
 
     let historyState = loadHistory();
@@ -1706,7 +1713,34 @@ typeof e)throw Error("bad rs block @ typeNumber:"+b+"/errorCorrectLevel:"+a);b=e
         });
       }
 
+      if (els.shareQrBtn) {
+        els.shareQrBtn.addEventListener("click", shareQrImage);
+      }
+
       initAutocomplete();
+    }
+
+    async function shareQrImage() {
+      if (!UPI_QR_IMAGE) return;
+      try {
+        const response = await fetch(UPI_QR_IMAGE);
+        const blob = await response.blob();
+        const file = new File([blob], "sundays-upi-qr.png", { type: blob.type || "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+          return;
+        }
+      } catch (error) {
+        if (error && error.name === "AbortError") return;
+      }
+      // No share sheet available (e.g. desktop browser) — save the image instead
+      const link = document.createElement("a");
+      link.href = UPI_QR_IMAGE;
+      link.download = "sundays-upi-qr.png";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast("QR image saved — attach it in WhatsApp");
     }
 
     function render() {
